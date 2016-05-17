@@ -3,7 +3,7 @@ package us_street
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"errors"
 	"net/http"
 )
 
@@ -58,3 +58,5 @@ func buildPostRequest(batch *Batch) (*http.Request, error) {
 
 // defaultAPIURL may be overwritten later by a Sender depending on wireup.
 const defaultAPIURL = "https://api.smartystreets.com/street-address"
+
+var emptyBatchError = errors.New("The batch was nil or had no records.")

@@ -2,7 +2,6 @@ package us_street
 
 import (
 	"encoding/json"
-	"errors"
 	"net/url"
 	"strconv"
 )
@@ -28,7 +27,9 @@ func (b *Batch) attach(candidate Candidate) {
 	b.records[i].Results = append(b.records[i].Results, candidate)
 }
 
-func (b *Batch) Length() int { return len(b.records) }
+func (b *Batch) Length() int {
+	return len(b.records)
+}
 
 func (b *Batch) Records() []*Input {
 	return b.records
@@ -52,5 +53,3 @@ func (b *Batch) marshalQueryString() string {
 	query.Set("candidates", strconv.Itoa(record.MaxCandidates))
 	return query.Encode()
 }
-
-var emptyBatchError = errors.New("The batch was nil or had no records.")
