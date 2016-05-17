@@ -69,4 +69,3 @@ type (
 		EWSMatch          bool   `json:"ews_match"`
 	}
 )
-

@@ -1,20 +1,19 @@
 package sdk
 
 import (
+	"errors"
+	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 	"net/http"
-	"github.com/smartystreets/assertions/should"
-	"errors"
 )
-
 
 type SigningClientFixture struct {
 	*gunit.Fixture
 
-	client *SigningClient
-	inner *FakeHTTPClient
+	client     *SigningClient
+	inner      *FakeHTTPClient
 	credential *FakeCredential
-	request *http.Request
+	request    *http.Request
 }
 
 func (this *SigningClientFixture) Setup() {

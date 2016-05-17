@@ -1,17 +1,17 @@
 package sdk
 
 import (
-	"testing"
-	"net/http"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"net/http"
+	"testing"
 )
 
 func TestSecretKeySigning(t *testing.T) {
 	t.Parallel()
 
 	credential := SecretKeyCredential{
-		AuthID: "my id",
+		AuthID:    "my id",
 		AuthToken: "my token",
 	}
 	request, _ := http.NewRequest("GET", "http://google.com", nil)
