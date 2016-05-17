@@ -1,0 +1,17 @@
+/workspace/
+/.vagrant/
+/bin
+testdata/
+*DS_Store*
+*.swp
+__MACOSX
+
+/*.dsc
+/*.deb
+/*.changes
+/*.tar.gz
+
+.idea
+generated_by_gunit_test.go
+coverage.html
+coverage.out
