@@ -3,14 +3,15 @@ package us_street
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
 type Client struct {
-	sender Sender
+	sender requestSender
 }
 
-func NewClient(sender Sender) *Client {
+func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 

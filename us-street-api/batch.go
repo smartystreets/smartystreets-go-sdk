@@ -8,7 +8,6 @@ import (
 )
 
 type Batch struct {
-	Error   error
 	records []*Input
 }
 
@@ -30,6 +29,10 @@ func (b *Batch) attach(candidate Candidate) {
 }
 
 func (b *Batch) Length() int { return len(b.records) }
+
+func (b *Batch) Records() []*Input {
+	return b.records
+}
 
 func (b *Batch) marshalJSON() ([]byte, error) {
 	return json.Marshal(b.records)

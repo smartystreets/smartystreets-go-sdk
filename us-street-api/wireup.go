@@ -33,6 +33,7 @@ func (this *ClientBuilder) Build() (*Client, error) {
 		return nil, this.err
 	}
 	client := http.DefaultClient
-	sender := sdk.NewHTTPSender(client)
+	signingClient := sdk.NewSigningClient(client, this.credential)
+	sender := sdk.NewHTTPSender(signingClient)
 	return NewClient(sender), nil
 }

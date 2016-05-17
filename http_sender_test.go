@@ -61,6 +61,19 @@ func (this *HTTPSenderFixture) TestErrorWhenReadingResponseBody_ReturnsNoContent
 	this.So(body.closed, should.BeFalse)
 }
 
+func (this *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
+	body := &Closer{Buffer: bytes.NewBufferString("Hello, World!")}
+	this.client.response = &http.Response{
+		StatusCode: 500,
+		Body:       body,
+	}
+
+	result, err := this.sender.Send(this.request)
+	this.So(err, should.NotBeNil)
+	this.So(result, should.BeEmpty)
+	this.So(body.closed, should.BeTrue)
+}
+
 func (this *HTTPSenderFixture) TestErrorWhenSendingRequest_ReturnsNoContentAndError() {
 	this.client.err = errors.New("GOPHERS!")
 	result, err := this.sender.Send(this.request)

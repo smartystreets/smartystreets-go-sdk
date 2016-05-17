@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -18,11 +19,21 @@ func NewHTTPSender(client httpClient) *HTTPSender {
 }
 
 func (this *HTTPSender) Send(request *http.Request) (content []byte, err error) {
-	if response, err := this.client.Do(request); err != nil {
+	response, err := this.client.Do(request)
+	if err != nil {
 		return nil, err
-	} else if content, err = ioutil.ReadAll(response.Body); err != nil {
-		return nil, err
-	} else {
-		return content, response.Body.Close()
 	}
+
+	content, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		response.Body.Close()
+		return nil, fmt.Errorf("Non-200 status: %s\n%s", response.Status, string(content))
+	}
+
+	return content, response.Body.Close()
+
 }

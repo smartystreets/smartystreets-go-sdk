@@ -2,6 +2,6 @@ package us_street
 
 import "net/http"
 
-type Sender interface {
+type requestSender interface {
 	Send(*http.Request) ([]byte, error)
 }
