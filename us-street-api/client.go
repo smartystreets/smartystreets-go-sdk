@@ -17,7 +17,7 @@ func NewClient(sender Sender) *Client {
 func (c *Client) Send(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
 		return err
-	} else if response, err := c.sender.Do(request); err != nil {
+	} else if response, err := c.sender.Send(request); err != nil {
 		return err
 	} else {
 		return deserializeResponse(response, batch)

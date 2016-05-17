@@ -1,11 +1,9 @@
 package us_street
 
 import (
-	"net/http"
-
-	"io/ioutil"
-
 	"errors"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
@@ -14,8 +12,8 @@ import (
 type ClientFixture struct {
 	*gunit.Fixture
 
-	sender         *FakeSender
-	client         *Client
+	sender *FakeSender
+	client *Client
 
 	batch *Batch
 }
@@ -140,7 +138,7 @@ type FakeSender struct {
 	err      error
 }
 
-func (f *FakeSender) Do(request *http.Request) ([]byte, error) {
+func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
 	if request.Body != nil {
