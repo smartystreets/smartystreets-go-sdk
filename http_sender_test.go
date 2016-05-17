@@ -70,19 +70,6 @@ func (this *HTTPSenderFixture) TestErrorWhenSendingRequest_ReturnsNoContentAndEr
 
 /*////////////////////////////////////////////////////////////////////////*/
 
-type FakeHTTPClient struct {
-	request  *http.Request
-	response *http.Response
-	err      error
-}
-
-func (this *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
-	this.request = request
-	return this.response, this.err
-}
-
-/*////////////////////////////////////////////////////////////////////////*/
-
 type Closer struct {
 	*bytes.Buffer
 	closed     bool

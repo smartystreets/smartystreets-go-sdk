@@ -8,7 +8,6 @@ import (
 
 type Client struct {
 	sender Sender
-	auth   Credential
 }
 
 func NewClient(sender Sender) *Client {
