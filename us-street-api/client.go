@@ -46,7 +46,18 @@ func buildRequest(batch *Batch) (request *http.Request, err error) {
 	} else {
 		request, err = buildPostRequest(batch)
 	}
+
+	setHeaders(batch, request)
+
 	return request, err
+}
+
+func setHeaders(batch *Batch, request *http.Request) {
+	if batch.includeInvalid {
+		request.Header.Set(xIncludeInvalidHeader, "true")
+	} else if batch.standardizeOnly {
+		request.Header.Set(xStandardizeOnlyHeader, "true")
+	}
 }
 
 func buildGetRequest(batch *Batch) (*http.Request, error) {
@@ -60,6 +71,10 @@ func buildPostRequest(batch *Batch) (*http.Request, error) {
 }
 
 // defaultAPIURL may be overwritten later by a Sender depending on wireup.
-const defaultAPIURL = "https://api.smartystreets.com/street-address"
+const (
+	defaultAPIURL          = "https://api.smartystreets.com/street-address"
+	xStandardizeOnlyHeader = "X-Standardize-Only"
+	xIncludeInvalidHeader  = "X-Include-Invalid"
+)
 
 var emptyBatchError = errors.New("The batch was nil or had no records.")
