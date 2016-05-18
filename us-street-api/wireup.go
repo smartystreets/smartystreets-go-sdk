@@ -10,14 +10,16 @@ import (
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully-functional Client for use in an application.
 type ClientBuilder struct {
-	credential *sdk.SecretKeyCredential
+	credential sdk.Credential
 	baseURL    string
 	err        error
 }
 
 // NewClientBuilder creates a new client builder, ready to receive calls to its chain-able methods.
 func NewClientBuilder() *ClientBuilder {
-	return &ClientBuilder{}
+	return &ClientBuilder{
+		credential: &sdk.NopCredential{},
+	}
 }
 
 // WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
@@ -41,13 +43,7 @@ func (b *ClientBuilder) Build() (*Client, error) {
 		return nil, b.err
 	}
 
-	var sender requestSender
-
-	if b.credential != nil {
-		signingClient := sdk.NewSigningClient(http.DefaultClient, b.credential)
-		sender = sdk.NewHTTPSender(signingClient)
-	} else {
-		sender = sdk.NewHTTPSender(http.DefaultClient)
-	}
+	signingClient := sdk.NewSigningClient(http.DefaultClient, b.credential)
+	sender := sdk.NewHTTPSender(signingClient)
 	return NewClient(sender), nil
 }
