@@ -36,14 +36,17 @@ func deserializeResponse(response []byte, batch *Batch) error {
 	return err
 }
 
-func buildRequest(batch *Batch) (*http.Request, error) {
+func buildRequest(batch *Batch) (request *http.Request, err error) {
 	if batch == nil || batch.Length() == 0 {
 		return nil, emptyBatchError
-	} else if length := batch.Length(); length == 1 {
-		return buildGetRequest(batch)
-	} else {
-		return buildPostRequest(batch)
 	}
+
+	if length := batch.Length(); length == 1 {
+		request, err = buildGetRequest(batch)
+	} else {
+		request, err = buildPostRequest(batch)
+	}
+	return request, err
 }
 
 func buildGetRequest(batch *Batch) (*http.Request, error) {
