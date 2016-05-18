@@ -1,10 +1,11 @@
 package sdk
 
 import (
-	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"net/http"
 	"testing"
+
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestSecretKeySigning(t *testing.T) {

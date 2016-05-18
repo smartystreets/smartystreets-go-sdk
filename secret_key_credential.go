@@ -7,10 +7,10 @@ type SecretKeyCredential struct {
 	AuthToken string
 }
 
-func (this SecretKeyCredential) Sign(request *http.Request) error {
+func (c SecretKeyCredential) Sign(request *http.Request) error {
 	query := request.URL.Query()
-	query.Set("auth-id", this.AuthID)
-	query.Set("auth-token", this.AuthToken)
+	query.Set("auth-id", c.AuthID)
+	query.Set("auth-token", c.AuthToken)
 	request.URL.RawQuery = query.Encode()
 	return nil
 }

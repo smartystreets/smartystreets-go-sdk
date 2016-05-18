@@ -2,9 +2,10 @@ package sdk
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
-	"net/http"
 )
 
 type SigningClientFixture struct {
@@ -16,29 +17,29 @@ type SigningClientFixture struct {
 	request    *http.Request
 }
 
-func (this *SigningClientFixture) Setup() {
-	this.credential = &FakeCredential{}
-	this.inner = &FakeHTTPClient{}
-	this.client = NewSigningClient(this.inner, this.credential)
-	this.request, _ = http.NewRequest("GET", "http://google.com", nil)
+func (f *SigningClientFixture) Setup() {
+	f.credential = &FakeCredential{}
+	f.inner = &FakeHTTPClient{}
+	f.client = NewSigningClient(f.inner, f.credential)
+	f.request, _ = http.NewRequest("GET", "http://google.com", nil)
 }
 
-func (this *SigningClientFixture) TestSuccessfulSigning() {
+func (f *SigningClientFixture) TestSuccessfulSigning() {
 	expected := &http.Response{}
-	this.inner.response = expected
-	response, err := this.client.Do(this.request)
-	this.So(response, should.Equal, expected)
-	this.So(err, should.BeNil)
-	this.So(this.request.Header.Get("Auth"), should.Equal, "Success")
+	f.inner.response = expected
+	response, err := f.client.Do(f.request)
+	f.So(response, should.Equal, expected)
+	f.So(err, should.BeNil)
+	f.So(f.request.Header.Get("Auth"), should.Equal, "Success")
 }
 
-func (this *SigningClientFixture) TestSigningFailed() {
-	this.credential.err = errors.New("GOPHERS!")
-	this.inner.response = &http.Response{}
-	response, err := this.client.Do(this.request)
-	this.So(response, should.BeNil)
-	this.So(err, should.NotBeNil)
-	this.So(this.request.Header.Get("Auth"), should.BeBlank)
+func (f *SigningClientFixture) TestSigningFailed() {
+	f.credential.err = errors.New("GOPHERS!")
+	f.inner.response = &http.Response{}
+	response, err := f.client.Do(f.request)
+	f.So(response, should.BeNil)
+	f.So(err, should.NotBeNil)
+	f.So(f.request.Header.Get("Auth"), should.BeBlank)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
@@ -47,9 +48,9 @@ type FakeCredential struct {
 	err error
 }
 
-func (this *FakeCredential) Sign(request *http.Request) error {
-	if this.err == nil {
+func (f *FakeCredential) Sign(request *http.Request) error {
+	if f.err == nil {
 		request.Header.Set("Auth", "Success")
 	}
-	return this.err
+	return f.err
 }

@@ -11,9 +11,9 @@ type FakeHTTPClient struct {
 	err      error
 }
 
-func (this *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
-	this.request = request
-	return this.response, this.err
+func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
+	f.request = request
+	return f.response, f.err
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

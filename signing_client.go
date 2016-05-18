@@ -18,10 +18,10 @@ func NewSigningClient(inner httpClient, credential Credential) *SigningClient {
 	}
 }
 
-func (this *SigningClient) Do(request *http.Request) (*http.Response, error) {
-	err := this.credential.Sign(request)
+func (c *SigningClient) Do(request *http.Request) (*http.Response, error) {
+	err := c.credential.Sign(request)
 	if err != nil {
 		return nil, err
 	}
-	return this.inner.Do(request)
+	return c.inner.Do(request)
 }

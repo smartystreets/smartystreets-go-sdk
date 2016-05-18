@@ -17,23 +17,23 @@ func NewClientBuilder() *ClientBuilder {
 	return &ClientBuilder{}
 }
 
-func (this *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
-	this.credential = &sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
-	return this
+func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
+	b.credential = &sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
+	return b
 }
 
-func (this *ClientBuilder) WithCustomBaseURL(uri string) *ClientBuilder {
-	_, this.err = url.Parse(uri)
-	this.baseURL = uri
-	return this
+func (b *ClientBuilder) WithCustomBaseURL(uri string) *ClientBuilder {
+	_, b.err = url.Parse(uri)
+	b.baseURL = uri
+	return b
 }
 
-func (this *ClientBuilder) Build() (*Client, error) {
-	if this.err != nil {
-		return nil, this.err
+func (b *ClientBuilder) Build() (*Client, error) {
+	if b.err != nil {
+		return nil, b.err
 	}
 	client := http.DefaultClient
-	signingClient := sdk.NewSigningClient(client, this.credential)
+	signingClient := sdk.NewSigningClient(client, b.credential)
 	sender := sdk.NewHTTPSender(signingClient)
 	return NewClient(sender), nil
 }

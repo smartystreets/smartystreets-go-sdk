@@ -17,87 +17,87 @@ type HTTPSenderFixture struct {
 	request *http.Request
 }
 
-func (this *HTTPSenderFixture) Setup() {
-	this.client = &FakeHTTPClient{}
-	this.sender = NewHTTPSender(this.client)
-	this.request, _ = http.NewRequest("GET", "http://google.com", nil)
+func (f *HTTPSenderFixture) Setup() {
+	f.client = &FakeHTTPClient{}
+	f.sender = NewHTTPSender(f.client)
+	f.request, _ = http.NewRequest("GET", "http://google.com", nil)
 }
 
-func (this *HTTPSenderFixture) TestRequestSentToClient_ResponseFromClientReadAndReturned() {
-	closer := &Closer{Buffer: bytes.NewBufferString("Hello, World!")}
-	this.client.response = &http.Response{
+func (f *HTTPSenderFixture) TestRequestSentToClient_ResponseFromClientReadAndReturned() {
+	closer := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
+	f.client.response = &http.Response{
 		StatusCode: 200,
 		Body:       closer,
 	}
-	result, err := this.sender.Send(this.request)
-	this.So(err, should.BeNil)
-	this.So(string(result), should.Equal, "Hello, World!")
-	this.So(closer.closed, should.BeTrue)
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.BeNil)
+	f.So(string(result), should.Equal, "Hello, World!")
+	f.So(closer.closed, should.BeTrue)
 }
 
-func (this *HTTPSenderFixture) TestErrorWhenClosingResponseBody_ReturnsContentAndError() {
-	closer := &Closer{Buffer: bytes.NewBufferString("Hello, World!"), closeError: errors.New("GOPHERS!")}
-	this.client.response = &http.Response{
+func (f *HTTPSenderFixture) TestErrorWhenClosingResponseBody_ReturnsContentAndError() {
+	closer := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!"), closeError: errors.New("GOPHERS!")}
+	f.client.response = &http.Response{
 		StatusCode: 200,
 		Body:       closer,
 	}
 
-	result, err := this.sender.Send(this.request)
-	this.So(err, should.NotBeNil)
-	this.So(string(result), should.Equal, "Hello, World!")
-	this.So(closer.closed, should.BeTrue)
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.NotBeNil)
+	f.So(string(result), should.Equal, "Hello, World!")
+	f.So(closer.closed, should.BeTrue)
 }
 
-func (this *HTTPSenderFixture) TestErrorWhenReadingResponseBody_ReturnsNoContentAndError() {
-	body := &Closer{Buffer: bytes.NewBufferString("Hello, World!"), readError: errors.New("GOPHERS!")}
-	this.client.response = &http.Response{
+func (f *HTTPSenderFixture) TestErrorWhenReadingResponseBody_ReturnsNoContentAndError() {
+	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!"), readError: errors.New("GOPHERS!")}
+	f.client.response = &http.Response{
 		StatusCode: 200,
 		Body:       body,
 	}
 
-	result, err := this.sender.Send(this.request)
-	this.So(err, should.NotBeNil)
-	this.So(result, should.BeEmpty)
-	this.So(body.closed, should.BeFalse)
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.NotBeNil)
+	f.So(result, should.BeEmpty)
+	f.So(body.closed, should.BeFalse)
 }
 
-func (this *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
-	body := &Closer{Buffer: bytes.NewBufferString("Hello, World!")}
-	this.client.response = &http.Response{
+func (f *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
+	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
+	f.client.response = &http.Response{
 		StatusCode: 500,
 		Body:       body,
 	}
 
-	result, err := this.sender.Send(this.request)
-	this.So(err, should.NotBeNil)
-	this.So(result, should.BeEmpty)
-	this.So(body.closed, should.BeTrue)
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.NotBeNil)
+	f.So(result, should.BeEmpty)
+	f.So(body.closed, should.BeTrue)
 }
 
-func (this *HTTPSenderFixture) TestErrorWhenSendingRequest_ReturnsNoContentAndError() {
-	this.client.err = errors.New("GOPHERS!")
-	result, err := this.sender.Send(this.request)
-	this.So(err, should.NotBeNil)
-	this.So(result, should.BeEmpty)
+func (f *HTTPSenderFixture) TestErrorWhenSendingRequest_ReturnsNoContentAndError() {
+	f.client.err = errors.New("GOPHERS!")
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.NotBeNil)
+	f.So(result, should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
 
-type Closer struct {
+type ErrorProneReadCloser struct {
 	*bytes.Buffer
 	closed     bool
 	closeError error
 	readError  error
 }
 
-func (this *Closer) Close() error {
-	this.closed = true
-	return this.closeError
+func (e *ErrorProneReadCloser) Close() error {
+	e.closed = true
+	return e.closeError
 }
 
-func (this *Closer) Read(p []byte) (int, error) {
-	if this.readError != nil {
-		return 0, this.readError
+func (e *ErrorProneReadCloser) Read(p []byte) (int, error) {
+	if e.readError != nil {
+		return 0, e.readError
 	}
-	return this.Buffer.Read(p)
+	return e.Buffer.Read(p)
 }

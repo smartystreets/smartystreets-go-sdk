@@ -18,8 +18,8 @@ func NewHTTPSender(client httpClient) *HTTPSender {
 	return &HTTPSender{client: client}
 }
 
-func (this *HTTPSender) Send(request *http.Request) (content []byte, err error) {
-	response, err := this.client.Do(request)
+func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
+	response, err := s.client.Do(request)
 	if err != nil {
 		return nil, err
 	}
