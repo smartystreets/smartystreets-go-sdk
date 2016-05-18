@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
