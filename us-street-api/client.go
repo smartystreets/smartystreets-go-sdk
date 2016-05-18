@@ -7,14 +7,17 @@ import (
 	"net/http"
 )
 
+// Client is responsible for sending batches of addresses to the us-street-api.
 type Client struct {
 	sender requestSender
 }
 
+// NewClient creates a client with the provided sender.
 func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
+// Send sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) Send(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
 		return err
