@@ -1,11 +1,5 @@
 package us_street
 
-import (
-	"encoding/json"
-	"net/url"
-	"strconv"
-)
-
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
 	records []*Input
@@ -51,25 +45,6 @@ func (b *Batch) Length() int {
 // Records returns the internal records collection.
 func (b *Batch) Records() []*Input {
 	return b.records
-}
-
-func (b *Batch) marshalJSON() ([]byte, error) {
-	return json.Marshal(b.records)
-}
-
-func (b *Batch) marshalQueryString() string {
-	record := b.records[0]
-	query := make(url.Values)
-	query.Set("input_id", record.InputID)
-	query.Set("addressee", record.Addressee)
-	query.Set("street", record.Street)
-	query.Set("street2", record.Street2)
-	query.Set("secondary", record.Secondary)
-	query.Set("lastline", record.LastLine)
-	query.Set("urbanization", record.Urbanization)
-	query.Set("zipcode", record.ZIPCode)
-	query.Set("candidates", strconv.Itoa(record.MaxCandidates))
-	return query.Encode()
 }
 
 // Clear clears the internal collection.

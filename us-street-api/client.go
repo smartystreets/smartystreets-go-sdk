@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 // Client is responsible for sending batches of addresses to the us-street-api.
@@ -64,12 +66,27 @@ func setHeaders(batch *Batch, request *http.Request) {
 }
 
 func buildGetRequest(batch *Batch) (*http.Request, error) {
-	url := defaultAPIURL + "?" + batch.marshalQueryString()
+	url := defaultAPIURL + "?" + marshalQueryString(batch)
 	return http.NewRequest("GET", url, nil)
 }
 
+func marshalQueryString(batch *Batch) string {
+	record := batch.records[0]
+	query := make(url.Values)
+	query.Set("input_id", record.InputID)
+	query.Set("addressee", record.Addressee)
+	query.Set("street", record.Street)
+	query.Set("street2", record.Street2)
+	query.Set("secondary", record.Secondary)
+	query.Set("lastline", record.LastLine)
+	query.Set("urbanization", record.Urbanization)
+	query.Set("zipcode", record.ZIPCode)
+	query.Set("candidates", strconv.Itoa(record.MaxCandidates))
+	return query.Encode()
+}
+
 func buildPostRequest(batch *Batch) (*http.Request, error) {
-	payload, _ := batch.marshalJSON() // err ignored because since we control the types being serialized it is safe.
+	payload, _ := json.Marshal(batch.records) // err ignored because since we control the types being serialized it is safe.
 	return http.NewRequest("POST", defaultAPIURL, bytes.NewReader(payload))
 }
 

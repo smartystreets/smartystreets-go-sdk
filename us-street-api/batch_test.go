@@ -1,6 +1,7 @@
 package us_street
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/smartystreets/assertions/should"
@@ -46,7 +47,7 @@ func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 		InputID:       "successfully",
 		MaxCandidates: 7,
 	})
-	serialized, err := batch.marshalJSON()
+	serialized, err := json.Marshal(batch.records)
 	f.So(err, should.BeNil)
 	f.So(serialized, should.NotBeEmpty)
 }
