@@ -58,7 +58,7 @@ func (f *HTTPSenderFixture) TestErrorWhenReadingResponseBody_ReturnsNoContentAnd
 	result, err := f.sender.Send(f.request)
 	f.So(err, should.NotBeNil)
 	f.So(result, should.BeEmpty)
-	f.So(body.closed, should.BeFalse)
+	f.So(body.closed, should.BeTrue)
 }
 
 func (f *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {

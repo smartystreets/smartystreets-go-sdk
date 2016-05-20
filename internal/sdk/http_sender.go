@@ -26,7 +26,7 @@ func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
 
 	content, err = ioutil.ReadAll(response.Body)
 	if err != nil {
-		// BUG: if we get a response (and it has a body), it should always be closed
+		response.Body.Close()
 		return nil, err
 	}
 
