@@ -1,4 +1,4 @@
-package sdk
+package smarty_sdk
 
 import (
 	"net/http"
