@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
@@ -168,7 +168,7 @@ func (f *ClientFixture) TestXIncludeInvalidHeaderNOTAddedWhenNOTSpecified() {
 }
 
 func (f *ClientFixture) TestCredentialsOnBatchUsedToBuildRequest() {
-	credentials := sdk.SecretKeyCredential{
+	credentials := smarty_sdk.SecretKeyCredential{
 		AuthID:    "AUTHID",
 		AuthToken: "AUTHTOKEN",
 	}
@@ -194,7 +194,7 @@ func (f *ClientFixture) TestCredentialSigningErrorReturned() {
 
 /*////////////////////////////////////////////////////////////////////////*/
 
-type ErrorCredentials struct {}
+type ErrorCredentials struct{}
 
 func (f *ErrorCredentials) Sign(request *http.Request) error {
 	return errors.New("GOPHERS!")

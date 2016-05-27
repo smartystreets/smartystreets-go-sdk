@@ -1,6 +1,9 @@
 package us_street
 
-import "bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+import (
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+)
 
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
@@ -8,7 +11,7 @@ type Batch struct {
 
 	standardizeOnly bool
 	includeInvalid  bool
-	credentials     sdk.Credential
+	credentials     smarty_sdk.Credential
 }
 
 // NewBatch creates a new, empty batch.
@@ -29,7 +32,7 @@ func (b *Batch) IncludeInvalid(on bool) {
 }
 
 // SetCredentials allows setting of credentials on a per-batch basis.
-func (b *Batch) SetCredentials(credentials sdk.Credential) {
+func (b *Batch) SetCredentials(credentials smarty_sdk.Credential) {
 	b.credentials = credentials
 }
 
@@ -67,4 +70,5 @@ func (b *Batch) Reset() {
 	b.Clear()
 	b.standardizeOnly = false
 	b.includeInvalid = false
+	b.credentials = new(sdk.NopCredential)
 }

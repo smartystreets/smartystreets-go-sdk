@@ -6,6 +6,8 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
 )
 
 type BatchFixture struct {
@@ -72,6 +74,7 @@ func (f *BatchFixture) TestResetRemovesAllRecordsAndResetsSettings() {
 	batch := NewBatch()
 	batch.StandardizeOnly(true)
 	batch.IncludeInvalid(true)
+	batch.SetCredentials(&smarty_sdk.SecretKeyCredential{})
 
 	for x := 0; x < 100; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
@@ -82,4 +85,5 @@ func (f *BatchFixture) TestResetRemovesAllRecordsAndResetsSettings() {
 	f.So(batch.Length(), should.Equal, 0)
 	f.So(batch.standardizeOnly, should.BeFalse)
 	f.So(batch.includeInvalid, should.BeFalse)
+	f.So(batch.credentials, should.Resemble, &sdk.NopCredential{})
 }

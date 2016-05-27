@@ -5,12 +5,13 @@ import (
 	"net/url"
 
 	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully-functional Client for use in an application.
 type ClientBuilder struct {
-	credential sdk.Credential
+	credential smarty_sdk.Credential
 	baseURL    string
 	err        error
 }
@@ -25,7 +26,7 @@ func NewClientBuilder() *ClientBuilder {
 // WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
 // In all but very few cases calling this method with a valid authID and authToken is required.
 func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
-	b.credential = &sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
+	b.credential = &smarty_sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
 	return b
 }
 
