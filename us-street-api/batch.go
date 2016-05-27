@@ -1,16 +1,21 @@
 package us_street
 
+import "bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
 	lookups []*Lookup
 
 	standardizeOnly bool
 	includeInvalid  bool
+	credentials     sdk.Credential
 }
 
 // NewBatch creates a new, empty batch.
 func NewBatch() *Batch {
-	return &Batch{}
+	return &Batch{
+		credentials: new(sdk.NopCredential),
+	}
 }
 
 // StandardizeOnly sets the X-Standardize-Only header value.
@@ -21,6 +26,11 @@ func (b *Batch) StandardizeOnly(on bool) {
 // IncludeInvalid sets the X-Include-Invalid header value.
 func (b *Batch) IncludeInvalid(on bool) {
 	b.includeInvalid = on
+}
+
+// SetCredentials allows setting of credentials on a per-batch basis.
+func (b *Batch) SetCredentials(credentials sdk.Credential) {
+	b.credentials = credentials
 }
 
 // Append includes the record in the collection to be sent if there is still room (max: 100).
