@@ -1,17 +1,16 @@
 package sdk
 
-import "net/http"
-
-type Credential interface {
-	Sign(*http.Request) error
-}
+import (
+	"net/http"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+)
 
 type SigningClient struct {
 	inner      httpClient
-	credential Credential
+	credential smarty_sdk.Credential
 }
 
-func NewSigningClient(inner httpClient, credential Credential) *SigningClient {
+func NewSigningClient(inner httpClient, credential smarty_sdk.Credential) *SigningClient {
 	return &SigningClient{
 		inner:      inner,
 		credential: credential,
