@@ -20,7 +20,7 @@ func main() {
 	}
 
 	batch := us_street.NewBatch()
-	for batch.Append(&us_street.Input{Street: "3214 N University ave", LastLine: "Provo UT 84604"}) {
+	for batch.Append(&us_street.Lookup{Street: "3214 N University ave", LastLine: "Provo UT 84604"}) {
 		fmt.Print(".")
 	}
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())

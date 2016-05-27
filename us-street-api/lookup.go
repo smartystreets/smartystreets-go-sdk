@@ -1,6 +1,6 @@
 package us_street
 
-type Input struct {
+type Lookup struct {
 	Street        string `json:"street,omitempty"`
 	Street2       string `json:"street2,omitempty"`
 	Secondary     string `json:"secondary,omitempty"`

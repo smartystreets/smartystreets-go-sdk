@@ -19,13 +19,13 @@ func (f *BatchFixture) TestCapacityIsLimitedAt100Inputs() {
 	f.So(batch.Records(), should.HaveLength, 0)
 
 	for x := 0; x < 100; x++ {
-		f.So(batch.Append(&Input{InputID: strconv.Itoa(x)}), should.BeTrue)
+		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 	f.So(batch.Length(), should.Equal, 100)
 	f.So(batch.Records(), should.HaveLength, 100)
 
 	for x := 100; x < 200; x++ {
-		f.So(batch.Append(&Input{InputID: strconv.Itoa(x)}), should.BeFalse)
+		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeFalse)
 	}
 
 	f.So(batch.Length(), should.Equal, 100)
@@ -34,7 +34,7 @@ func (f *BatchFixture) TestCapacityIsLimitedAt100Inputs() {
 
 func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 	batch := NewBatch()
-	batch.Append(&Input{
+	batch.Append(&Lookup{
 		Street:        "This",
 		Street2:       "test",
 		Secondary:     "exists",
@@ -47,7 +47,7 @@ func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 		InputID:       "successfully",
 		MaxCandidates: 7,
 	})
-	serialized, err := json.Marshal(batch.records)
+	serialized, err := json.Marshal(batch.lookups)
 	f.So(err, should.BeNil)
 	f.So(serialized, should.NotBeEmpty)
 }
@@ -58,7 +58,7 @@ func (f *BatchFixture) TestClearRemovesAllRecords() {
 	batch.IncludeInvalid(true)
 
 	for x := 0; x < 100; x++ {
-		f.So(batch.Append(&Input{InputID: strconv.Itoa(x)}), should.BeTrue)
+		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 
 	batch.Clear()
@@ -74,7 +74,7 @@ func (f *BatchFixture) TestResetRemovesAllRecordsAndResetsSettings() {
 	batch.IncludeInvalid(true)
 
 	for x := 0; x < 100; x++ {
-		f.So(batch.Append(&Input{InputID: strconv.Itoa(x)}), should.BeTrue)
+		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 
 	batch.Reset()

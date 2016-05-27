@@ -26,7 +26,7 @@ func (f *ClientFixture) Setup() {
 
 func (f *ClientFixture) TestSingleAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
-	input := &Input{
+	input := &Lookup{
 		InputID:       "42",
 		Addressee:     "addressee",
 		Street:        "street",
@@ -66,9 +66,9 @@ func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandi
 		{"input_index": 2, "input_id": "44"},
 		{"input_index": 2, "input_id": "44", "candidate_index": 1}
 	]`
-	input0 := &Input{InputID: "42"}
-	input1 := &Input{InputID: "43"}
-	input2 := &Input{InputID: "44"}
+	input0 := &Lookup{InputID: "42"}
+	input1 := &Lookup{InputID: "43"}
+	input2 := &Lookup{InputID: "44"}
 	f.batch.Append(input0)
 	f.batch.Append(input1)
 	f.batch.Append(input2)
@@ -106,7 +106,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 		{"input_index": 2, "input_id": "44", "candidate_index": 1}
 	]` // would be deserialized if not for the err (above)
 
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	err := f.client.Send(f.batch)
@@ -117,7 +117,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	err := f.client.Send(f.batch)
@@ -128,7 +128,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestXStandardizeOnlyHeaderAddedWhenSpecified() {
 	f.batch.StandardizeOnly(true)
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	f.client.Send(f.batch)
@@ -138,7 +138,7 @@ func (f *ClientFixture) TestXStandardizeOnlyHeaderAddedWhenSpecified() {
 
 func (f *ClientFixture) TestXStandardizeOnlyHeaderNOTAddedWhenNOTSpecified() {
 	f.batch.StandardizeOnly(false)
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	f.client.Send(f.batch)
@@ -148,7 +148,7 @@ func (f *ClientFixture) TestXStandardizeOnlyHeaderNOTAddedWhenNOTSpecified() {
 
 func (f *ClientFixture) TestXIncludeInvalidHeaderAddedWhenSpecified() {
 	f.batch.IncludeInvalid(true)
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	f.client.Send(f.batch)
@@ -158,7 +158,7 @@ func (f *ClientFixture) TestXIncludeInvalidHeaderAddedWhenSpecified() {
 
 func (f *ClientFixture) TestXIncludeInvalidHeaderNOTAddedWhenNOTSpecified() {
 	f.batch.IncludeInvalid(false)
-	input := new(Input)
+	input := new(Lookup)
 	f.batch.Append(input)
 
 	f.client.Send(f.batch)

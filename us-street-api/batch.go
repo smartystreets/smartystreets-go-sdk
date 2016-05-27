@@ -2,7 +2,7 @@ package us_street
 
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
-	records []*Input
+	lookups []*Lookup
 
 	standardizeOnly bool
 	includeInvalid  bool
@@ -24,32 +24,32 @@ func (b *Batch) IncludeInvalid(on bool) {
 }
 
 // Append includes the record in the collection to be sent if there is still room (max: 100).
-func (b *Batch) Append(record *Input) bool {
-	hasSpace := len(b.records) < 100
+func (b *Batch) Append(record *Lookup) bool {
+	hasSpace := len(b.lookups) < 100
 	if hasSpace {
-		b.records = append(b.records, record)
+		b.lookups = append(b.lookups, record)
 	}
 	return hasSpace
 }
 
 func (b *Batch) attach(candidate Candidate) {
 	i := candidate.InputIndex
-	b.records[i].Results = append(b.records[i].Results, candidate)
+	b.lookups[i].Results = append(b.lookups[i].Results, candidate)
 }
 
 // Length returns
 func (b *Batch) Length() int {
-	return len(b.records)
+	return len(b.lookups)
 }
 
 // Records returns the internal records collection.
-func (b *Batch) Records() []*Input {
-	return b.records
+func (b *Batch) Records() []*Lookup {
+	return b.lookups
 }
 
 // Clear clears the internal collection.
 func (b *Batch) Clear() {
-	b.records = nil
+	b.lookups = nil
 }
 
 // Reset clears the internal collection and resets settings.

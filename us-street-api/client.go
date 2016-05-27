@@ -35,7 +35,7 @@ func deserializeResponse(response []byte, batch *Batch) error {
 	err := json.Unmarshal(response, &candidates)
 	if err == nil {
 		for _, candidate := range candidates {
-			batch.attach(candidate) // TODO: what about inputs that don't produce any outputs?
+			batch.attach(candidate)
 		}
 	}
 	return err
@@ -71,7 +71,7 @@ func buildGetRequest(batch *Batch) (*http.Request, error) {
 }
 
 func marshalQueryString(batch *Batch) string {
-	record := batch.records[0]
+	record := batch.lookups[0]
 	query := make(url.Values)
 	query.Set("input_id", record.InputID)
 	query.Set("addressee", record.Addressee)
@@ -86,7 +86,7 @@ func marshalQueryString(batch *Batch) string {
 }
 
 func buildPostRequest(batch *Batch) (*http.Request, error) {
-	payload, _ := json.Marshal(batch.records) // err ignored because since we control the types being serialized it is safe.
+	payload, _ := json.Marshal(batch.lookups) // err ignored because since we control the types being serialized it is safe.
 	return http.NewRequest("POST", defaultAPIURL, bytes.NewReader(payload))
 }
 
