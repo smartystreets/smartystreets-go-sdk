@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
-// all components necessary to assemble a fully-functional Client for use in an application.
+// all components necessary to assemble a fully functional Client for use in an application.
 type ClientBuilder struct {
 	credential smarty_sdk.Credential
 	baseURL    string
