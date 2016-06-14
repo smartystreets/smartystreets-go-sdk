@@ -13,5 +13,5 @@ type Lookup struct {
 	InputID       string `json:"input_id,omitempty"`
 	MaxCandidates int    `json:"candidates,omitempty"`
 
-	Results []Candidate `json:"-"`
+	Results []*Candidate `json:"-"`
 }

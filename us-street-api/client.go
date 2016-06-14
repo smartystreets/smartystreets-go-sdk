@@ -31,7 +31,7 @@ func (c *Client) Send(batch *Batch) error {
 }
 
 func deserializeResponse(response []byte, batch *Batch) error {
-	var candidates []Candidate
+	var candidates []*Candidate
 	err := json.Unmarshal(response, &candidates)
 	if err == nil {
 		for _, candidate := range candidates {
