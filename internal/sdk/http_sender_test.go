@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
 type HTTPSenderFixture struct {
@@ -88,7 +88,7 @@ func (f *HTTPSenderFixture) TestHTTP413() {
 	f.client.response = &http.Response{StatusCode: 413, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, smarty_sdk.StatusTooLarge)
+	f.So(err, should.Equal, smarty_sdk.StatusRequestEntityTooLarge)
 }
 func (f *HTTPSenderFixture) TestHTTP429() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}

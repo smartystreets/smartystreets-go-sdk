@@ -40,7 +40,7 @@ func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
 	case 402:
 		return nil, smarty_sdk.StatusPaymentRequired
 	case 413:
-		return nil, smarty_sdk.StatusTooLarge
+		return nil, smarty_sdk.StatusRequestEntityTooLarge
 	case 429:
 		return nil, smarty_sdk.StatusTooManyRequests
 	case 200:
