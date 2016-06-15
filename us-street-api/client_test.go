@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
@@ -20,7 +19,7 @@ type ClientFixture struct {
 }
 
 func (f *ClientFixture) Setup() {
-	f.sender = &FakeSender{response: `[]`}
+	f.sender = &FakeSender{}
 	f.client = NewClient(f.sender)
 	f.batch = NewBatch()
 }
@@ -167,38 +166,7 @@ func (f *ClientFixture) TestXIncludeInvalidHeaderNOTAddedWhenNOTSpecified() {
 	f.So(f.sender.request.Header.Get(xIncludeInvalidHeader), should.BeBlank)
 }
 
-func (f *ClientFixture) TestCredentialsOnBatchUsedToBuildRequest() {
-	credentials := smarty_sdk.SecretKeyCredential{
-		AuthID:    "AUTHID",
-		AuthToken: "AUTHTOKEN",
-	}
-	f.batch.SetCredentials(credentials)
-	f.batch.Append(new(Lookup))
-
-	err := f.client.Send(f.batch)
-
-	f.So(err, should.BeNil)
-	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, credentials.AuthID)
-	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, credentials.AuthToken)
-}
-
-func (f *ClientFixture) TestCredentialSigningErrorReturned() {
-	f.batch.SetCredentials(new(ErrorCredentials))
-	f.batch.Append(new(Lookup))
-
-	err := f.client.Send(f.batch)
-
-	f.So(err, should.NotBeNil)
-	f.So(err.Error(), should.Equal, "GOPHERS!")
-}
-
 /*////////////////////////////////////////////////////////////////////////*/
-
-type ErrorCredentials struct{}
-
-func (f *ErrorCredentials) Sign(request *http.Request) error {
-	return errors.New("GOPHERS!")
-}
 
 type FakeSender struct {
 	callCount int

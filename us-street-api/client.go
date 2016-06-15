@@ -52,12 +52,8 @@ func buildRequest(batch *Batch) (request *http.Request, err error) {
 		request, err = buildPostRequest(batch)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	setHeaders(batch, request)
-	return request, batch.credentials.Sign(request)
+	return request, err
 }
 
 func setHeaders(batch *Batch, request *http.Request) {
