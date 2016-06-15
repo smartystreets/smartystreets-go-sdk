@@ -1,10 +1,11 @@
 package sdk
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
 type httpClient interface {
@@ -33,15 +34,15 @@ func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
 
 	switch response.StatusCode {
 	case 400:
-		return nil, BadRequest
+		return nil, smarty_sdk.StatusBadRequest
 	case 401:
-		return nil, Unauthorized
+		return nil, smarty_sdk.StatusUnauthorized
 	case 402:
-		return nil, PaymentRequired
+		return nil, smarty_sdk.StatusPaymentRequired
 	case 413:
-		return nil, TooLarge
+		return nil, smarty_sdk.StatusTooLarge
 	case 429:
-		return nil, TooManyRequests
+		return nil, smarty_sdk.StatusTooManyRequests
 	case 200:
 		return content, response.Body.Close()
 	default:
@@ -49,11 +50,3 @@ func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
 		return nil, fmt.Errorf("Non-200 status: %s\n%s", response.Status, string(content))
 	}
 }
-
-var (
-	Unauthorized    = errors.New("401 Unauthorized")
-	PaymentRequired = errors.New("402 Payment Required")
-	BadRequest      = errors.New("400 Bad Request")
-	TooLarge        = errors.New("413 Request entity too large")
-	TooManyRequests = errors.New("429 Too many requests")
-)

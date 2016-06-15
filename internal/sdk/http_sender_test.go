@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
@@ -66,35 +67,35 @@ func (f *HTTPSenderFixture) TestHTTP400() {
 	f.client.response = &http.Response{StatusCode: 400, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, BadRequest)
+	f.So(err, should.Equal, smarty_sdk.StatusBadRequest)
 }
 func (f *HTTPSenderFixture) TestHTTP401() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 401, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, Unauthorized)
+	f.So(err, should.Equal, smarty_sdk.StatusUnauthorized)
 }
 func (f *HTTPSenderFixture) TestHTTP402() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 402, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, PaymentRequired)
+	f.So(err, should.Equal, smarty_sdk.StatusPaymentRequired)
 }
 func (f *HTTPSenderFixture) TestHTTP413() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 413, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, TooLarge)
+	f.So(err, should.Equal, smarty_sdk.StatusTooLarge)
 }
 func (f *HTTPSenderFixture) TestHTTP429() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 429, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Equal, TooManyRequests)
+	f.So(err, should.Equal, smarty_sdk.StatusTooManyRequests)
 }
 
 func (f *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
