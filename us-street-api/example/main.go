@@ -25,7 +25,7 @@ func main() {
 	}
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())
 
-	if err = client.Send(batch); err != nil {
+	if err = client.SendBatch(batch); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

@@ -39,7 +39,7 @@ func (f *ClientFixture) TestSingleAddressBatchSerializedAndSent__ResponseCandida
 	}
 	f.batch.Append(input)
 
-	err := f.client.Send(f.batch)
+	err := f.client.SendBatch(f.batch)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -73,7 +73,7 @@ func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandi
 	f.batch.Append(input1)
 	f.batch.Append(input2)
 
-	err := f.client.Send(f.batch)
+	err := f.client.SendBatch(f.batch)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -87,13 +87,13 @@ func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandi
 }
 
 func (f *ClientFixture) TestNilBatchCausesSerializationError__PreventsBatchBeingSent() {
-	err := f.client.Send(nil)
+	err := f.client.SendBatch(nil)
 	f.So(err, should.NotBeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestEmptyBatchCausesSerializationError__PreventsBatchBeingSent() {
-	err := f.client.Send(new(Batch))
+	err := f.client.SendBatch(new(Batch))
 	f.So(err, should.NotBeNil)
 	f.So(f.sender.request, should.BeNil)
 }
@@ -109,7 +109,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	err := f.client.Send(f.batch)
+	err := f.client.SendBatch(f.batch)
 
 	f.So(err, should.NotBeNil)
 	f.So(input.Results, should.BeEmpty)
@@ -120,7 +120,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	err := f.client.Send(f.batch)
+	err := f.client.SendBatch(f.batch)
 
 	f.So(err, should.NotBeNil)
 	f.So(input.Results, should.BeEmpty)
@@ -131,7 +131,7 @@ func (f *ClientFixture) TestXStandardizeOnlyHeaderAddedWhenSpecified() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	f.client.Send(f.batch)
+	f.client.SendBatch(f.batch)
 
 	f.So(f.sender.request.Header.Get(xStandardizeOnlyHeader), should.Equal, "true")
 }
@@ -141,7 +141,7 @@ func (f *ClientFixture) TestXStandardizeOnlyHeaderNOTAddedWhenNOTSpecified() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	f.client.Send(f.batch)
+	f.client.SendBatch(f.batch)
 
 	f.So(f.sender.request.Header.Get(xStandardizeOnlyHeader), should.BeBlank)
 }
@@ -151,7 +151,7 @@ func (f *ClientFixture) TestXIncludeInvalidHeaderAddedWhenSpecified() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	f.client.Send(f.batch)
+	f.client.SendBatch(f.batch)
 
 	f.So(f.sender.request.Header.Get(xIncludeInvalidHeader), should.Equal, "true")
 }
@@ -161,7 +161,7 @@ func (f *ClientFixture) TestXIncludeInvalidHeaderNOTAddedWhenNOTSpecified() {
 	input := new(Lookup)
 	f.batch.Append(input)
 
-	f.client.Send(f.batch)
+	f.client.SendBatch(f.batch)
 
 	f.So(f.sender.request.Header.Get(xIncludeInvalidHeader), should.BeBlank)
 }

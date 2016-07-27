@@ -19,8 +19,8 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// Send sends the batch of inputs, populating the output for each input if the batch was successful.
-func (c *Client) Send(batch *Batch) error {
+// SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
+func (c *Client) SendBatch(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
 		return err
 	} else if response, err := c.sender.Send(request); err != nil {
