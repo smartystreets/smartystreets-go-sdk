@@ -12,24 +12,35 @@ type BatchFixture struct {
 	*gunit.Fixture
 }
 
+func (f *BatchFixture) TestBatchKnowsWhenItsFullAndEmpty() {
+	batch := NewBatch()
+
+	for x := 0; x < MaxBatchSize; x++ {
+		f.So(batch.IsFull(), should.BeFalse)
+		batch.Append(&Lookup{})
+	}
+
+	f.So(batch.IsFull(), should.BeTrue)
+}
+
 func (f *BatchFixture) TestCapacityIsLimitedAt100Inputs() {
 	batch := NewBatch()
 
 	f.So(batch.Length(), should.Equal, 0)
 	f.So(batch.Records(), should.HaveLength, 0)
 
-	for x := 0; x < 100; x++ {
+	for x := 0; x < MaxBatchSize; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
-	f.So(batch.Length(), should.Equal, 100)
-	f.So(batch.Records(), should.HaveLength, 100)
+	f.So(batch.Length(), should.Equal, MaxBatchSize)
+	f.So(batch.Records(), should.HaveLength, MaxBatchSize)
 
 	for x := 100; x < 200; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeFalse)
 	}
 
-	f.So(batch.Length(), should.Equal, 100)
-	f.So(batch.Records(), should.HaveLength, 100)
+	f.So(batch.Length(), should.Equal, MaxBatchSize)
+	f.So(batch.Records(), should.HaveLength, MaxBatchSize)
 }
 
 func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
@@ -57,7 +68,7 @@ func (f *BatchFixture) TestClearRemovesAllRecords() {
 	batch.StandardizeOnly(true)
 	batch.IncludeInvalid(true)
 
-	for x := 0; x < 100; x++ {
+	for x := 0; x < MaxBatchSize; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 
@@ -73,7 +84,7 @@ func (f *BatchFixture) TestResetRemovesAllRecordsAndResetsSettings() {
 	batch.StandardizeOnly(true)
 	batch.IncludeInvalid(true)
 
-	for x := 0; x < 100; x++ {
+	for x := 0; x < MaxBatchSize; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 
