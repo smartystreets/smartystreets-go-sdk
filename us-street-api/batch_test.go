@@ -65,9 +65,6 @@ func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 
 func (f *BatchFixture) TestClearRemovesAllRecords() {
 	batch := NewBatch()
-	batch.StandardizeOnly(true)
-	batch.IncludeInvalid(true)
-
 	for x := 0; x < MaxBatchSize; x++ {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
@@ -75,22 +72,4 @@ func (f *BatchFixture) TestClearRemovesAllRecords() {
 	batch.Clear()
 
 	f.So(batch.Length(), should.Equal, 0)
-	f.So(batch.standardizeOnly, should.BeTrue)
-	f.So(batch.includeInvalid, should.BeTrue)
-}
-
-func (f *BatchFixture) TestResetRemovesAllRecordsAndResetsSettings() {
-	batch := NewBatch()
-	batch.StandardizeOnly(true)
-	batch.IncludeInvalid(true)
-
-	for x := 0; x < MaxBatchSize; x++ {
-		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
-	}
-
-	batch.Reset()
-
-	f.So(batch.Length(), should.Equal, 0)
-	f.So(batch.standardizeOnly, should.BeFalse)
-	f.So(batch.includeInvalid, should.BeFalse)
 }

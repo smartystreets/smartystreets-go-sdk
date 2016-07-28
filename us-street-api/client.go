@@ -39,22 +39,11 @@ func deserializeResponse(response []byte, batch *Batch) error {
 	return nil
 }
 
-func buildRequest(batch *Batch) (request *http.Request, err error) {
+func buildRequest(batch *Batch) (*http.Request, error) {
 	if batch == nil || batch.Length() == 0 {
 		return nil, emptyBatchError
 	}
-
-	request, err = buildPostRequest(batch)
-	setHeaders(batch, request)
-	return request, err
-}
-
-func setHeaders(batch *Batch, request *http.Request) {
-	if batch.includeInvalid {
-		request.Header.Set(xIncludeInvalidHeader, "true")
-	} else if batch.standardizeOnly {
-		request.Header.Set(xStandardizeOnlyHeader, "true")
-	}
+	return buildPostRequest(batch)
 }
 
 func buildPostRequest(batch *Batch) (*http.Request, error) {

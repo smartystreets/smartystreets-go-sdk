@@ -90,46 +90,6 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(input.Results, should.BeEmpty)
 }
 
-func (f *ClientFixture) TestXStandardizeOnlyHeaderAddedWhenSpecified() {
-	f.batch.StandardizeOnly(true)
-	input := new(Lookup)
-	f.batch.Append(input)
-
-	f.client.SendBatch(f.batch)
-
-	f.So(f.sender.request.Header.Get(xStandardizeOnlyHeader), should.Equal, "true")
-}
-
-func (f *ClientFixture) TestXStandardizeOnlyHeaderNOTAddedWhenNOTSpecified() {
-	f.batch.StandardizeOnly(false)
-	input := new(Lookup)
-	f.batch.Append(input)
-
-	f.client.SendBatch(f.batch)
-
-	f.So(f.sender.request.Header.Get(xStandardizeOnlyHeader), should.BeBlank)
-}
-
-func (f *ClientFixture) TestXIncludeInvalidHeaderAddedWhenSpecified() {
-	f.batch.IncludeInvalid(true)
-	input := new(Lookup)
-	f.batch.Append(input)
-
-	f.client.SendBatch(f.batch)
-
-	f.So(f.sender.request.Header.Get(xIncludeInvalidHeader), should.Equal, "true")
-}
-
-func (f *ClientFixture) TestXIncludeInvalidHeaderNOTAddedWhenNOTSpecified() {
-	f.batch.IncludeInvalid(false)
-	input := new(Lookup)
-	f.batch.Append(input)
-
-	f.client.SendBatch(f.batch)
-
-	f.So(f.sender.request.Header.Get(xIncludeInvalidHeader), should.BeBlank)
-}
-
 /*////////////////////////////////////////////////////////////////////////*/
 
 type FakeSender struct {
