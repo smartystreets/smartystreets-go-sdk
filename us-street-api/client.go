@@ -38,6 +38,28 @@ func (c *Client) SendLookups(lookups ...*Lookup) (err error) {
 	return err
 }
 
+// SendFromChannel is a high-level convenience function that leverages a reusable Batch
+// to send everything received from the provided lookups channel in serial, blocking fashion.
+func (c *Client) SendFromChannel(lookups chan *Lookup) (err error) {
+	batch := NewBatch()
+	for lookup := range lookups {
+		batch.Append(lookup)
+
+		if batch.IsFull() {
+			if err = c.SendBatch(batch); err != nil {
+				break
+			}
+			batch.Clear()
+		}
+	}
+
+	if err == nil && batch.Length() > 0 {
+		err = c.SendBatch(batch)
+	}
+
+	return err
+}
+
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {

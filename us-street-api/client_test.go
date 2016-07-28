@@ -240,6 +240,46 @@ func (f *ClientSendFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
 }
 
+func (f *ClientSendFixture) TestChannelOfLookupsSentInBatches() {
+	lookups := make(chan *Lookup, 250)
+	for x := 0; x < cap(lookups); x++ {
+		lookups <- &Lookup{InputID: strconv.Itoa(x)}
+	}
+	close(lookups)
+
+	f.client.SendFromChannel(lookups)
+
+	if !f.So(f.sender.callCount, should.Equal, 3) {
+		return
+	}
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
+
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249"}]`)
+}
+
+func (f *ClientSendFixture) TestErrorPreventsAllLookupsOnChannelFromBeingBatched() {
+	lookups := make([]*Lookup, 250)
+	for x := 0; x < len(lookups); x++ {
+		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
+	}
+	f.sender.err = errors.New("GOPHERS!")
+	f.sender.errOnCall = 2
+	f.client.SendLookups(lookups...)
+
+	if !f.So(f.sender.callCount, should.Equal, 2) {
+		return
+	}
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+}
+
 /*////////////////////////////////////////////////////////////////////////*/
 
 type FakeMultiSender struct {
