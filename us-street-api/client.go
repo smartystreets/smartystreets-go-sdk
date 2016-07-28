@@ -19,7 +19,8 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// SendLookups manages a reusable Batch to send all lookups in serial, blocking fashion.
+// SendLookups is a high-level convenience function that leverages a reusable Batch
+// to send all lookups provided in serial, blocking fashion.
 func (c *Client) SendLookups(lookups ...*Lookup) (err error) {
 	batch := NewBatch()
 	last := len(lookups) - 1

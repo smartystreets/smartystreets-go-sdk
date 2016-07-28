@@ -209,8 +209,9 @@ func (f *ClientSendFixture) TestManyLookupsSentInBatches() {
 	}
 	f.client.SendLookups(lookups...)
 
-	f.So(f.sender.callCount, should.Equal, 3)
-
+	if !f.So(f.sender.callCount, should.Equal, 3) {
+		return
+	}
 	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
 	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
 	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
@@ -229,8 +230,9 @@ func (f *ClientSendFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 	f.sender.errOnCall = 2
 	f.client.SendLookups(lookups...)
 
-	f.So(f.sender.callCount, should.Equal, 2)
-
+	if !f.So(f.sender.callCount, should.Equal, 2) {
+		return
+	}
 	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
 	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
 
