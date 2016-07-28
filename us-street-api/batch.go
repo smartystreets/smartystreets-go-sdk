@@ -42,6 +42,10 @@ func (b *Batch) IsFull() bool {
 	return b.Length() == MaxBatchSize
 }
 
+func (b *Batch) isEmpty() bool {
+	return b.Length() == 0
+}
+
 // Length returns
 func (b *Batch) Length() int {
 	return len(b.lookups)
