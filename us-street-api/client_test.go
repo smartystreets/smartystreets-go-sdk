@@ -2,8 +2,10 @@ package us_street
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
@@ -186,3 +188,81 @@ func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	}
 	return []byte(f.response), f.err
 }
+
+/*////////////////////////////////////////////////////////////////////////*/
+
+type ClientSendFixture struct {
+	*gunit.Fixture
+	client *Client
+	sender *FakeMultiSender
+}
+
+func (f *ClientSendFixture) Setup() {
+	f.sender = &FakeMultiSender{}
+	f.client = NewClient(f.sender)
+}
+
+func (f *ClientSendFixture) TestManyLookupsSentInBatches() {
+	lookups := make([]*Lookup, 250)
+	for x := 0; x < len(lookups); x++ {
+		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
+	}
+	f.client.SendLookups(lookups...)
+
+	f.So(f.sender.callCount, should.Equal, 3)
+
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
+
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249"}]`)
+}
+
+func (f *ClientSendFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
+	lookups := make([]*Lookup, 250)
+	for x := 0; x < len(lookups); x++ {
+		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
+	}
+	f.sender.err = errors.New("GOPHERS!")
+	f.sender.errOnCall = 2
+	f.client.SendLookups(lookups...)
+
+	f.So(f.sender.callCount, should.Equal, 2)
+
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+}
+
+/*////////////////////////////////////////////////////////////////////////*/
+
+type FakeMultiSender struct {
+	callCount     int
+	requests      []*http.Request
+	requestBodies []string
+
+	err       error
+	errOnCall int
+}
+
+func (f *FakeMultiSender) Send(request *http.Request) ([]byte, error) {
+	f.callCount++
+	f.requests = append(f.requests, request)
+
+	if request.Body != nil {
+		body, _ := ioutil.ReadAll(request.Body)
+		f.requestBodies = append(f.requestBodies, string(body))
+	}
+
+	var err error
+	if f.errOnCall == f.callCount {
+		err = f.err
+	}
+	return []byte(fmt.Sprintf(multiSenderResponseFormat, f.callCount)), err
+}
+
+const multiSenderResponseFormat = `[{"input_index": %d}]`

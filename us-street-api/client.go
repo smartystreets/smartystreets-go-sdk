@@ -19,6 +19,24 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
+// SendLookups manages a reusable Batch to send all lookups in serial, blocking fashion.
+func (c *Client) SendLookups(lookups ...*Lookup) (err error) {
+	batch := NewBatch()
+	last := len(lookups) - 1
+	for l, lookup := range lookups {
+		batch.Append(lookup)
+
+		if batch.IsFull() || l == last {
+			if err = c.SendBatch(batch); err != nil {
+				break
+			}
+			batch.Clear()
+		}
+	}
+
+	return err
+}
+
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
