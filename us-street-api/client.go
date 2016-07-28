@@ -17,22 +17,6 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// SendLookups is a high-level convenience function that leverages a reusable Batch
-// to send all lookups provided in serial, blocking fashion.
-func (c *Client) SendLookups(lookups ...*Lookup) error {
-	stream := make(chan *Lookup)
-	go load(stream, lookups)
-	return c.SendFromChannel(stream)
-}
-
-// SendFromChannel is a high-level convenience function that leverages a reusable Batch
-// to send everything received from the provided lookups channel in serial, blocking fashion.
-func (c *Client) SendFromChannel(lookups <-chan *Lookup) error {
-	processor := newBatchProcessor(lookups, c)
-	processor.ProcessAll()
-	return processor.Error()
-}
-
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
