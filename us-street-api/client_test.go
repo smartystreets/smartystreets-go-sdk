@@ -26,43 +26,7 @@ func (f *ClientFixture) Setup() {
 	f.batch = NewBatch()
 }
 
-func (f *ClientFixture) TestSingleAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
-	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
-	input := &Lookup{
-		InputID:       "42",
-		Addressee:     "addressee",
-		Street:        "street",
-		Street2:       "street2",
-		Secondary:     "secondary",
-		LastLine:      "lastline",
-		Urbanization:  "urbanization",
-		ZIPCode:       "zipcode",
-		MaxCandidates: 7,
-	}
-	f.batch.Append(input)
-
-	err := f.client.SendBatch(f.batch)
-
-	f.So(err, should.BeNil)
-	f.So(f.sender.request, should.NotBeNil)
-	f.So(f.sender.request.Method, should.Equal, "GET") // single address input
-	f.So(f.sender.requestBody, should.BeNil)
-	f.So(f.sender.request.URL.String(), should.Equal,
-		defaultAPIURL+
-			"?addressee=addressee"+
-			"&candidates=7"+
-			"&input_id=42"+
-			"&lastline=lastline"+
-			"&secondary=secondary"+
-			"&street=street"+
-			"&street2=street2"+
-			"&urbanization=urbanization"+
-			"&zipcode=zipcode",
-	)
-	f.So(input.Results, should.Resemble, []*Candidate{{InputID: "42"}})
-}
-
-func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
+func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
 	f.sender.response = `[
 		{"input_index": 0, "input_id": "42"},
 		{"input_index": 2, "input_id": "44"},
