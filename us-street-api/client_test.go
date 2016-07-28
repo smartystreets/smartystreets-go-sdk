@@ -57,7 +57,7 @@ func (f *ClientFixture) TestSingleAddressBatchSerializedAndSent__ResponseCandida
 			"&urbanization=urbanization"+
 			"&zipcode=zipcode",
 	)
-	f.So(input.Results, should.Resemble, []*Candidate{&Candidate{InputID: "42"}})
+	f.So(input.Results, should.Resemble, []*Candidate{{InputID: "42"}})
 }
 
 func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
@@ -81,9 +81,9 @@ func (f *ClientFixture) TestMultipleAddressBatchSerializedAndSent__ResponseCandi
 	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
 	f.So(f.sender.request.URL.String(), should.Equal, defaultAPIURL)
 
-	f.So(input0.Results, should.Resemble, []*Candidate{&Candidate{InputID: "42"}})
+	f.So(input0.Results, should.Resemble, []*Candidate{{InputID: "42"}})
 	f.So(input1.Results, should.BeEmpty)
-	f.So(input2.Results, should.Resemble, []*Candidate{&Candidate{InputID: "44", InputIndex: 2}, &Candidate{InputID: "44", InputIndex: 2, CandidateIndex: 1}})
+	f.So(input2.Results, should.Resemble, []*Candidate{{InputID: "44", InputIndex: 2}, {InputID: "44", InputIndex: 2, CandidateIndex: 1}})
 }
 
 func (f *ClientFixture) TestNilBatchCausesSerializationError__PreventsBatchBeingSent() {
