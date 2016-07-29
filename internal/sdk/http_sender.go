@@ -1,7 +1,6 @@
 package sdk
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -20,33 +19,41 @@ func NewHTTPSender(client httpClient) *HTTPSender {
 	return &HTTPSender{client: client}
 }
 
-func (s *HTTPSender) Send(request *http.Request) (content []byte, err error) {
-	response, err := s.client.Do(request)
-	if err != nil {
+func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
+	if response, err := s.client.Do(request); err != nil {
 		return nil, err
+	} else if content, err := readResponseBody(response); err != nil {
+		return content, err
+	} else {
+		return interpret(response, content)
 	}
+}
 
-	content, err = ioutil.ReadAll(response.Body)
-	if err != nil {
+func readResponseBody(response *http.Response) ([]byte, error) {
+	if content, err := ioutil.ReadAll(response.Body); err != nil {
 		response.Body.Close()
 		return nil, err
+	} else {
+		err = response.Body.Close()
+		return content, err
 	}
+}
 
+func interpret(response *http.Response, content []byte) ([]byte, error) {
 	switch response.StatusCode {
-	case 400:
+	case http.StatusOK:
+		return content, nil
+	case http.StatusBadRequest:
 		return nil, smarty_sdk.StatusBadRequest
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, smarty_sdk.StatusUnauthorized
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, smarty_sdk.StatusPaymentRequired
-	case 413:
+	case http.StatusRequestEntityTooLarge:
 		return nil, smarty_sdk.StatusRequestEntityTooLarge
-	case 429:
+	case http.StatusTooManyRequests:
 		return nil, smarty_sdk.StatusTooManyRequests
-	case 200:
-		return content, response.Body.Close()
 	default:
-		response.Body.Close()
-		return nil, fmt.Errorf("Non-200 status: %s\n%s", response.Status, string(content))
+		return nil, smarty_sdk.StatusOtherError(response.Status, content)
 	}
 }

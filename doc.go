@@ -2,6 +2,7 @@ package smarty_sdk
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -17,3 +18,7 @@ var (
 	StatusRequestEntityTooLarge = errors.New("413 Request entity too large")
 	StatusTooManyRequests       = errors.New("429 Too many requests")
 )
+
+func StatusOtherError(status string, content []byte) error {
+	return fmt.Errorf("Non-200 status: %s\n%s", status, string(content))
+}
