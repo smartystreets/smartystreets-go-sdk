@@ -30,13 +30,11 @@ func (c *Client) SendBatch(batch *Batch) error {
 
 func deserializeResponse(response []byte, batch *Batch) error {
 	var candidates []*Candidate
-	if err := json.Unmarshal(response, &candidates); err != nil {
-		return err
+	err := json.Unmarshal(response, &candidates)
+	if err == nil {
+		batch.attach(candidates)
 	}
-	for _, candidate := range candidates {
-		batch.attach(candidate)
-	}
-	return nil
+	return err
 }
 
 func buildRequest(batch *Batch) (*http.Request, error) {

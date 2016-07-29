@@ -19,9 +19,11 @@ func (b *Batch) Append(record *Lookup) bool {
 	return hasSpace
 }
 
-func (b *Batch) attach(candidate *Candidate) {
-	i := candidate.InputIndex
-	b.lookups[i].Results = append(b.lookups[i].Results, candidate)
+func (b *Batch) attach(candidates []*Candidate) {
+	for _, candidate := range candidates {
+		i := candidate.InputIndex
+		b.lookups[i].Results = append(b.lookups[i].Results, candidate)
+	}
 }
 
 // IsFull returns true when the batch has 100 lookups, false in every other case.
