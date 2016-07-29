@@ -1,10 +1,16 @@
 package sdk
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+
+	"github.com/smartystreets/clock"
+)
 
 type RetryClient struct {
 	inner      httpClient
 	maxRetries int
+	sleeper    *clock.Sleeper
 }
 
 func NewRetryClient(client httpClient, maxRetries int) *RetryClient {
@@ -14,9 +20,14 @@ func NewRetryClient(client httpClient, maxRetries int) *RetryClient {
 	}
 }
 
-func (this *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
-	for attempt := 0; attempt <= this.maxRetries; attempt++ {
-		response, err = this.inner.Do(request)
+func (r *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
+	for attempt := 0; attempt <= r.maxRetries; attempt++ {
+		if attempt > 0 {
+			r.sleeper.Sleep(time.Second * time.Duration(attempt))
+		}
+
+		response, err = r.inner.Do(request)
+
 		if err == nil && response.StatusCode == http.StatusOK {
 			break
 		}
