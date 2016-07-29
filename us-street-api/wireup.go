@@ -67,9 +67,11 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 
 // Builds the client using the provided configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) Build() *Client {
-	client := http.Client{Timeout: b.timeout}
-	retryClient := sdk.NewRetryClient(client, b.retries)
-	signingClient := sdk.NewSigningClient(retryClient, b.credential)
-	sender := sdk.NewHTTPSender(signingClient)
+	var (
+		client        = http.Client{Timeout: b.timeout}
+		retryClient   = sdk.NewRetryClient(client, b.retries)
+		signingClient = sdk.NewSigningClient(retryClient, b.credential)
+		sender        = sdk.NewHTTPSender(signingClient)
+	)
 	return NewClient(sender)
 }
