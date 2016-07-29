@@ -19,6 +19,6 @@ var (
 	StatusTooManyRequests       = errors.New("429 Too many requests")
 )
 
-func StatusOtherError(status string, content []byte) error {
+func StatusUncataloguedError(status string, content []byte) error {
 	return fmt.Errorf("Non-200 status: %s\n%s", status, string(content))
 }

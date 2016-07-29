@@ -54,6 +54,6 @@ func interpret(response *http.Response, content []byte) ([]byte, error) {
 	case http.StatusTooManyRequests:
 		return nil, smarty_sdk.StatusTooManyRequests
 	default:
-		return nil, smarty_sdk.StatusOtherError(response.Status, content)
+		return nil, smarty_sdk.StatusUncataloguedError(response.Status, content)
 	}
 }
