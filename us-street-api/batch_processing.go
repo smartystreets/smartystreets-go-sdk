@@ -46,7 +46,7 @@ func (c *batchProcessor) ProcessAll() {
 func (c *batchProcessor) readLookups() {
 	for lookup := range c.lookups {
 		c.processLookup(lookup)
-		if c.haltedPrematurely() {
+		if c.errorOccurred() {
 			break
 		}
 	}
@@ -65,13 +65,13 @@ func (c *batchProcessor) sendBatch() {
 }
 
 func (c *batchProcessor) sendLastBatch() {
-	if c.haltedPrematurely() || c.batch.isEmpty() {
+	if c.errorOccurred() || c.batch.isEmpty() {
 		return
 	}
 	c.sendBatch()
 }
 
-func (c *batchProcessor) haltedPrematurely() bool {
+func (c *batchProcessor) errorOccurred() bool {
 	return c.err != nil
 }
 
