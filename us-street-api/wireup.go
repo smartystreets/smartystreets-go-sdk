@@ -15,7 +15,7 @@ import (
 // all components necessary to assemble a fully functional Client for use in an application.
 type ClientBuilder struct {
 	credential smarty_sdk.Credential
-	baseURL    string
+	baseURL    *url.URL
 	retries    int
 	timeout    time.Duration
 }
@@ -25,6 +25,7 @@ func NewClientBuilder() *ClientBuilder {
 	return &ClientBuilder{
 		credential: &sdk.NopCredential{},
 		timeout:    time.Second * 10,
+		baseURL:    defaultBaseURL,
 	}
 }
 
@@ -37,12 +38,14 @@ func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *Clien
 
 // WithSecretKeyCredential allows the caller to specify the url that the client will use.
 // In all but very few use cases the default value is sufficient and this method should not be called.
-func (b *ClientBuilder) WithCustomBaseURL(uri string) *ClientBuilder {
-	_, err := url.Parse(uri)
+// The address provided should be a url that consists of only the scheme and host. Any other elements
+// (such as a path, query string, or fragment) will be ignored.
+func (b *ClientBuilder) WithCustomBaseURL(address string) *ClientBuilder {
+	parsed, err := url.Parse(address)
 	if err != nil {
 		panic(fmt.Sprint("Could not parse provided address:", err.Error()))
 	}
-	b.baseURL = uri
+	b.baseURL = parsed
 	return b
 }
 
@@ -67,11 +70,12 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 
 // Builds the client using the provided configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) Build() *Client {
-	var (
-		client        = &http.Client{Timeout: b.timeout}
-		retryClient   = sdk.NewRetryClient(client, b.retries)
-		signingClient = sdk.NewSigningClient(retryClient, b.credential)
-		sender        = sdk.NewHTTPSender(signingClient)
-	)
-	return NewClient(sender)
+	var client sdk.HTTPClient
+	client = &http.Client{Timeout: b.timeout}
+	client = sdk.NewRetryClient(client, b.retries)
+	client = sdk.NewSigningClient(client, b.credential)
+	client = sdk.NewBaseURLClient(client, b.baseURL)
+	return NewClient(sdk.NewHTTPSender(client))
 }
+
+var defaultBaseURL, _ = url.Parse("https://api.smartystreets.com")

@@ -43,7 +43,7 @@ func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesInc
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "POST")
 	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
-	f.So(f.sender.request.URL.String(), should.Equal, defaultAPIURL)
+	f.So(f.sender.request.URL.String(), should.Equal, placeholderURL)
 
 	f.So(input0.Results, should.Resemble, []*Candidate{{InputID: "42"}})
 	f.So(input1.Results, should.BeEmpty)
@@ -88,6 +88,22 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(input.Results, should.BeEmpty)
+}
+
+func (f *ClientFixture) TestPingReturnsTrueWhenServiceIsUp() {
+	f.sender.response = "OK"
+	f.So(f.client.Ping(), should.BeTrue)
+}
+
+func (f *ClientFixture) TestPingReturnsFalseWhenServiceIsDown() {
+	f.sender.response = "Not OK"
+	f.So(f.client.Ping(), should.BeFalse)
+}
+
+func (f *ClientFixture) TestPingReturnsFalseWhenServiceIsUnreachable() {
+	f.sender.response = "OK" // This wouldn't happen, but having an error next should trump even an OK in the response.
+	f.sender.err = errors.New("HOT POCKETS!")
+	f.So(f.client.Ping(), should.BeFalse)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

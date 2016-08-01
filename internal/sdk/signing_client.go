@@ -6,11 +6,11 @@ import (
 )
 
 type SigningClient struct {
-	inner      httpClient
+	inner      HTTPClient
 	credential smarty_sdk.Credential
 }
 
-func NewSigningClient(inner httpClient, credential smarty_sdk.Credential) *SigningClient {
+func NewSigningClient(inner HTTPClient, credential smarty_sdk.Credential) *SigningClient {
 	return &SigningClient{
 		inner:      inner,
 		credential: credential,

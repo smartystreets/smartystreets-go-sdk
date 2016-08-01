@@ -17,6 +17,11 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
+func (c *Client) Ping() bool {
+	result, err := c.sender.Send(buildPingRequest())
+	return err == nil && string(result) == "OK"
+}
+
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
 	if request, err := buildRequest(batch); err != nil {
@@ -46,10 +51,16 @@ func buildRequest(batch *Batch) (*http.Request, error) {
 
 func buildPostRequest(batch *Batch) (*http.Request, error) {
 	payload, _ := json.Marshal(batch.lookups) // err ignored because since we control the types being serialized it is safe.
-	return http.NewRequest("POST", defaultAPIURL, bytes.NewReader(payload))
+	return http.NewRequest("POST", placeholderURL, bytes.NewReader(payload))
 }
 
-// defaultAPIURL may be overwritten later by a Sender depending on wireup.
-const defaultAPIURL = "https://api.smartystreets.com/street-address"
+func buildPingRequest() *http.Request {
+	request, _ := http.NewRequest("GET", placeholderURL, nil)
+	return request
+}
+
+var (
+	placeholderURL = "/" // will be overwritten later by the sdk.BaseURLClient
+)
 
 var emptyBatchError = errors.New("The batch was nil or had no records.")

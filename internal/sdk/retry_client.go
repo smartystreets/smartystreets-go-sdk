@@ -8,12 +8,12 @@ import (
 )
 
 type RetryClient struct {
-	inner      httpClient
+	inner      HTTPClient
 	maxRetries int
 	sleeper    *clock.Sleeper
 }
 
-func NewRetryClient(client httpClient, maxRetries int) *RetryClient {
+func NewRetryClient(client HTTPClient, maxRetries int) *RetryClient {
 	return &RetryClient{
 		inner:      client,
 		maxRetries: maxRetries,

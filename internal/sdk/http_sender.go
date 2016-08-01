@@ -7,15 +7,15 @@ import (
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
-type httpClient interface {
+type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
 type HTTPSender struct {
-	client httpClient
+	client HTTPClient
 }
 
-func NewHTTPSender(client httpClient) *HTTPSender {
+func NewHTTPSender(client HTTPClient) *HTTPSender {
 	return &HTTPSender{client: client}
 }
 
