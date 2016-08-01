@@ -1,24 +1,34 @@
 package smarty_sdk
 
-import (
-	"errors"
-	"fmt"
-	"net/http"
-)
+import "net/http"
 
 type Credential interface {
 	Sign(*http.Request) error
 }
 
-// Common HTTP status codes returned by the SmartyStreets APIs:
-var (
-	StatusUnauthorized          = errors.New("401 Unauthorized")
-	StatusPaymentRequired       = errors.New("402 Payment Required")
-	StatusBadRequest            = errors.New("400 Bad Request")
-	StatusRequestEntityTooLarge = errors.New("413 Request entity too large")
-	StatusTooManyRequests       = errors.New("429 Too many requests")
-)
+func NewHTTPStatusError(statusCode int, content []byte) HTTPStatusError {
+	return HTTPStatusError{
+		statusCode: statusCode,
+		content:    content,
+	}
+}
 
-func StatusUncataloguedError(status string, content []byte) error {
-	return fmt.Errorf("Non-200 status: %s\n%s", status, string(content))
+// HTTPStatusError stands for for the error type but also provides convenience methods
+// for accessing the status code and content of the request that caused the error.
+// Instances of this type are returned by sdk.HTTPSender.Send().
+type HTTPStatusError struct {
+	statusCode int
+	content    []byte
+}
+
+func (e HTTPStatusError) Error() string {
+	return http.StatusText(e.statusCode)
+}
+
+func (e HTTPStatusError) StatusCode() int {
+	return e.statusCode
+}
+
+func (e HTTPStatusError) Content() []byte {
+	return e.content
 }

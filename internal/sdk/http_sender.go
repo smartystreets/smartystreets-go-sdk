@@ -40,20 +40,8 @@ func readResponseBody(response *http.Response) ([]byte, error) {
 }
 
 func interpret(response *http.Response, content []byte) ([]byte, error) {
-	switch response.StatusCode {
-	case http.StatusOK:
+	if response.StatusCode == http.StatusOK {
 		return content, nil
-	case http.StatusBadRequest:
-		return nil, smarty_sdk.StatusBadRequest
-	case http.StatusUnauthorized:
-		return nil, smarty_sdk.StatusUnauthorized
-	case http.StatusPaymentRequired:
-		return nil, smarty_sdk.StatusPaymentRequired
-	case http.StatusRequestEntityTooLarge:
-		return nil, smarty_sdk.StatusRequestEntityTooLarge
-	case http.StatusTooManyRequests:
-		return nil, smarty_sdk.StatusTooManyRequests
-	default:
-		return nil, smarty_sdk.StatusUncataloguedError(response.Status, content)
 	}
+	return nil, smarty_sdk.NewHTTPStatusError(response.StatusCode, content)
 }
