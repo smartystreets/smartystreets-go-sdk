@@ -70,12 +70,12 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 
 // Builds the client using the provided configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) Build() *Client {
-	var client sdk.HTTPClient
-	client = &http.Client{Timeout: b.timeout}
-	client = sdk.NewRetryClient(client, b.retries)
-	client = sdk.NewSigningClient(client, b.credential)
-	client = sdk.NewBaseURLClient(client, b.baseURL)
-	return NewClient(sdk.NewHTTPSender(client))
+	var wrapped sdk.HTTPClient
+	wrapped = &http.Client{Timeout: b.timeout}
+	wrapped = sdk.NewRetryClient(wrapped, b.retries)
+	wrapped = sdk.NewSigningClient(wrapped, b.credential)
+	wrapped = sdk.NewBaseURLClient(wrapped, b.baseURL)
+	return NewClient(sdk.NewHTTPSender(wrapped))
 }
 
 var defaultBaseURL, _ = url.Parse("https://api.smartystreets.com")
