@@ -8,6 +8,8 @@ import (
 )
 
 func TestHTTPStatusError(t *testing.T) {
+	t.Parallel()
+
 	err := NewHTTPStatusError(http.StatusTeapot, []byte("Hello, World!"))
 
 	assert := assertions.New(t)
@@ -17,6 +19,8 @@ func TestHTTPStatusError(t *testing.T) {
 }
 
 func TestNilHTTPStatusErrorBehavesLikeHTTP200(t *testing.T) {
+	t.Parallel()
+
 	var err *HTTPStatusError
 
 	assert := assertions.New(t)
