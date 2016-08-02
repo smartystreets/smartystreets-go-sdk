@@ -42,6 +42,7 @@ func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesInc
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "POST")
+	f.So(f.sender.request.URL.Path, should.Equal, "/street-address")
 	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
 	f.So(f.sender.request.URL.String(), should.Equal, placeholderURL)
 

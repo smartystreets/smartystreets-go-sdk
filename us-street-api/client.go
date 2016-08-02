@@ -60,7 +60,7 @@ func buildPingRequest() *http.Request {
 }
 
 var (
-	placeholderURL = "/" // will be overwritten later by the sdk.BaseURLClient
+	placeholderURL = "/street-address" // Remaining parts will be completed later by the sdk.BaseURLClient.
 )
 
 var emptyBatchError = errors.New("The batch was nil or had no records.")
