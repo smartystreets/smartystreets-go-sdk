@@ -11,13 +11,9 @@ import (
 func main() {
 	log.SetFlags(log.Ltime)
 
-	client, err := us_street.NewClientBuilder().
+	client := us_street.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
 		Build()
-
-	if err != nil {
-		log.Fatal("Error building client:", err)
-	}
 
 	batch := us_street.NewBatch()
 	for batch.Append(&us_street.Lookup{Street: "3214 N University ave", LastLine: "Provo UT 84604"}) {
@@ -25,7 +21,7 @@ func main() {
 	}
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())
 
-	if err = client.SendBatch(batch); err != nil {
+	if err := client.SendBatch(batch); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 
