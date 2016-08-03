@@ -1,10 +1,9 @@
 package us_street
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
-
-	"fmt"
 	"time"
 
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
@@ -18,6 +17,7 @@ type ClientBuilder struct {
 	baseURL    *url.URL
 	retries    int
 	timeout    time.Duration
+	debug      bool
 }
 
 // NewClientBuilder creates a new client builder, ready to receive calls to its chain-able methods.
@@ -69,10 +69,17 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 	return b
 }
 
+// WithDebugHTTPOutput enables detailed HTTP request/response logging using functions from net/http/httputil.
+func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
+	b.debug = true
+	return b
+}
+
 // Builds the client using the provided configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) Build() *Client {
 	var wrapped sdk.HTTPClient
 	wrapped = &http.Client{Timeout: b.timeout}
+	wrapped = sdk.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = sdk.NewRetryClient(wrapped, b.retries)
 	wrapped = sdk.NewSigningClient(wrapped, b.credential)
 	wrapped = sdk.NewBaseURLClient(wrapped, b.baseURL)
