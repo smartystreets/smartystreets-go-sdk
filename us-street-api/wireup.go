@@ -24,6 +24,7 @@ type ClientBuilder struct {
 func NewClientBuilder() *ClientBuilder {
 	return &ClientBuilder{
 		credential: &sdk.NopCredential{},
+		retries:    4,
 		timeout:    time.Second * 10,
 		baseURL:    defaultBaseURL,
 	}
