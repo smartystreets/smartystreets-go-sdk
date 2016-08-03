@@ -9,7 +9,7 @@ func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {
 	}
 }
 
-// HTTPStatusError stands for for the error type but also provides convenience methods
+// HTTPStatusError stands in for the error type but also provides convenience methods
 // for accessing the status code and content of the request that caused the error.
 // Instances of this type are returned by sdk.HTTPSender.Send(). When nil, the methods
 // of this type behave as if called on a non-nil instance instantiated with http.StatusOK (200).
