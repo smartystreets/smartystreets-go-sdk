@@ -17,9 +17,16 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
-func (c *Client) Ping() bool {
+// Ping:
+// 	Returns (true,  nil) if the us-street-api service is reachable and responding nominally.
+//  Returns (false, nil) if the us-street-api service is reachable but not responding.
+//  Returns (false, err) if the status request could not be completed.
+func (c *Client) Ping() (bool, error) {
 	result, err := c.sender.Send(buildPingRequest())
-	return err == nil && string(result) == "OK"
+	if err != nil {
+		return false, err
+	}
+	return string(result) == "OK", nil
 }
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.

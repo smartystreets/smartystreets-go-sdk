@@ -93,18 +93,24 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestPingReturnsTrueWhenServiceIsUp() {
 	f.sender.response = "OK"
-	f.So(f.client.Ping(), should.BeTrue)
+	up, err := f.client.Ping()
+	f.So(up, should.BeTrue)
+	f.So(err, should.BeNil)
 }
 
 func (f *ClientFixture) TestPingReturnsFalseWhenServiceIsDown() {
 	f.sender.response = "Not OK"
-	f.So(f.client.Ping(), should.BeFalse)
+	up, err := f.client.Ping()
+	f.So(up, should.BeFalse)
+	f.So(err, should.BeNil)
 }
 
-func (f *ClientFixture) TestPingReturnsFalseWhenServiceIsUnreachable() {
+func (f *ClientFixture) TestPingReturnsErrorAndFalseWhenServiceIsUnreachable() {
 	f.sender.response = "OK" // This wouldn't happen, but having an error next should trump even an OK in the response.
 	f.sender.err = errors.New("HOT POCKETS!")
-	f.So(f.client.Ping(), should.BeFalse)
+	up, err := f.client.Ping()
+	f.So(up, should.BeFalse)
+	f.So(err, should.Equal, f.sender.err)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
