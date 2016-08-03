@@ -11,7 +11,7 @@ type BaseURLClientFixture struct {
 	*gunit.Fixture
 }
 
-func (this *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
+func (f *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
 	inner := &FakeHTTPClient{}
 	inner.response = &http.Response{StatusCode: 123}
 	original, _ := http.NewRequest("GET", "http://www.google.com/the/path/stays", nil)
@@ -20,9 +20,9 @@ func (this *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
 
 	response, err := client.Do(original)
 
-	this.So(err, should.BeNil)
-	this.So(response, should.Equal, inner.response)
-	this.So(original.URL.String(), should.Equal, override.Scheme + "://" + override.Host + original.URL.Path)
-	this.So(original.URL.Scheme, should.Equal, override.Scheme)
-	this.So(original.URL.Host, should.Equal, override.Host)
+	f.So(err, should.BeNil)
+	f.So(response, should.Equal, inner.response)
+	f.So(original.URL.String(), should.Equal, override.Scheme + "://" + override.Host + original.URL.Path)
+	f.So(original.URL.Scheme, should.Equal, override.Scheme)
+	f.So(original.URL.Host, should.Equal, override.Host)
 }

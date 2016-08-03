@@ -16,8 +16,8 @@ type RetryClientFixture struct {
 	sleeper *clock.Sleeper
 }
 
-func (this *RetryClientFixture) Setup() {
-	this.sleeper = clock.StayAwake()
+func (f *RetryClientFixture) Setup() {
+	f.sleeper = clock.StayAwake()
 }
 
 func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {
