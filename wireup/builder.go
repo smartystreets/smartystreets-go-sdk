@@ -1,4 +1,4 @@
-package us_street
+package wireup
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-street-api"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
@@ -26,7 +27,6 @@ func NewClientBuilder() *ClientBuilder {
 		credential: &sdk.NopCredential{},
 		retries:    4,
 		timeout:    time.Second * 10,
-		baseURL:    defaultBaseURL,
 	}
 }
 
@@ -75,15 +75,25 @@ func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 	return b
 }
 
-// Builds the client using the provided configuration details provided by other methods on the ClientBuilder.
-func (b *ClientBuilder) Build() *Client {
-	var wrapped sdk.HTTPClient
+// BuildUSStreetAPIClient builds the client using the provided configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildUSStreetAPIClient() *us_street.Client {
+	if b.baseURL == nil {
+		b.baseURL = defaultBaseURL_USStreetAPI
+	}
+	return us_street.NewClient(b.buildHTTPSender())
+}
+
+func (b *ClientBuilder) buildHTTPSender() *sdk.HTTPSender {
+	return sdk.NewHTTPSender(b.buildHTTPClient())
+}
+
+func (b *ClientBuilder) buildHTTPClient() (wrapped sdk.HTTPClient) {
 	wrapped = &http.Client{Timeout: b.timeout}
 	wrapped = sdk.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = sdk.NewRetryClient(wrapped, b.retries)
 	wrapped = sdk.NewSigningClient(wrapped, b.credential)
 	wrapped = sdk.NewBaseURLClient(wrapped, b.baseURL)
-	return NewClient(sdk.NewHTTPSender(wrapped))
+	return wrapped
 }
 
-var defaultBaseURL, _ = url.Parse("https://api.smartystreets.com")
+var defaultBaseURL_USStreetAPI, _ = url.Parse("https://api.smartystreets.com")

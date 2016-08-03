@@ -6,14 +6,15 @@ import (
 	"os"
 
 	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-street-api"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
 	log.SetFlags(log.Ltime)
 
-	client := us_street.NewClientBuilder().
+	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
-		Build()
+		BuildUSStreetAPIClient()
 
 	batch := us_street.NewBatch()
 	for batch.Append(&us_street.Lookup{Street: "3214 N University ave", LastLine: "Provo UT 84604"}) {
