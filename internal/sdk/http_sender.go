@@ -39,8 +39,7 @@ func readResponseBody(response *http.Response) ([]byte, error) {
 		response.Body.Close()
 		return nil, err
 	} else {
-		err = response.Body.Close()
-		return content, err
+		return content, response.Body.Close()
 	}
 }
 
