@@ -77,14 +77,19 @@ func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 
 // BuildUSStreetAPIClient builds the client using the provided configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) BuildUSStreetAPIClient() *us_street.Client {
-	if b.baseURL == nil {
-		b.baseURL = defaultBaseURL_USStreetAPI
-	}
+	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
 	return us_street.NewClient(b.buildHTTPSender())
 }
 
+func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
+	if b.baseURL == nil {
+		b.baseURL = u
+	}
+}
+
 func (b *ClientBuilder) buildHTTPSender() *sdk.HTTPSender {
-	return sdk.NewHTTPSender(b.buildHTTPClient())
+	client := b.buildHTTPClient()
+	return sdk.NewHTTPSender(client)
 }
 
 func (b *ClientBuilder) buildHTTPClient() (wrapped sdk.HTTPClient) {
