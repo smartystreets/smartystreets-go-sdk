@@ -4,9 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/smartystreets/gunit"
+	"time"
+
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/clock"
+	"github.com/smartystreets/gunit"
 )
 
 type RetryClientFixture struct {
@@ -28,7 +30,8 @@ func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {
 	}
 	f.So(err, should.BeNil)
 	f.So(inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.HaveLength, 4)
+	f.So(f.sleeper.Naps, should.Resemble,
+		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
 }
 
 func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
@@ -40,7 +43,8 @@ func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
 	}
 	f.So(err, should.BeNil)
 	f.So(inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.HaveLength, 4)
+	f.So(f.sleeper.Naps, should.Resemble,
+		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
 }
 
 func (f *RetryClientFixture) TestFailureReturnedIfRetryExceeded() {
@@ -52,11 +56,18 @@ func (f *RetryClientFixture) TestFailureReturnedIfRetryExceeded() {
 	}
 	f.So(err, should.BeNil)
 	f.So(inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.HaveLength, 4)
+	f.So(f.sleeper.Naps, should.Resemble,
+		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
+}
+
+func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
+	inner := &FakeHTTPClient{}
+	client := NewRetryClient(inner, 0)
+	f.So(client, should.Equal, inner)
 }
 
 func (f *RetryClientFixture) sendWithRetry(retries int, inner *FakeMultiHTTPClient) (*http.Response, error) {
-	client := NewRetryClient(inner, retries)
+	client := NewRetryClient(inner, retries).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("GET", "/", nil)
 	return client.Do(request)
