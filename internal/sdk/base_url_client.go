@@ -5,6 +5,8 @@ import (
 	"net/url"
 )
 
+// BaseURLClient amends the http.Request.URL with the configured scheme and host.
+// This comes in handy when calling an onsite installation of the us-street-api.
 type BaseURLClient struct {
 	inner HTTPClient
 	base  *url.URL

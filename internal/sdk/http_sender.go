@@ -7,10 +7,15 @@ import (
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
+// HTTPClient matches http.Client and allows us to define custom clients that wrap over http.Client.
 type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
+// HTTPSender translates *http.Request into ([]byte, error) by
+// - calling the provided HTTPClient,
+// - reading the response body, and
+// - interpreting the content (or error) received.
 type HTTPSender struct {
 	client HTTPClient
 }

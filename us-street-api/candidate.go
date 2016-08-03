@@ -1,6 +1,8 @@
 package us_street
 
 type (
+	// Candidate contains all output fields defined here:
+	// https://smartystreets.com/docs/us-street-api#http-response-output
 	Candidate struct {
 		InputID              string     `json:"input_id,omitempty"`
 		InputIndex           int        `json:"input_index"`
@@ -15,6 +17,8 @@ type (
 		Analysis             Analysis   `json:"analysis,omitempty"`
 	}
 
+	// Components contains all output fields defined here:
+	// https://smartystreets.com/docs/us-street-api#components
 	Components struct {
 		PrimaryNumber            string `json:"primary_number,omitempty"`
 		StreetPredirection       string `json:"street_predirection,omitempty"`
@@ -37,6 +41,8 @@ type (
 		Urbanization             string `json:"urbanization,omitempty"`
 	}
 
+	// Metadata contains all output fields defined here:
+	// https://smartystreets.com/docs/us-street-api#metadata
 	Metadata struct {
 		RecordType               string  `json:"record_type,omitempty"`
 		ZIPType                  string  `json:"zip_type,omitempty"`
@@ -56,13 +62,15 @@ type (
 		DST                      bool    `json:"dst,omitempty"`
 	}
 
+	// Analysis contains all output fields defined here:
+	// https://smartystreets.com/docs/us-street-api#analysis
 	Analysis struct {
 		DPVMatchCode      string `json:"dpv_match_code,omitempty"`
 		DPVFootnotes      string `json:"dpv_footnotes,omitempty"`
 		DPVCMRACode       string `json:"dpv_cmra,omitempty"`
 		DPVVacantCode     string `json:"dpv_vacant,omitempty"`
 		Active            string `json:"active,omitempty"`
-		Footnotes         string `json:"footnotes,omitempty"`
+		Footnotes         string `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
 		LACSLinkCode      string `json:"lacslink_code,omitempty"`
 		LACSLinkIndicator string `json:"lacslink_indicator,omitempty"`
 		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`

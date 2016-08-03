@@ -5,6 +5,8 @@ import (
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
+// Signing client signs each request it receives using the credential
+// provided and forwards the request to the inner client.
 type SigningClient struct {
 	inner      HTTPClient
 	credential smarty_sdk.Credential

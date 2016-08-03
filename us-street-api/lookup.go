@@ -1,5 +1,7 @@
 package us_street
 
+// Lookup contains all input fields defined here:
+// https://smartystreets.com/docs/us-street-api#input-fields
 type Lookup struct {
 	Street        string `json:"street,omitempty"`
 	Street2       string `json:"street2,omitempty"`
