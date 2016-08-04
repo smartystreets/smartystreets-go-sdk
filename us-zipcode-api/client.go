@@ -3,7 +3,6 @@ package us_zipcode
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -26,7 +25,9 @@ func (c *Client) Ping() error {
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
-	if request, err := buildRequest(batch); err != nil {
+	if batch == nil || batch.Length() == 0 {
+		return nil
+	} else if request, err := buildRequest(batch); err != nil {
 		return err
 	} else if response, err := c.sender.Send(request); err != nil {
 		return err
@@ -45,13 +46,6 @@ func deserializeResponse(response []byte, batch *Batch) error {
 }
 
 func buildRequest(batch *Batch) (*http.Request, error) {
-	if batch == nil || batch.Length() == 0 {
-		return nil, emptyBatchError
-	}
-	return buildPostRequest(batch)
-}
-
-func buildPostRequest(batch *Batch) (*http.Request, error) {
 	payload, _ := json.Marshal(batch.lookups) // err ignored because since we control the types being serialized it is safe.
 	return http.NewRequest("POST", placeholderURL, bytes.NewReader(payload))
 }
@@ -65,5 +59,3 @@ var (
 	placeholderURL = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
 	statusURL      = "/status"
 )
-
-var emptyBatchError = errors.New("The batch was nil or had no records.")

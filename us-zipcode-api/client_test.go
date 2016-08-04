@@ -51,15 +51,15 @@ func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBac
 	f.So(input2.Result, should.Resemble, &Result{InputID: "44", InputIndex: 2})
 }
 
-func (f *ClientFixture) TestNilBatchCausesSerializationError__PreventsBatchBeingSent() {
+func (f *ClientFixture) TestNilBatchNOP() {
 	err := f.client.SendBatch(nil)
-	f.So(err, should.NotBeNil)
+	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestEmptyBatchCausesSerializationError__PreventsBatchBeingSent() {
 	err := f.client.SendBatch(new(Batch))
-	f.So(err, should.NotBeNil)
+	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 

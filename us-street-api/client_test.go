@@ -44,22 +44,22 @@ func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesInc
 	f.So(f.sender.request.Method, should.Equal, "POST")
 	f.So(f.sender.request.URL.Path, should.Equal, "/street-address")
 	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
-	f.So(f.sender.request.URL.String(), should.Equal, placeholderURL)
+	f.So(f.sender.request.URL.String(), should.Equal, verifyURL)
 
 	f.So(input0.Results, should.Resemble, []*Candidate{{InputID: "42"}})
 	f.So(input1.Results, should.BeEmpty)
 	f.So(input2.Results, should.Resemble, []*Candidate{{InputID: "44", InputIndex: 2}, {InputID: "44", InputIndex: 2, CandidateIndex: 1}})
 }
 
-func (f *ClientFixture) TestNilBatchCausesSerializationError__PreventsBatchBeingSent() {
+func (f *ClientFixture) TestNilBatchNOP() {
 	err := f.client.SendBatch(nil)
-	f.So(err, should.NotBeNil)
+	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 
-func (f *ClientFixture) TestEmptyBatchCausesSerializationError__PreventsBatchBeingSent() {
+func (f *ClientFixture) TestEmptyBatch_NOP() {
 	err := f.client.SendBatch(new(Batch))
-	f.So(err, should.NotBeNil)
+	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 
@@ -118,7 +118,7 @@ type FakeSender struct {
 func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
-	if request.Body != nil {
+	if request != nil && request.Body != nil {
 		f.requestBody, _ = ioutil.ReadAll(request.Body)
 	}
 	return []byte(f.response), f.err
