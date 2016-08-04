@@ -1,4 +1,4 @@
-package us_zipcode
+package zipcode
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package us_zipcode
+package zipcode
 
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {

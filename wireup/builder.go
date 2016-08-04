@@ -78,16 +78,16 @@ func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 
 // BuildUSStreetAPIClient builds the us-street-api client using the provided
 // configuration details provided by other methods on the ClientBuilder.
-func (b *ClientBuilder) BuildUSStreetAPIClient() *us_street.Client {
+func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
-	return us_street.NewClient(b.buildHTTPSender())
+	return street.NewClient(b.buildHTTPSender())
 }
 
 // BuildUSZIPCodeAPIClient builds the us-zipcode-api client using the provided
 // configuration details provided by other methods on the ClientBuilder.
-func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *us_zipcode.Client {
+func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *zipcode.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USZIPCodeAPI)
-	return us_zipcode.NewClient(b.buildHTTPSender())
+	return zipcode.NewClient(b.buildHTTPSender())
 }
 
 func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {

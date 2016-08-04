@@ -1,4 +1,4 @@
-package us_street
+package street
 
 type (
 	// Candidate contains all output fields defined here:

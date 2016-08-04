@@ -1,4 +1,4 @@
-package us_zipcode
+package zipcode
 
 // SendLookups is a high-level convenience function that leverages a reusable Batch
 // to send all lookups provided in serial, blocking fashion.

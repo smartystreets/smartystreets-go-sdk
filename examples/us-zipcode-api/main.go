@@ -23,8 +23,8 @@ func main() {
 		fmt.Println("Ping successful; service is reachable and responding.")
 	}
 
-	batch := us_zipcode.NewBatch()
-	for batch.Append(&us_zipcode.Lookup{City: "PROVO", State: "UT", ZIPCode: "84604"}) {
+	batch := zipcode.NewBatch()
+	for batch.Append(&zipcode.Lookup{City: "PROVO", State: "UT", ZIPCode: "84604"}) {
 		fmt.Print(".")
 	}
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())

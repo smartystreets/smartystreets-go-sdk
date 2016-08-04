@@ -1,4 +1,4 @@
-package us_zipcode
+package zipcode
 
 type (
 	// Result contains all output fields defined here:

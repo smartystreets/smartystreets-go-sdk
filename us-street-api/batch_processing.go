@@ -1,4 +1,4 @@
-package us_street
+package street
 
 // SendLookups is a high-level convenience function that leverages an internal reusable Batch
 // to send all lookups provided in serial, blocking fashion.

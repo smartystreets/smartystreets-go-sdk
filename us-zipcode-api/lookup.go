@@ -1,4 +1,4 @@
-package us_zipcode
+package zipcode
 
 // Lookup contains all input fields defined here:
 // https://smartystreets.com/docs/us-street-api#input-fields

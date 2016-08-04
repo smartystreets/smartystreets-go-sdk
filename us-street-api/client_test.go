@@ -1,4 +1,4 @@
-package us_street
+package street
 
 import (
 	"errors"
