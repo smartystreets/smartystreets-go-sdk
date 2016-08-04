@@ -17,16 +17,11 @@ func NewClient(sender requestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// Ping:
-// 	Returns (true,  nil) if the us-street-api service is reachable and responding nominally.
-//  Returns (false, nil) if the us-street-api service is reachable but not responding.
-//  Returns (false, err) if the status request could not be completed.
-func (c *Client) Ping() (bool, error) {
-	result, err := c.sender.Send(buildPingRequest())
-	if err != nil {
-		return false, err
-	}
-	return string(result) == "OK", nil
+// Ping returns an error if the service is not reachable or not responding.
+// The error is of type HTTPStatusError.
+func (c *Client) Ping() error {
+	_, err := c.sender.Send(buildPingRequest())
+	return err
 }
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
@@ -62,12 +57,13 @@ func buildPostRequest(batch *Batch) (*http.Request, error) {
 }
 
 func buildPingRequest() *http.Request {
-	request, _ := http.NewRequest("GET", placeholderURL, nil)
+	request, _ := http.NewRequest("GET", statusURL, nil) // TODO: /status is the url to use
 	return request
 }
 
 var (
 	placeholderURL = "/street-address" // Remaining parts will be completed later by the sdk.BaseURLClient.
+	statusURL      = "/status"
 )
 
 var emptyBatchError = errors.New("The batch was nil or had no records.")
