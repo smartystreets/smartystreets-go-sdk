@@ -3,7 +3,7 @@ package sdk
 
 import "net/http"
 
-type RequestSender interface { // TODO: make this public, top-level
+type RequestSender interface {
 	Send(*http.Request) ([]byte, error)
 }
 
