@@ -1,10 +1,11 @@
 package sdk
 
 import (
-	"github.com/smartystreets/gunit"
 	"net/http"
 	"net/url"
+
 	"github.com/smartystreets/assertions/should"
+	"github.com/smartystreets/gunit"
 )
 
 type BaseURLClientFixture struct {
@@ -22,7 +23,7 @@ func (f *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
 
 	f.So(err, should.BeNil)
 	f.So(response, should.Equal, inner.response)
-	f.So(original.URL.String(), should.Equal, override.Scheme + "://" + override.Host + original.URL.Path)
+	f.So(original.URL.String(), should.Equal, override.Scheme+"://"+override.Host+original.URL.Path)
 	f.So(original.URL.Scheme, should.Equal, override.Scheme)
 	f.So(original.URL.Host, should.Equal, override.Host)
 }

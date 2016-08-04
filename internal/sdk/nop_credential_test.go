@@ -1,11 +1,12 @@
 package sdk
 
 import (
-	"testing"
 	"net/http"
 	"strings"
-	"github.com/smartystreets/assertions/should"
+	"testing"
+
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestNopCredentialDoesNothing(t *testing.T) {

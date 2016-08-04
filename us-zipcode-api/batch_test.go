@@ -46,10 +46,10 @@ func (f *BatchFixture) TestCapacityIsLimitedAt100Inputs() {
 func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 	batch := NewBatch()
 	batch.Append(&Lookup{
-		City:          "ensure",
-		State:         "serialization",
-		ZIPCode:       "always",
-		InputID:       "successful",
+		City:    "ensure",
+		State:   "serialization",
+		ZIPCode: "always",
+		InputID: "successful",
 	})
 	serialized, err := json.Marshal(batch.lookups)
 	f.So(err, should.BeNil)

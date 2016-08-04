@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"net/http"
+
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 

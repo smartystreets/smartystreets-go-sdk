@@ -3,7 +3,6 @@ package sdk
 import (
 	"errors"
 	"net/http"
-
 	"time"
 
 	"github.com/smartystreets/assertions/should"

@@ -1,8 +1,9 @@
 package smarty_sdk
 
 import (
-	"testing"
 	"net/http"
+	"testing"
+
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )

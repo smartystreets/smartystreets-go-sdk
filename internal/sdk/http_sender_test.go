@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
+	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 )
 
 type HTTPSenderFixture struct {

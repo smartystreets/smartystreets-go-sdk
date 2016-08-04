@@ -1,11 +1,10 @@
 package sdk
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
-
-	"errors"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
