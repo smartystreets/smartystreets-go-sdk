@@ -14,6 +14,7 @@ func main() {
 
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
+		//WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
 		BuildUSStreetAPIClient()
 
 	if err := client.Ping(); err != nil {
@@ -21,20 +22,37 @@ func main() {
 		os.Exit(1)
 	} else {
 		fmt.Println("Ping successful; service is reachable and responding.")
+		fmt.Println()
+	}
+
+	lookup1 := &street.Lookup{
+		Street:        "1 Rosedale",
+		City:          "Baltimore",
+		State:         "MD",
+		MaxCandidates: 10, // This input produces more than one candidate!
+	}
+	lookup2 := &street.Lookup{
+		Street: "1600 Pennsylvania Avenue",
+		City:   "Washington",
+		State:  "DC",
+	}
+	lookup3 := &street.Lookup{
+		Street: "1600 Amphitheatre Parkway Mountain View, CA 94043",
 	}
 
 	batch := street.NewBatch()
-	for batch.Append(&street.Lookup{Street: "3214 N University ave", LastLine: "Provo UT 84604"}) {
-		fmt.Print(".")
-	}
-	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())
+	batch.Append(lookup1)
+	batch.Append(lookup2)
+	batch.Append(lookup3)
 
 	if err := client.SendBatch(batch); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 
 	for i, input := range batch.Records() {
-		fmt.Println("Input:", i)
+		fmt.Println("---------------------\n")
+		fmt.Println("Results for input:", i)
+		fmt.Println()
 		for j, candidate := range input.Results {
 			fmt.Println("Candidate:", j)
 			fmt.Println(candidate.DeliveryLine1)
