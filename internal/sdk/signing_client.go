@@ -3,7 +3,7 @@ package sdk
 import (
 	"net/http"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
 // Signing client signs each request it receives using the credential

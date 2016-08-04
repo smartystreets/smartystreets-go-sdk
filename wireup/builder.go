@@ -6,10 +6,10 @@ import (
 	"net/url"
 	"time"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-street-api"
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-zipcode-api"
+	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine

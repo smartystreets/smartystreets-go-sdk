@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
 // HTTPClient matches http.Client and allows us to define custom clients that wrap over http.Client.

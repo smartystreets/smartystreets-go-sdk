@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-zipcode-api"
-	"bitbucket.org/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
+	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
