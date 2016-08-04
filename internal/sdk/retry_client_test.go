@@ -65,6 +65,20 @@ func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	f.So(client, should.Equal, inner)
 }
 
+func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
+	inner := NewFailingHTTPClient(make([]int, 20)...)
+	_, err := f.sendWithRetry(19, inner)
+	f.So(err, should.BeNil)
+	f.So(inner.call, should.Equal, 20)
+	f.So(f.sleeper.Naps, should.Resemble,
+		[]time.Duration{
+			time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4, // incrementing
+			time.Second * 5, time.Second * 6, time.Second * 7, time.Second * 8, time.Second * 9, // incrementing
+			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
+			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
+		})
+}
+
 func (f *RetryClientFixture) sendWithRetry(retries int, inner *FakeMultiHTTPClient) (*http.Response, error) {
 	client := NewRetryClient(inner, retries).(*RetryClient)
 	client.sleeper = f.sleeper
