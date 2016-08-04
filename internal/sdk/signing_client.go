@@ -10,10 +10,10 @@ import (
 // provided and forwards the request to the inner client.
 type SigningClient struct {
 	inner      HTTPClient
-	credential smarty_sdk.Credential
+	credential sdk.Credential
 }
 
-func NewSigningClient(inner HTTPClient, credential smarty_sdk.Credential) *SigningClient {
+func NewSigningClient(inner HTTPClient, credential sdk.Credential) *SigningClient {
 	return &SigningClient{
 		inner:      inner,
 		credential: credential,

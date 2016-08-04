@@ -1,4 +1,4 @@
-package smarty_sdk
+package sdk
 
 import "net/http"
 
@@ -14,3 +14,5 @@ func (c SecretKeyCredential) Sign(request *http.Request) error {
 	request.URL.RawQuery = query.Encode()
 	return nil
 }
+
+// FUTURE: implement HTML key credential

@@ -47,5 +47,5 @@ func interpret(response *http.Response, content []byte) ([]byte, error) {
 	if response.StatusCode == http.StatusOK {
 		return content, nil
 	}
-	return nil, smarty_sdk.NewHTTPStatusError(response.StatusCode, content)
+	return nil, sdk.NewHTTPStatusError(response.StatusCode, content)
 }

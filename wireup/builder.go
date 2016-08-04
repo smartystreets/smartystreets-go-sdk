@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
@@ -15,7 +15,7 @@ import (
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully functional Client for use in an application.
 type ClientBuilder struct {
-	credential smarty_sdk.Credential
+	credential sdk.Credential
 	baseURL    *url.URL
 	retries    int
 	timeout    time.Duration
@@ -25,7 +25,7 @@ type ClientBuilder struct {
 // NewClientBuilder creates a new client builder, ready to receive calls to its chain-able methods.
 func NewClientBuilder() *ClientBuilder {
 	return &ClientBuilder{
-		credential: &sdk.NopCredential{},
+		credential: &internal.NopCredential{},
 		retries:    4,
 		timeout:    time.Second * 10,
 	}
@@ -34,7 +34,7 @@ func NewClientBuilder() *ClientBuilder {
 // WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
 // In all but very few cases calling this method with a valid authID and authToken is required.
 func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
-	b.credential = &smarty_sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
+	b.credential = &sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
 	return b
 }
 
@@ -96,17 +96,17 @@ func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
 	}
 }
 
-func (b *ClientBuilder) buildHTTPSender() *sdk.HTTPSender {
+func (b *ClientBuilder) buildHTTPSender() *internal.HTTPSender {
 	client := b.buildHTTPClient()
-	return sdk.NewHTTPSender(client)
+	return internal.NewHTTPSender(client)
 }
 
-func (b *ClientBuilder) buildHTTPClient() (wrapped sdk.HTTPClient) {
+func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = &http.Client{Timeout: b.timeout}
-	wrapped = sdk.NewDebugOutputClient(wrapped, b.debug)
-	wrapped = sdk.NewRetryClient(wrapped, b.retries)
-	wrapped = sdk.NewSigningClient(wrapped, b.credential)
-	wrapped = sdk.NewBaseURLClient(wrapped, b.baseURL)
+	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
+	wrapped = internal.NewRetryClient(wrapped, b.retries)
+	wrapped = internal.NewSigningClient(wrapped, b.credential)
+	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	return wrapped
 }
 

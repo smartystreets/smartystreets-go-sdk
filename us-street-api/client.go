@@ -4,15 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+
+	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
 // Client is responsible for sending batches of addresses to the us-street-api.
 type Client struct {
-	sender requestSender
+	sender sdk.RequestSender
 }
 
 // NewClient creates a client with the provided sender.
-func NewClient(sender requestSender) *Client {
+func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 

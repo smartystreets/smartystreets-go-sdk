@@ -67,35 +67,35 @@ func (f *HTTPSenderFixture) TestHTTP400() {
 	f.client.response = &http.Response{StatusCode: 400, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Resemble, smarty_sdk.NewHTTPStatusError(400, []byte("Hello, World!")))
+	f.So(err, should.Resemble, sdk.NewHTTPStatusError(400, []byte("Hello, World!")))
 }
 func (f *HTTPSenderFixture) TestHTTP401() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 401, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Resemble, smarty_sdk.NewHTTPStatusError(401, []byte("Hello, World!")))
+	f.So(err, should.Resemble, sdk.NewHTTPStatusError(401, []byte("Hello, World!")))
 }
 func (f *HTTPSenderFixture) TestHTTP402() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 402, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Resemble, smarty_sdk.NewHTTPStatusError(402, []byte("Hello, World!")))
+	f.So(err, should.Resemble, sdk.NewHTTPStatusError(402, []byte("Hello, World!")))
 }
 func (f *HTTPSenderFixture) TestHTTP413() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 413, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Resemble, smarty_sdk.NewHTTPStatusError(413, []byte("Hello, World!")))
+	f.So(err, should.Resemble, sdk.NewHTTPStatusError(413, []byte("Hello, World!")))
 }
 func (f *HTTPSenderFixture) TestHTTP429() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{StatusCode: 429, Body: body}
 	result, err := f.sender.Send(f.request)
 	f.So(result, should.BeNil)
-	f.So(err, should.Resemble, smarty_sdk.NewHTTPStatusError(429, []byte("Hello, World!")))
+	f.So(err, should.Resemble, sdk.NewHTTPStatusError(429, []byte("Hello, World!")))
 }
 
 func (f *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
