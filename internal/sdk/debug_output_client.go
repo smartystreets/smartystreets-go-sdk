@@ -30,8 +30,9 @@ func (d *DebugOutputClient) Do(request *http.Request) (*http.Response, error) {
 }
 
 func dumpRequest(request *http.Request) string {
-	dump, err := httputil.DumpRequestOut(request, true) // FUTURE: prefix line with '> ' (like cURL)
-	return composeDump("request", string(dump), err)
+	dump, err := httputil.DumpRequestOut(request, true)
+	prefixed := addPrefixToEachLine(string(dump), requestLinePrefix)
+	return composeDump("request", prefixed, err)
 }
 
 func dumpResponse(response *http.Response, err error) string {
@@ -39,7 +40,12 @@ func dumpResponse(response *http.Response, err error) string {
 		return composeDump("err", err.Error(), nil)
 	}
 	dump, err := httputil.DumpResponse(response, true)
-	return composeDump("response", string(dump), err) // FUTURE: prefix line with '< ' (like cURL)
+	prefixed := addPrefixToEachLine(string(dump), responseLinePrefix)
+	return composeDump("response", prefixed, err)
+}
+
+func addPrefixToEachLine(dump string, prefix string) string {
+	return prefix + strings.Join(strings.Split(dump, "\n"), "\n"+prefix)
 }
 
 func composeDump(title string, dump string, err error) string {
@@ -49,3 +55,8 @@ func composeDump(title string, dump string, err error) string {
 		return fmt.Sprintf("HTTP %s:\n%s\n", strings.Title(title), dump)
 	}
 }
+
+const (
+	requestLinePrefix  = "> "
+	responseLinePrefix = "< "
+)

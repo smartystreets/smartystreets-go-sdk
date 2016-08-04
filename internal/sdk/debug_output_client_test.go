@@ -43,20 +43,18 @@ func (f *DebugOutputClientFixture) TestRequestDumped() {
 }
 func (f *DebugOutputClientFixture) assertRequestDumped(log string) {
 	f.So(log, should.ContainSubstring, "HTTP Request:\n")
-	f.So(log, should.ContainSubstring, "PUT /search HTTP/1.1")
-	f.So(log, should.ContainSubstring, "Host: www.google.com")
-	f.So(log, should.ContainSubstring, "User-Agent: Go-http-client/1.1")
-	f.So(log, should.ContainSubstring, "Content-Length: 13")
-	f.So(log, should.ContainSubstring, "Accept-Encoding: gzip")
-	f.So(log, should.ContainSubstring, "\n\n")
-	f.So(log, should.ContainSubstring, "Hello, World!")
+	f.So(log, should.ContainSubstring, "> PUT /search HTTP/1.1")
+	f.So(log, should.ContainSubstring, "> Host: www.google.com")
+	f.So(log, should.ContainSubstring, "> User-Agent: Go-http-client/1.1")
+	f.So(log, should.ContainSubstring, "> Content-Length: 13")
+	f.So(log, should.ContainSubstring, "> Accept-Encoding: gzip")
+	f.So(log, should.ContainSubstring, "> Hello, World!")
 }
 func (f *DebugOutputClientFixture) assertResponseDumped(log string) {
 	f.So(log, should.ContainSubstring, "HTTP Response:")
-	f.So(log, should.ContainSubstring, "HTTP/1.1 418 I'm a teapot")
-	f.So(log, should.ContainSubstring, "Connection: close")
-	f.So(log, should.ContainSubstring, "\n\n")
-	f.So(log, should.ContainSubstring, "Goodbye, World!")
+	f.So(log, should.ContainSubstring, "< HTTP/1.1 418 I'm a teapot")
+	f.So(log, should.ContainSubstring, "< Connection: close")
+	f.So(log, should.ContainSubstring, "< Goodbye, World!")
 }
 
 func (f *DebugOutputClientFixture) TestErrorDumpedIfResponseNil() {
