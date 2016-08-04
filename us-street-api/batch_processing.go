@@ -1,6 +1,6 @@
 package us_street
 
-// SendLookups is a high-level convenience function that leverages a reusable Batch
+// SendLookups is a high-level convenience function that leverages an internal reusable Batch
 // to send all lookups provided in serial, blocking fashion.
 func (c *Client) SendLookups(lookups ...*Lookup) error {
 	stream := make(chan *Lookup)
@@ -15,7 +15,7 @@ func load(stream chan *Lookup, lookups []*Lookup) {
 	close(stream)
 }
 
-// SendFromChannel is a high-level convenience function that leverages a reusable Batch
+// SendFromChannel is a high-level convenience function that leverages an internal reusable Batch
 // to send everything received from the provided lookups channel in serial, blocking fashion.
 func (c *Client) SendFromChannel(lookups <-chan *Lookup) error {
 	processor := newBatchProcessor(lookups, c)
