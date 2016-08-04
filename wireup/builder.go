@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/smartystreets/smartystreets-go-sdk"
 	"bitbucket.org/smartystreets/smartystreets-go-sdk/internal/sdk"
 	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-street-api"
+	"bitbucket.org/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
@@ -75,10 +76,18 @@ func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 	return b
 }
 
-// BuildUSStreetAPIClient builds the client using the provided configuration details provided by other methods on the ClientBuilder.
+// BuildUSStreetAPIClient builds the us-street-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) BuildUSStreetAPIClient() *us_street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
 	return us_street.NewClient(b.buildHTTPSender())
+}
+
+// BuildUSZIPCodeAPIClient builds the us-zipcode-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *us_zipcode.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_USZIPCodeAPI)
+	return us_zipcode.NewClient(b.buildHTTPSender())
 }
 
 func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
@@ -101,4 +110,7 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped sdk.HTTPClient) {
 	return wrapped
 }
 
-var defaultBaseURL_USStreetAPI, _ = url.Parse("https://api.smartystreets.com")
+var (
+	defaultBaseURL_USStreetAPI, _  = url.Parse("https://api.smartystreets.com")
+	defaultBaseURL_USZIPCodeAPI, _ = url.Parse("https://us-zipcode.api.smartystreets.com")
+)
