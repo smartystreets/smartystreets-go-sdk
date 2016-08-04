@@ -13,7 +13,7 @@ type Lookup struct {
 	Addressee     string `json:"addressee,omitempty"`
 	Urbanization  string `json:"urbanization,omitempty"`
 	InputID       string `json:"input_id,omitempty"`
-	MaxCandidates int    `json:"candidates,omitempty"`
+	MaxCandidates int    `json:"candidates,omitempty"` // Default value: 1
 
 	Results []*Candidate `json:"-"`
 }
