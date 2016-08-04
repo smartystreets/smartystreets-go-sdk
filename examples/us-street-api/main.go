@@ -50,13 +50,12 @@ func main() {
 	}
 
 	for i, input := range batch.Records() {
-		fmt.Println("---------------------\n")
 		fmt.Println("Results for input:", i)
 		fmt.Println()
 		for j, candidate := range input.Results {
-			fmt.Println("Candidate:", j)
-			fmt.Println(candidate.DeliveryLine1)
-			fmt.Println(candidate.LastLine)
+			fmt.Println("  Candidate:", j)
+			fmt.Println(" ", candidate.DeliveryLine1)
+			fmt.Println(" ", candidate.LastLine)
 			fmt.Println()
 		}
 	}
