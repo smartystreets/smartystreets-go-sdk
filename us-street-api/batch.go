@@ -12,11 +12,11 @@ func NewBatch() *Batch {
 
 // Append includes the record in the collection to be sent if there is still room (max: 100).
 func (b *Batch) Append(record *Lookup) bool {
-	hasSpace := len(b.lookups) < MaxBatchSize
-	if hasSpace {
-		b.lookups = append(b.lookups, record)
+	if b.IsFull() {
+		return false
 	}
-	return hasSpace
+	b.lookups = append(b.lookups, record)
+	return true
 }
 
 func (b *Batch) attach(candidates []*Candidate) {
