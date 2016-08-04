@@ -26,7 +26,7 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 
 func (r *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
 	for attempt := 0; attempt <= r.maxRetries; attempt++ {
-		r.sleeper.Sleep(time.Second * time.Duration(attempt))
+		r.sleeper.Sleep(time.Second * time.Duration(attempt)) // FUTURE: upper threshold for back-off
 
 		response, err = r.inner.Do(request)
 

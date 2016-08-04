@@ -30,7 +30,7 @@ func (d *DebugOutputClient) Do(request *http.Request) (*http.Response, error) {
 }
 
 func dumpRequest(request *http.Request) string {
-	dump, err := httputil.DumpRequestOut(request, true)
+	dump, err := httputil.DumpRequestOut(request, true) // FUTURE: prefix line with '> ' (like cURL)
 	return composeDump("request", string(dump), err)
 }
 
@@ -39,7 +39,7 @@ func dumpResponse(response *http.Response, err error) string {
 		return composeDump("err", err.Error(), nil)
 	}
 	dump, err := httputil.DumpResponse(response, true)
-	return composeDump("response", string(dump), err)
+	return composeDump("response", string(dump), err) // FUTURE: prefix line with '< ' (like cURL)
 }
 
 func composeDump(title string, dump string, err error) string {
