@@ -29,9 +29,7 @@ func (c *Client) Ping() error {
 func (c *Client) SendBatch(batch *Batch) error {
 	if batch == nil || batch.Length() == 0 {
 		return nil
-	} else if request, err := buildRequest(batch); err != nil {
-		return err
-	} else if response, err := c.sender.Send(request); err != nil {
+	} else if response, err := c.sender.Send(buildRequest(batch)); err != nil {
 		return err
 	} else {
 		return deserializeResponse(response, batch)
@@ -47,9 +45,10 @@ func deserializeResponse(response []byte, batch *Batch) error {
 	return err
 }
 
-func buildRequest(batch *Batch) (*http.Request, error) {
-	payload, _ := json.Marshal(batch.lookups) // err ignored because since we control the types being serialized it is safe.
-	return http.NewRequest("POST", placeholderURL, bytes.NewReader(payload))
+func buildRequest(batch *Batch) *http.Request {
+	payload, _ := json.Marshal(batch.lookups)                                       // We control the types being serialized. This is safe.
+	request, _ := http.NewRequest("POST", placeholderURL, bytes.NewReader(payload)) // We control the method and the URL. This is safe.
+	return request
 }
 
 func buildPingRequest() *http.Request {
