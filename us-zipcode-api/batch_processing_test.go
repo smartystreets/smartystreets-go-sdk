@@ -61,17 +61,19 @@ func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 }
 
 func (f *BatchProcessingFixture) TestChannelOfLookupsSentInBatches() {
-	lookups := make(chan *Lookup, 250)
-	for x := 0; x < cap(lookups); x++ {
-		lookups <- &Lookup{InputID: strconv.Itoa(x)}
+	input := make(chan *Lookup, 250)
+	for x := 0; x < cap(input); x++ {
+		input <- &Lookup{InputID: strconv.Itoa(x)}
 	}
-	close(lookups)
+	close(input)
+	output := make(chan *Lookup, 250)
 
-	f.client.SendFromChannel(lookups)
+	err := f.client.SendFromChannel(input, output)
 
-	if !f.So(f.sender.callCount, should.Equal, 3) {
+	if !f.So(err, should.BeNil) || !f.So(f.sender.callCount, should.Equal, 3) {
 		return
 	}
+	f.So(len(unload(output)), should.Equal, 250)
 	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
 	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
 	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
@@ -79,6 +81,13 @@ func (f *BatchProcessingFixture) TestChannelOfLookupsSentInBatches() {
 	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
 	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
 	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249"}]`)
+}
+
+func unload(stream chan *Lookup) (lookups []*Lookup) {
+	for lookup := range stream {
+		lookups = append(lookups, lookup)
+	}
+	return lookups
 }
 
 func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsOnChannelFromBeingBatched() {
