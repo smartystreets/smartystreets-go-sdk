@@ -3,9 +3,9 @@ package street
 // SendLookups is a high-level convenience function that leverages an internal reusable Batch
 // to send all lookups provided in serial, blocking fashion.
 func (c *Client) SendLookups(lookups ...*Lookup) error {
-	stream := make(chan *Lookup)
-	go loadAll(stream, lookups)
-	return c.SendFromChannel(stream, nil)
+	input := make(chan *Lookup)
+	go loadAll(input, lookups)
+	return c.SendFromChannel(input, nil)
 }
 
 func loadAll(stream chan *Lookup, lookups []*Lookup) {
