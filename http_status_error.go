@@ -1,6 +1,9 @@
 package sdk
 
-import "net/http"
+import (
+	"net/http"
+	"fmt"
+)
 
 func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {
 	return &HTTPStatusError{
@@ -20,9 +23,13 @@ type HTTPStatusError struct {
 
 func (e *HTTPStatusError) Error() string {
 	if e == nil {
-		return http.StatusText(http.StatusOK)
+		return statusText(http.StatusOK)
 	}
-	return http.StatusText(e.statusCode)
+	return statusText(e.statusCode)
+}
+
+func statusText(code int) string {
+	return fmt.Sprintf("HTTP %d %s", code, http.StatusText(code))
 }
 
 func (e *HTTPStatusError) StatusCode() int {
