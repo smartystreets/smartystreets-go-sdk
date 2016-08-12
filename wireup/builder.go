@@ -20,6 +20,7 @@ type ClientBuilder struct {
 	retries    int
 	timeout    time.Duration
 	debug      bool
+	headers    http.Header
 }
 
 // NewClientBuilder creates a new client builder, ready to receive calls to its chain-able methods.
@@ -28,7 +29,14 @@ func NewClientBuilder() *ClientBuilder {
 		credential: &internal.NopCredential{},
 		retries:    4,
 		timeout:    time.Second * 10,
+		headers:    initializeHeadersWithUserAgent(),
 	}
+}
+
+func initializeHeadersWithUserAgent() http.Header {
+	headers := make(http.Header)
+	headers.Add("User-Agent", fmt.Sprintf("smartystreets (sdk:go@%s)", sdk.VERSION))
+	return headers
 }
 
 // WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
@@ -76,6 +84,12 @@ func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 	return b
 }
 
+// WithCustomHeader ensures the provided header is added to every API request made with the resulting client.
+func (b *ClientBuilder) WithCustomHeader(key, value string) *ClientBuilder {
+	b.headers.Add(key, value)
+	return b
+}
+
 // BuildUSStreetAPIClient builds the us-street-api client using the provided
 // configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
@@ -107,6 +121,7 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewRetryClient(wrapped, b.retries)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
+	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
 	return wrapped
 }
 
