@@ -47,11 +47,13 @@ func deserializeResponse(response []byte, batch *Batch) error {
 func buildRequest(batch *Batch) *http.Request {
 	payload, _ := json.Marshal(batch.lookups)                                  // We control the types being serialized. This is safe.
 	request, _ := http.NewRequest("POST", verifyURL, bytes.NewReader(payload)) // We control the method and the URL. This is safe.
+	request.Close = true
 	return request
 }
 
 func buildPingRequest() *http.Request {
 	request, _ := http.NewRequest("GET", statusURL, nil)
+	request.Close = true
 	return request
 }
 
