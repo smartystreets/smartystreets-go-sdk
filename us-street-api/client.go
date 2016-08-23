@@ -48,6 +48,7 @@ func buildRequest(batch *Batch) *http.Request {
 	payload, _ := json.Marshal(batch.lookups)                                  // We control the types being serialized. This is safe.
 	request, _ := http.NewRequest("POST", verifyURL, bytes.NewReader(payload)) // We control the method and the URL. This is safe.
 	request.Close = true
+	request.Header.Set("Content-Type", "application/json")
 	return request
 }
 
