@@ -17,14 +17,6 @@ func main() {
 		//WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
 		BuildUSStreetAPIClient()
 
-	if err := client.Ping(); err != nil {
-		fmt.Println("Ping failed:", err)
-		os.Exit(1)
-	} else {
-		fmt.Println("Ping successful; service is reachable and responding.")
-		fmt.Println()
-	}
-
 	lookup1 := &street.Lookup{
 		Street:        "1 Rosedale",
 		City:          "Baltimore",
