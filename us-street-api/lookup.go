@@ -14,7 +14,7 @@ type Lookup struct {
 	LastLine      string        `json:"lastline,omitempty"`
 	Addressee     string        `json:"addressee,omitempty"`
 	Urbanization  string        `json:"urbanization,omitempty"`
-	InputID       string        `json:"-"`
+	InputID       string        `json:"input_id,omitempty"`
 	MaxCandidates int           `json:"candidates,omitempty"` // Default value: 1
 	MatchStrategy matchStrategy `json:"match,omitempty"`
 
