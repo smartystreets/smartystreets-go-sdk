@@ -16,13 +16,6 @@ func main() {
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
 		BuildUSZIPCodeAPIClient()
 
-	if err := client.Ping(); err != nil {
-		fmt.Println("Ping failed:", err)
-		os.Exit(1)
-	} else {
-		fmt.Println("Ping successful; service is reachable and responding.")
-	}
-
 	batch := zipcode.NewBatch()
 	for batch.Append(&zipcode.Lookup{City: "PROVO", State: "UT", ZIPCode: "84604"}) {
 		fmt.Print(".")

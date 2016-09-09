@@ -91,18 +91,6 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(input.Result, should.BeNil)
 }
 
-func (f *ClientFixture) TestPingReturnsNothingWhenServiceIsUp() {
-	f.sender.err = nil
-	err := f.client.Ping()
-	f.So(err, should.BeNil)
-}
-
-func (f *ClientFixture) TestPingReturnsErrorWhenServiceIsUnreachableOrDown() {
-	f.sender.err = errors.New("HOT POCKETS!")
-	err := f.client.Ping()
-	f.So(err, should.Equal, f.sender.err)
-}
-
 /*////////////////////////////////////////////////////////////////////////*/
 
 type FakeSender struct {

@@ -18,12 +18,6 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// Ping returns an error if the service is not reachable or not responding.
-func (c *Client) Ping() error {
-	_, err := c.sender.Send(buildPingRequest())
-	return err
-}
-
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
 	if batch == nil || batch.Length() == 0 {
@@ -51,12 +45,4 @@ func buildRequest(batch *Batch) *http.Request {
 	return request
 }
 
-func buildPingRequest() *http.Request {
-	request, _ := http.NewRequest("GET", statusURL, nil)
-	return request
-}
-
-var (
-	verifyURL = "/street-address" // Remaining parts will be completed later by the sdk.BaseURLClient.
-	statusURL = "/status"
-)
+const verifyURL = "/street-address" // Remaining parts will be completed later by the sdk.BaseURLClient.
