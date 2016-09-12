@@ -18,7 +18,7 @@ type Lookup struct {
 	MaxCandidates int           `json:"candidates,omitempty"` // Default value: 1
 	MatchStrategy matchStrategy `json:"match,omitempty"`
 
-	Results []*Candidate `json:"-"`
+	Results []*Candidate `json:"results"`
 }
 
 /**************************************************************************/
