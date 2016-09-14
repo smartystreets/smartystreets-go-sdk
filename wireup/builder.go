@@ -126,6 +126,6 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 }
 
 var (
-	defaultBaseURL_USStreetAPI, _  = url.Parse("https://api.smartystreets.com")
+	defaultBaseURL_USStreetAPI, _  = url.Parse("https://us-street.api.smartystreets.com")
 	defaultBaseURL_USZIPCodeAPI, _ = url.Parse("https://us-zipcode.api.smartystreets.com")
 )
