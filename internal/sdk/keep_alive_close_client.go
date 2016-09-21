@@ -17,4 +17,3 @@ func (c *KeepAliveCloseClient) Do(request *http.Request) (*http.Response, error)
 	request.Close = true
 	return c.inner.Do(request)
 }
-
