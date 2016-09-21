@@ -20,6 +20,7 @@ type ClientBuilder struct {
 	retries    int
 	timeout    time.Duration
 	debug      bool
+	close      bool
 	headers    http.Header
 }
 
@@ -90,6 +91,11 @@ func (b *ClientBuilder) WithCustomHeader(key, value string) *ClientBuilder {
 	return b
 }
 
+func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
+	b.close = true
+	return b
+}
+
 // BuildUSStreetAPIClient builds the us-street-api client using the provided
 // configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
@@ -122,6 +128,7 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
+	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	return wrapped
 }
 
