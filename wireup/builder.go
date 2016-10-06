@@ -43,7 +43,7 @@ func initializeHeadersWithUserAgent() http.Header {
 // WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
 // In all but very few cases calling this method with a valid authID and authToken is required.
 func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
-	b.credential = &sdk.SecretKeyCredential{AuthID: authID, AuthToken: authToken}
+	b.credential = sdk.NewSecretKeyCredential(authID, authToken)
 	return b
 }
 
