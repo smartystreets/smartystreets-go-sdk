@@ -3,6 +3,7 @@ package sdk
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/smartystreets/assertions/should"
@@ -12,6 +13,10 @@ import (
 
 type RetryClientFixture struct {
 	*gunit.Fixture
+	inner    *FakeMultiHTTPClient
+	response *http.Response
+	err      error
+
 	sleeper *clock.Sleeper
 }
 
@@ -19,45 +24,63 @@ func (f *RetryClientFixture) Setup() {
 	f.sleeper = clock.StayAwake()
 }
 
-func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {
-	clientError := errors.New("Simulating Network Outage")
-	inner := NewErringHTTPClient(clientError, clientError, clientError, clientError, nil)
-	response, err := f.sendWithRetry(4, inner)
+/**************************************************************************/
 
-	if f.So(response, should.NotBeNil) {
-		f.So(response.StatusCode, should.Equal, 200)
+func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {
+	f.simulateNetworkOutageUntilSuccess()
+	f.response, f.err = f.sendWithRetry(4)
+	f.assertRequestAttempted5TimesWithBackOff_EachTimeWithSameBody()
+}
+func (f *RetryClientFixture) simulateNetworkOutageUntilSuccess() {
+	clientError := errors.New("Simulating Network Outage")
+	f.inner = NewErringHTTPClient(clientError, clientError, clientError, clientError, nil)
+}
+func (f *RetryClientFixture) assertRequestAttempted5TimesWithBackOff_EachTimeWithSameBody() {
+	f.assertRequestWasSuccessful()
+	f.assertBackOffStrategyWasObserved()
+	f.So(f.inner.bodies, should.Resemble, []string{"request", "request", "request", "request", "request"})
+}
+func (f *RetryClientFixture) assertRequestWasSuccessful() {
+	f.So(f.err, should.BeNil)
+	if f.So(f.response, should.NotBeNil) {
+		f.So(f.response.StatusCode, should.Equal, 200)
 	}
-	f.So(err, should.BeNil)
-	f.So(inner.call, should.Equal, 5)
+}
+func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
+	f.So(f.inner.call, should.Equal, 5)
 	f.So(f.sleeper.Naps, should.Resemble,
 		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
 }
+
+/**************************************************************************/
 
 func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
-	inner := NewFailingHTTPClient(400, 401, 402, 422, 200)
-	response, err := f.sendWithRetry(4, inner)
+	f.inner = NewFailingHTTPClient(400, 401, 402, 422, 200)
 
-	if f.So(response, should.NotBeNil) {
-		f.So(response.StatusCode, should.Equal, 200)
-	}
-	f.So(err, should.BeNil)
-	f.So(inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.Resemble,
-		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
+	f.response, f.err = f.sendWithRetry(4)
+
+	f.assertRequestWasSuccessful()
+	f.assertBackOffStrategyWasObserved()
 }
+
+/**************************************************************************/
 
 func (f *RetryClientFixture) TestFailureReturnedIfRetryExceeded() {
-	inner := NewFailingHTTPClient(500, 500, 500, 500, 500)
-	response, err := f.sendWithRetry(4, inner)
+	f.inner = NewFailingHTTPClient(500, 500, 500, 500, 500)
 
-	if f.So(response, should.NotBeNil) {
-		f.So(response.StatusCode, should.Equal, 500)
-	}
-	f.So(err, should.BeNil)
-	f.So(inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.Resemble,
-		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
+	f.response, f.err = f.sendWithRetry(4)
+
+	f.assertInternalServerError()
+	f.assertBackOffStrategyWasObserved()
 }
+func (f *RetryClientFixture) assertInternalServerError() {
+	if f.So(f.response, should.NotBeNil) {
+		f.So(f.response.StatusCode, should.Equal, 500)
+	}
+	f.So(f.err, should.BeNil)
+}
+
+/**************************************************************************/
 
 func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	inner := &FakeHTTPClient{}
@@ -65,11 +88,15 @@ func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	f.So(client, should.Equal, inner)
 }
 
+/**************************************************************************/
+
 func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
-	inner := NewFailingHTTPClient(make([]int, 20)...)
-	_, err := f.sendWithRetry(19, inner)
-	f.So(err, should.BeNil)
-	f.So(inner.call, should.Equal, 20)
+	f.inner = NewFailingHTTPClient(make([]int, 20)...)
+
+	_, f.err = f.sendWithRetry(19)
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 20)
 	f.So(f.sleeper.Naps, should.Resemble,
 		[]time.Duration{
 			time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4, // incrementing
@@ -79,9 +106,11 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 		})
 }
 
-func (f *RetryClientFixture) sendWithRetry(retries int, inner *FakeMultiHTTPClient) (*http.Response, error) {
-	client := NewRetryClient(inner, retries).(*RetryClient)
+/**************************************************************************/
+
+func (f *RetryClientFixture) sendWithRetry(retries int) (*http.Response, error) {
+	client := NewRetryClient(f.inner, retries).(*RetryClient)
 	client.sleeper = f.sleeper
-	request, _ := http.NewRequest("GET", "/", nil)
+	request, _ := http.NewRequest("GET", "/", strings.NewReader("request"))
 	return client.Do(request)
 }

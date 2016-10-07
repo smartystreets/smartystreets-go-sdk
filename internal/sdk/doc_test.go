@@ -1,6 +1,9 @@
 package sdk
 
-import "net/http"
+import (
+	"io/ioutil"
+	"net/http"
+)
 
 //go:generate go install github.com/smartystreets/gunit/gunit
 //go:generate gunit
@@ -20,6 +23,7 @@ func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
 
 type FakeMultiHTTPClient struct {
 	requests  []*http.Request
+	bodies    []string
 	responses []*http.Response
 	errors    []error
 	call      int
@@ -27,8 +31,16 @@ type FakeMultiHTTPClient struct {
 
 func (f *FakeMultiHTTPClient) Do(request *http.Request) (*http.Response, error) {
 	defer f.increment()
+	f.simulateServerReadingRequestBody(request)
 	f.requests = append(f.requests, request)
 	return f.responses[f.call], f.errors[f.call]
+}
+
+func (f *FakeMultiHTTPClient) simulateServerReadingRequestBody(request *http.Request) {
+	if request.Body != nil {
+		body, _ := ioutil.ReadAll(request.Body)
+		f.bodies = append(f.bodies, string(body))
+	}
 }
 
 func (f *FakeMultiHTTPClient) increment() {

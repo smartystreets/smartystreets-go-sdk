@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -25,7 +27,10 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 }
 
 func (r *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
+	body, _ := ioutil.ReadAll(request.Body) // TODO: check err and bail if non-nil
+
 	for attempt := 0; r.backOff(attempt); attempt++ {
+		request.Body = ioutil.NopCloser(bytes.NewReader(body))
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			break
 		}
