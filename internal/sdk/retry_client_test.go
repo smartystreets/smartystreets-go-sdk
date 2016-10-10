@@ -24,6 +24,23 @@ func (f *RetryClientFixture) Setup() {
 	f.sleeper = clock.StayAwake()
 }
 
+func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmediately() {
+	f.response, f.err = f.sendErrorProneRequest()
+	f.assertReadErrorReturnedAndRequestNotSent()
+}
+func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
+	f.inner = &FakeMultiHTTPClient{}
+	client := NewRetryClient(f.inner, 10).(*RetryClient)
+	client.sleeper = f.sleeper
+	request, _ := http.NewRequest("GET", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
+	return client.Do(request)
+}
+func (f *RetryClientFixture) assertReadErrorReturnedAndRequestNotSent() {
+	f.So(f.response, should.BeNil)
+	f.So(f.err, should.Resemble, errors.New("GOPHERS!"))
+	f.So(f.inner.call, should.Equal, 0)
+}
+
 /**************************************************************************/
 
 func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {

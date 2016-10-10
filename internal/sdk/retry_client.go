@@ -27,7 +27,10 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 }
 
 func (r *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
-	body, _ := ioutil.ReadAll(request.Body) // TODO: check err and bail if non-nil
+	body, err := ioutil.ReadAll(request.Body) // TODO: check err and bail if non-nil
+	if err != nil {
+		return nil, err
+	}
 
 	for attempt := 0; r.backOff(attempt); attempt++ {
 		request.Body = ioutil.NopCloser(bytes.NewReader(body))
