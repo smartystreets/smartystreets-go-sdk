@@ -32,7 +32,7 @@ func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	f.inner = &FakeMultiHTTPClient{}
 	client := NewRetryClient(f.inner, 10).(*RetryClient)
 	client.sleeper = f.sleeper
-	request, _ := http.NewRequest("GET", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
+	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
 }
 func (f *RetryClientFixture) assertReadErrorReturnedAndRequestNotSent() {
@@ -41,11 +41,17 @@ func (f *RetryClientFixture) assertReadErrorReturnedAndRequestNotSent() {
 	f.So(f.inner.call, should.Equal, 0)
 }
 
+func (f *RetryClientFixture) TestGetRequestRetryUntilSuccess() {
+	f.simulateNetworkOutageUntilSuccess()
+	f.response, f.err = f.sendGetWithRetry(4)
+	f.assertRequestAttempted5TimesWithBackOff_EachTimeWithSameBody()
+}
+
 /**************************************************************************/
 
 func (f *RetryClientFixture) TestRetryOnClientErrorUntilSuccess() {
 	f.simulateNetworkOutageUntilSuccess()
-	f.response, f.err = f.sendWithRetry(4)
+	f.response, f.err = f.sendPostWithRetry(4)
 	f.assertRequestAttempted5TimesWithBackOff_EachTimeWithSameBody()
 }
 func (f *RetryClientFixture) simulateNetworkOutageUntilSuccess() {
@@ -74,7 +80,7 @@ func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
 	f.inner = NewFailingHTTPClient(400, 401, 402, 422, 200)
 
-	f.response, f.err = f.sendWithRetry(4)
+	f.response, f.err = f.sendPostWithRetry(4)
 
 	f.assertRequestWasSuccessful()
 	f.assertBackOffStrategyWasObserved()
@@ -85,7 +91,7 @@ func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
 func (f *RetryClientFixture) TestFailureReturnedIfRetryExceeded() {
 	f.inner = NewFailingHTTPClient(500, 500, 500, 500, 500)
 
-	f.response, f.err = f.sendWithRetry(4)
+	f.response, f.err = f.sendPostWithRetry(4)
 
 	f.assertInternalServerError()
 	f.assertBackOffStrategyWasObserved()
@@ -110,7 +116,7 @@ func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	f.inner = NewFailingHTTPClient(make([]int, 20)...)
 
-	_, f.err = f.sendWithRetry(19)
+	_, f.err = f.sendPostWithRetry(19)
 
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, 20)
@@ -125,9 +131,15 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 
 /**************************************************************************/
 
-func (f *RetryClientFixture) sendWithRetry(retries int) (*http.Response, error) {
+func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
 	client := NewRetryClient(f.inner, retries).(*RetryClient)
 	client.sleeper = f.sleeper
-	request, _ := http.NewRequest("GET", "/", strings.NewReader("request"))
+	request, _ := http.NewRequest("GET", "/?body=request", nil)
+	return client.Do(request)
+}
+func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, error) {
+	client := NewRetryClient(f.inner, retries).(*RetryClient)
+	client.sleeper = f.sleeper
+	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
 }
