@@ -14,7 +14,7 @@ func main() {
 
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
-		WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
+		//WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
 		BuildUSAutocompleteAPIClient()
 
 	lookup := &autocomplete.Lookup{Prefix: "123 main"}
