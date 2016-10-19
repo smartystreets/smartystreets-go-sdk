@@ -24,8 +24,18 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 	} else if response, err := c.sender.Send(buildRequest(lookup)); err != nil {
 		return err
 	} else {
-		return json.Unmarshal(response, &lookup.Results)
+		return deserializeResponse(response, lookup)
 	}
+}
+
+func deserializeResponse(response []byte, lookup *Lookup) error {
+	var suggestions suggestionListing
+	err := json.Unmarshal(response, &suggestions)
+	if err != nil {
+		return err
+	}
+	lookup.Results = suggestions.Listing
+	return nil
 }
 
 func buildRequest(lookup *Lookup) *http.Request {

@@ -1,5 +1,8 @@
 package autocomplete
 
+type suggestionListing struct {
+	Listing []*Suggestion `json:"suggestions"`
+}
 // Suggestion is the primary element in the response array.
 // Online documentation: https://smartystreets.com/docs/us-autocomplete-api#http-response
 type Suggestion struct {

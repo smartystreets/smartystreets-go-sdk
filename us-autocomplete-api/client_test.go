@@ -24,11 +24,11 @@ func (f *ClientFixture) Setup() {
 }
 
 func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseCandidatesIncorporatedIntoLookup() {
-	f.sender.response = `[
+	f.sender.response = `{"suggestions":[
 		{"text": "1"},
 		{"text": "2"},
 		{"text": "3"}
-	]`
+	]}`
 	f.input.Prefix = "42"
 
 	err := f.client.SendLookup(f.input)
@@ -57,12 +57,11 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("GOPHERS!")
-	f.sender.response = `[
+	f.sender.response = `{"suggestions":[
 		{"text": "1"},
 		{"text": "2"},
 		{"text": "3"}
-	]` // would be deserialized if not for the err (above)
-
+	]}` // would be deserialized if not for the err (above)
 	f.input.Prefix = "HI"
 
 	err := f.client.SendLookup(f.input)
