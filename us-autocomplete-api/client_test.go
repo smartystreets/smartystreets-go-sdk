@@ -23,7 +23,7 @@ func (f *ClientFixture) Setup() {
 	f.input = new(Lookup)
 }
 
-func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseCandidatesIncorporatedIntoLookup() {
+func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
 	f.sender.response = `{"suggestions":[
 		{"text": "1"},
 		{"text": "2"},
@@ -37,6 +37,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseCandidatesIn
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
+	f.So(f.sender.request.Header.Get("Content-Type"), should.Equal, "text/plain")
 	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
 
