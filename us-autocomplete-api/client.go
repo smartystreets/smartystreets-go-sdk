@@ -52,8 +52,6 @@ func buildRequest(lookup *Lookup) *http.Request {
 	query.Set("prefer", strings.Join(lookup.CityStatePreferences, ";"))
 
 	request.URL.RawQuery = query.Encode()
-	request.Header.Set("Content-Type", "application/json")
-
 	return request
 }
 
