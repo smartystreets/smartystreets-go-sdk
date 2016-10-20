@@ -3,6 +3,8 @@ package autocomplete
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
 )
@@ -41,10 +43,17 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 func buildRequest(lookup *Lookup) *http.Request {
 	request, _ := http.NewRequest("GET", suggestURL, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
+
+	// Apply lookup values to query
 	query.Set("prefix", lookup.Prefix)
-	// TODO: additional input fields
+	query.Set("suggestions", strconv.Itoa(lookup.MaxSuggestions))
+	query.Set("city_filter", strings.Join(lookup.CityFilter, ","))
+	query.Set("state_filter", strings.Join(lookup.StateFilter, ","))
+	query.Set("prefer", strings.Join(lookup.CityStatePreferences, ";"))
+
 	request.URL.RawQuery = query.Encode()
 	request.Header.Set("Content-Type", "application/json")
+
 	return request
 }
 
