@@ -26,8 +26,24 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 	}
 }
 
-func (r *RetryClient) Do(request *http.Request) (response *http.Response, err error) {
-	body, err := ioutil.ReadAll(request.Body) // TODO: check err and bail if non-nil
+func (r *RetryClient) Do(request *http.Request) (*http.Response, error) {
+	if request.Method == "POST" {
+		return r.doBufferedPost(request)
+	}
+	return r.doGet(request)
+}
+
+func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err error) {
+	for attempt := 0; r.backOff(attempt); attempt++ {
+		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
+			break
+		}
+	}
+	return response, err
+}
+
+func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Response, err error) {
+	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return nil, err
 	}

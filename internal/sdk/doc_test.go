@@ -40,6 +40,8 @@ func (f *FakeMultiHTTPClient) simulateServerReadingRequestBody(request *http.Req
 	if request.Body != nil {
 		body, _ := ioutil.ReadAll(request.Body)
 		f.bodies = append(f.bodies, string(body))
+	} else {
+		f.bodies = append(f.bodies, request.URL.Query().Get("body"))
 	}
 }
 
