@@ -18,6 +18,7 @@ import (
 type ClientBuilder struct {
 	credential sdk.Credential
 	baseURL    *url.URL
+	proxy      *url.URL
 	retries    int
 	timeout    time.Duration
 	debug      bool
@@ -97,6 +98,15 @@ func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
 	return b
 }
 
+func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
+	proxy, err := url.Parse(address)
+	if err != nil {
+		panic(fmt.Sprint("Could not parse provided address:", err.Error()))
+	}
+	b.proxy = proxy
+	return b
+}
+
 // BuildUSStreetAPIClient builds the us-street-api client using the provided
 // configuration details provided by other methods on the ClientBuilder.
 func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
@@ -130,7 +140,11 @@ func (b *ClientBuilder) buildHTTPSender() *internal.HTTPSender {
 }
 
 func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
-	wrapped = &http.Client{Timeout: b.timeout}
+	client := &http.Client{Timeout: b.timeout}
+	if b.proxy != nil {
+		client.Transport = &http.Transport{Proxy: http.ProxyURL(b.proxy)}
+	}
+	wrapped = client
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = internal.NewRetryClient(wrapped, b.retries)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
