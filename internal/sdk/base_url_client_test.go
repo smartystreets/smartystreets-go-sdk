@@ -3,10 +3,15 @@ package sdk
 import (
 	"net/http"
 	"net/url"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestBaseURLClientFixture(t *testing.T) {
+	gunit.Run(new(BaseURLClientFixture), t)
+}
 
 type BaseURLClientFixture struct {
 	*gunit.Fixture

@@ -6,10 +6,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestBatchProcessingFixture(t *testing.T) {
+	gunit.Run(new(BatchProcessingFixture), t)
+}
 
 type BatchProcessingFixture struct {
 	*gunit.Fixture

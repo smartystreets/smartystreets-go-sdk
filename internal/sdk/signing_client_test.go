@@ -3,10 +3,15 @@ package sdk
 import (
 	"errors"
 	"net/http"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestSigningClientFixture(t *testing.T) {
+	gunit.Run(new(SigningClientFixture), t)
+}
 
 type SigningClientFixture struct {
 	*gunit.Fixture

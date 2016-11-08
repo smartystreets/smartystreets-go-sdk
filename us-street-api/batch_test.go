@@ -3,10 +3,15 @@ package street
 import (
 	"encoding/json"
 	"strconv"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestBatchFixture(t *testing.T) {
+	gunit.Run(new(BatchFixture), t)
+}
 
 type BatchFixture struct {
 	*gunit.Fixture

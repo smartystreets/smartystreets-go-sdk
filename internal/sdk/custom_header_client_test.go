@@ -1,12 +1,17 @@
 package sdk
 
 import (
-	"net/http"
-
-	"github.com/smartystreets/gunit"
 	"errors"
+	"net/http"
+	"testing"
+
 	"github.com/smartystreets/assertions/should"
+	"github.com/smartystreets/gunit"
 )
+
+func TestCustomHeadersClientFixture(t *testing.T) {
+	gunit.Run(new(CustomHeadersClientFixture), t)
+}
 
 type CustomHeadersClientFixture struct {
 	*gunit.Fixture

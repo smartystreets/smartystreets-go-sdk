@@ -5,9 +5,6 @@ import (
 	"net/http"
 )
 
-//go:generate go install github.com/smartystreets/gunit/gunit
-//go:generate gunit
-
 type FakeHTTPClient struct {
 	request  *http.Request
 	response *http.Response

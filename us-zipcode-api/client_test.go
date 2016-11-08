@@ -4,10 +4,15 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestClientFixture(t *testing.T) {
+	gunit.Run(new(ClientFixture), t)
+}
 
 type ClientFixture struct {
 	*gunit.Fixture

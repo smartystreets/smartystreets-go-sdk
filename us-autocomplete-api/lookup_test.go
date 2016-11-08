@@ -2,10 +2,15 @@ package autocomplete
 
 import (
 	"net/url"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestLookupSerializationFixture(t *testing.T) {
+	gunit.Run(new(LookupSerializationFixture), t)
+}
 
 type LookupSerializationFixture struct {
 	*gunit.Fixture

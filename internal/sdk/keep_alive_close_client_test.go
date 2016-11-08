@@ -5,10 +5,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )
+
+func TestKeepAliveCloseClientFixture(t *testing.T) {
+	gunit.Run(new(KeepAliveCloseClientFixture), t)
+}
 
 type KeepAliveCloseClientFixture struct {
 	*gunit.Fixture

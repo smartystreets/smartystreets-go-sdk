@@ -4,12 +4,17 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/clock"
 	"github.com/smartystreets/gunit"
 )
+
+func TestRetryClientFixture(t *testing.T) {
+	gunit.Run(new(RetryClientFixture), t)
+}
 
 type RetryClientFixture struct {
 	*gunit.Fixture

@@ -1,9 +1,6 @@
 #!/usr/bin/make -f
 
-default: test
-
 test: build
-	go generate ./...
 	go test -v -short ./...
 
 build:

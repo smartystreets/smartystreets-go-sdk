@@ -5,11 +5,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 	"github.com/smartystreets/logging"
 )
+
+func TestDebugOutputClientFixture(t *testing.T) {
+	gunit.Run(new(DebugOutputClientFixture), t)
+}
 
 type DebugOutputClientFixture struct {
 	*gunit.Fixture

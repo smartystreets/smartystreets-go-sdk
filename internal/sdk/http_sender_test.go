@@ -4,11 +4,16 @@ import (
 	"bytes"
 	"errors"
 	"net/http"
+	"testing"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 	"github.com/smartystreets/smartystreets-go-sdk"
 )
+
+func TestHTTPSenderFixture(t *testing.T) {
+	gunit.Run(new(HTTPSenderFixture), t)
+}
 
 type HTTPSenderFixture struct {
 	*gunit.Fixture
