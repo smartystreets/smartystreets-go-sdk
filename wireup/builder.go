@@ -23,6 +23,7 @@ type ClientBuilder struct {
 	timeout    time.Duration
 	debug      bool
 	close      bool
+	trace      bool
 	headers    http.Header
 }
 
@@ -140,18 +141,31 @@ func (b *ClientBuilder) buildHTTPSender() *internal.HTTPSender {
 }
 
 func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
-	client := &http.Client{Timeout: b.timeout}
-	if b.proxy != nil {
-		client.Transport = &http.Transport{Proxy: http.ProxyURL(b.proxy)}
-	}
-	wrapped = client
+	// inner-most
+	wrapped = &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
+	wrapped = internal.NewTracingClient(wrapped, b.trace)
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = internal.NewRetryClient(wrapped, b.retries)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
+	// outer-most
 	return wrapped
+}
+
+func (b *ClientBuilder) buildTransport() *http.Transport {
+	transport := &http.Transport{}
+	if b.proxy != nil {
+		transport.Proxy = http.ProxyURL(b.proxy)
+	}
+	return transport
+}
+
+// WithHTTPRequestTracing is an experimental feature which may or may not remain.
+func (b *ClientBuilder) WithHTTPRequestTracing() *ClientBuilder {
+	b.trace = true
+	return b
 }
 
 var (
