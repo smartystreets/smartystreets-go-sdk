@@ -42,7 +42,6 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
-	f.So(f.sender.request.Header.Get("Content-Type"), should.Equal, "text/plain")
 	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
 

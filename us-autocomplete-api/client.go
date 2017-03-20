@@ -43,7 +43,6 @@ func buildRequest(lookup *Lookup) *http.Request {
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
-	request.Header.Set("Content-Type", "text/plain")
 	return request
 }
 
