@@ -23,14 +23,8 @@ func main() {
 		log.Fatal("Error sending batch:", err)
 	}
 
-	fmt.Println("Results for input:")
-	fmt.Println()
+	fmt.Printf("Results for input: [%s]\n", lookup.Prefix)
 	for s, suggestion := range lookup.Results {
-		fmt.Println("  Suggestion:", s)
-		fmt.Println(" ", suggestion.Text)
-		fmt.Println(" ", suggestion.StreetLine)
-		fmt.Println(" ", suggestion.City)
-		fmt.Println(" ", suggestion.State)
-		fmt.Println()
+		fmt.Printf("#%d: %#v\n", s, suggestion)
 	}
 }
