@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	log.SetFlags(log.Ltime)
+	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
@@ -27,4 +27,6 @@ func main() {
 	for s, suggestion := range lookup.Results {
 		fmt.Printf("#%d: %#v\n", s, suggestion)
 	}
+
+	log.Println("OK")
 }

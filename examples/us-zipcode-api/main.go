@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	log.SetFlags(log.Ltime)
+	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
@@ -31,4 +31,6 @@ func main() {
 		fmt.Printf("%#v\n", input.Result)
 		fmt.Println()
 	}
+
+	log.Println("OK")
 }
