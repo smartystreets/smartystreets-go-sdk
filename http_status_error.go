@@ -1,8 +1,8 @@
 package sdk
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {
