@@ -9,6 +9,7 @@ import (
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
+	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
@@ -128,6 +129,13 @@ func (b *ClientBuilder) BuildUSAutocompleteAPIClient() *autocomplete.Client {
 	return autocomplete.NewClient(b.buildHTTPSender())
 }
 
+// BuildUSExtractAPIClient builds the us-extract-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildUSExtractAPIClient() *extract.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_USExtractAPI)
+	return extract.NewClient(b.buildHTTPSender())
+}
+
 func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
 	if b.baseURL == nil {
 		b.baseURL = u
@@ -158,4 +166,5 @@ var (
 	defaultBaseURL_USStreetAPI, _       = url.Parse("https://us-street.api.smartystreets.com")
 	defaultBaseURL_USZIPCodeAPI, _      = url.Parse("https://us-zipcode.api.smartystreets.com")
 	defaultBaseURL_USAutocompleteAPI, _ = url.Parse("https://us-autocomplete.api.smartystreets.com")
+	defaultBaseURL_USExtractAPI, _      = url.Parse("https://us-extract.api.smartystreets.com")
 )
