@@ -6,4 +6,3 @@ import "net/http"
 type RequestSender interface {
 	Send(*http.Request) ([]byte, error)
 }
-
