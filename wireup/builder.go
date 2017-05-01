@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
+	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
@@ -136,6 +137,13 @@ func (b *ClientBuilder) BuildUSExtractAPIClient() *extract.Client {
 	return extract.NewClient(b.buildHTTPSender())
 }
 
+// BuildInternationalStreetAPIClient builds the international-street-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildInternationalStreetAPIClient() *international_street.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_InternationalStreetAPI)
+	return international_street.NewClient(b.buildHTTPSender())
+}
+
 func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
 	if b.baseURL == nil {
 		b.baseURL = u
@@ -163,8 +171,9 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 }
 
 var (
-	defaultBaseURL_USStreetAPI, _       = url.Parse("https://us-street.api.smartystreets.com")
-	defaultBaseURL_USZIPCodeAPI, _      = url.Parse("https://us-zipcode.api.smartystreets.com")
-	defaultBaseURL_USAutocompleteAPI, _ = url.Parse("https://us-autocomplete.api.smartystreets.com")
-	defaultBaseURL_USExtractAPI, _      = url.Parse("https://us-extract.api.smartystreets.com")
+	defaultBaseURL_InternationalStreetAPI, _ = url.Parse("https://international-street.api.smartystreets.com")
+	defaultBaseURL_USStreetAPI, _            = url.Parse("https://us-street.api.smartystreets.com")
+	defaultBaseURL_USZIPCodeAPI, _           = url.Parse("https://us-zipcode.api.smartystreets.com")
+	defaultBaseURL_USAutocompleteAPI, _      = url.Parse("https://us-autocomplete.api.smartystreets.com")
+	defaultBaseURL_USExtractAPI, _           = url.Parse("https://us-extract.api.smartystreets.com")
 )
