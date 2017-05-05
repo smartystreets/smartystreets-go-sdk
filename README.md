@@ -6,4 +6,10 @@ The official client libraries for accessing SmartyStreets APIs from Go.
 
 You may have noticed this page is curiously sparse. Don't panic, there are [examples](/examples) and [documentation](https://godoc.org/github.com/smartystreets/smartystreets-go-sdk).
 
+---
+
+[![asciicast](https://asciinema.org/a/119332.png)](https://asciinema.org/a/119332)
+
+---
+
 [Apache 2.0 License](LICENSE.md)
