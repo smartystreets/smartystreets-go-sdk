@@ -100,6 +100,7 @@ func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
 	return b
 }
 
+// ViaProxy saves the address of your proxy server through which to send all requests.
 func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
 	proxy, err := url.Parse(address)
 	if err != nil {

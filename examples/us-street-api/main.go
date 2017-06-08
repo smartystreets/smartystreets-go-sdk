@@ -14,6 +14,7 @@ func main() {
 
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
+		//ViaProxy("https://my-proxy.my-company.com"). // uncomment this line to point to the specified proxy.
 		//WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
 		BuildUSStreetAPIClient()
 
