@@ -73,7 +73,6 @@ type (
 		Longitude           float64 `json:"longitude,omitempty"`
 		GeocodePrecision    string  `json:"geocode_precision,omitempty"`
 		MaxGeocodePrecision string  `json:"max_geocode_precision,omitempty"`
-		AddressFormat       string  `json:"address_format,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:
