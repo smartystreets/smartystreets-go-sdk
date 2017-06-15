@@ -9,8 +9,6 @@ import (
 	"github.com/smartystreets/logging"
 )
 
-// TODO: tests? (The tracing constructs and request context weren't designed with testing in mind...)
-
 type TracingClient struct {
 	inner  HTTPClient
 	logger *logging.Logger
