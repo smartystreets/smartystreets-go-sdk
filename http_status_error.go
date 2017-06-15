@@ -1,14 +1,14 @@
 package sdk
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {
 	return &HTTPStatusError{
 		statusCode: statusCode,
-		content:    content,
+		content:    string(content),
 	}
 }
 
@@ -18,14 +18,14 @@ func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {
 // of this type behave as if called on a non-nil instance instantiated with http.StatusOK (200).
 type HTTPStatusError struct {
 	statusCode int
-	content    []byte
+	content    string
 }
 
 func (e *HTTPStatusError) Error() string {
 	if e == nil {
 		return statusText(http.StatusOK)
 	}
-	return statusText(e.statusCode)
+	return statusText(e.statusCode) + "\n" + e.content
 }
 
 func statusText(code int) string {
@@ -39,9 +39,9 @@ func (e *HTTPStatusError) StatusCode() int {
 	return e.statusCode
 }
 
-func (e *HTTPStatusError) Content() []byte {
+func (e *HTTPStatusError) Content() string {
 	if e == nil {
-		return nil
+		return ""
 	}
 	return e.content
 }

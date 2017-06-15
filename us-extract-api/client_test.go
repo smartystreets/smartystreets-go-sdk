@@ -1,4 +1,4 @@
-package autocomplete
+package extract
 
 import (
 	"errors"
@@ -28,24 +28,19 @@ func (f *ClientFixture) Setup() {
 	f.input = new(Lookup)
 }
 
-func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
-	f.sender.response = `{"suggestions":[
-		{"text": "1"},
-		{"text": "2"},
-		{"text": "3"}
-	]}`
-	f.input.Prefix = "42"
+func (f *ClientFixture) TestLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
-	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
-	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
-	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
+	f.So(f.sender.request.Method, should.Equal, "POST")
+	f.So(f.sender.request.URL.Path, should.Equal, extractURL)
+	f.So(readBody(f.sender.request), should.Equal, "42")
 
-	f.So(f.input.Results, should.Resemble, []*Suggestion{{Text: "1"}, {Text: "2"}, {Text: "3"}})
+	f.So(f.input.Result, should.Resemble, &Result{Metadata: Metadata{Lines: 42}})
 }
 
 func (f *ClientFixture) TestNilLookupNOP() {
@@ -62,27 +57,23 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("GOPHERS!")
-	f.sender.response = `{"suggestions":[
-		{"text": "1"},
-		{"text": "2"},
-		{"text": "3"}
-	]}` // would be deserialized if not for the err (above)
-	f.input.Prefix = "HI"
+	f.sender.response = `{"meta": {"lines": 42}}` // would be deserialized if not for the err (above)
+	f.input.Text = "HI"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Results, should.BeEmpty)
+	f.So(f.input.Result, should.BeNil)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input.Prefix = "HI"
+	f.input.Text = "HI"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Results, should.BeEmpty)
+	f.So(f.input.Result, should.BeNil)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

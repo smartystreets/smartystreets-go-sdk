@@ -8,7 +8,9 @@ import (
 
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
+	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
+	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
@@ -99,6 +101,7 @@ func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
 	return b
 }
 
+// ViaProxy saves the address of your proxy server through which to send all requests.
 func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
 	proxy, err := url.Parse(address)
 	if err != nil {
@@ -127,6 +130,20 @@ func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *zipcode.Client {
 func (b *ClientBuilder) BuildUSAutocompleteAPIClient() *autocomplete.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteAPI)
 	return autocomplete.NewClient(b.buildHTTPSender())
+}
+
+// BuildUSExtractAPIClient builds the us-extract-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildUSExtractAPIClient() *extract.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_USExtractAPI)
+	return extract.NewClient(b.buildHTTPSender())
+}
+
+// BuildInternationalStreetAPIClient builds the international-street-api client using the provided
+// configuration details provided by other methods on the ClientBuilder.
+func (b *ClientBuilder) BuildInternationalStreetAPIClient() *international_street.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_InternationalStreetAPI)
+	return international_street.NewClient(b.buildHTTPSender())
 }
 
 func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
@@ -169,7 +186,9 @@ func (b *ClientBuilder) WithHTTPRequestTracing() *ClientBuilder {
 }
 
 var (
-	defaultBaseURL_USStreetAPI, _       = url.Parse("https://us-street.api.smartystreets.com")
-	defaultBaseURL_USZIPCodeAPI, _      = url.Parse("https://us-zipcode.api.smartystreets.com")
-	defaultBaseURL_USAutocompleteAPI, _ = url.Parse("https://us-autocomplete.api.smartystreets.com")
+	defaultBaseURL_InternationalStreetAPI, _ = url.Parse("https://international-street.api.smartystreets.com")
+	defaultBaseURL_USStreetAPI, _            = url.Parse("https://us-street.api.smartystreets.com")
+	defaultBaseURL_USZIPCodeAPI, _           = url.Parse("https://us-zipcode.api.smartystreets.com")
+	defaultBaseURL_USAutocompleteAPI, _      = url.Parse("https://us-autocomplete.api.smartystreets.com")
+	defaultBaseURL_USExtractAPI, _           = url.Parse("https://us-extract.api.smartystreets.com")
 )

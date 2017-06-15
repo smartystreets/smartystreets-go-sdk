@@ -1,4 +1,4 @@
-package autocomplete
+package street
 
 import (
 	"errors"
@@ -29,23 +29,23 @@ func (f *ClientFixture) Setup() {
 }
 
 func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
-	f.sender.response = `{"suggestions":[
-		{"text": "1"},
-		{"text": "2"},
-		{"text": "3"}
-	]}`
-	f.input.Prefix = "42"
+	f.sender.response = `[
+		{"address1": "1"},
+		{"address1": "2"},
+		{"address1": "3"}
+	]`
+	f.input.Freeform = "42"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
-	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
-	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
+	f.So(f.sender.request.URL.Path, should.Equal, verifyURL)
+	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
+	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
 
-	f.So(f.input.Results, should.Resemble, []*Suggestion{{Text: "1"}, {Text: "2"}, {Text: "3"}})
+	f.So(f.input.Results, should.Resemble, []*Candidate{{Address1: "1"}, {Address1: "2"}, {Address1: "3"}})
 }
 
 func (f *ClientFixture) TestNilLookupNOP() {
@@ -67,7 +67,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 		{"text": "2"},
 		{"text": "3"}
 	]}` // would be deserialized if not for the err (above)
-	f.input.Prefix = "HI"
+	f.input.Freeform = "HI"
 
 	err := f.client.SendLookup(f.input)
 
@@ -77,7 +77,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input.Prefix = "HI"
+	f.input.Freeform = "HI"
 
 	err := f.client.SendLookup(f.input)
 

@@ -1,4 +1,4 @@
-package autocomplete
+package street
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
-// Client is responsible for sending batches of addresses to the us-street-api.
+// Client is responsible for sending batches of addresses to the international-street-api.
 type Client struct {
 	sender sdk.RequestSender
 }
@@ -17,9 +17,9 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
+// SendLookup sends the lookup, populating the output if the request was successful.
 func (c *Client) SendLookup(lookup *Lookup) error {
-	if lookup == nil || len(lookup.Prefix) == 0 {
+	if lookup == nil || (len(lookup.Address1) == 0 && len(lookup.Freeform) == 0) {
 		return nil
 	} else if response, err := c.sender.Send(buildRequest(lookup)); err != nil {
 		return err
@@ -29,21 +29,21 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {
-	var suggestions suggestionListing
-	err := json.Unmarshal(response, &suggestions)
+	var candidates []*Candidate
+	err := json.Unmarshal(response, &candidates)
 	if err != nil {
 		return err
 	}
-	lookup.Results = suggestions.Listing
+	lookup.Results = candidates
 	return nil
 }
 
 func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", suggestURL, nil) // We control the method and the URL. This is safe.
+	request, _ := http.NewRequest("GET", verifyURL, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
-const suggestURL = "/suggest" // Remaining parts will be completed later by the sdk.BaseURLClient.
+const verifyURL = "/verify" // Remaining parts will be completed later by the sdk.BaseURLClient.

@@ -14,9 +14,9 @@ func TestHTTPStatusError(t *testing.T) {
 	err := NewHTTPStatusError(http.StatusTeapot, []byte("Hello, World!"))
 
 	assert := assertions.New(t)
-	assert.So(err.Error(), should.Equal, "HTTP 418 I'm a teapot")
+	assert.So(err.Error(), should.Equal, "HTTP 418 I'm a teapot\nHello, World!")
 	assert.So(err.StatusCode(), should.Equal, http.StatusTeapot)
-	assert.So(err.Content(), should.Resemble, []byte("Hello, World!"))
+	assert.So(err.Content(), should.Equal, "Hello, World!")
 }
 
 func TestNilHTTPStatusErrorBehavesLikeHTTP200(t *testing.T) {
@@ -28,5 +28,5 @@ func TestNilHTTPStatusErrorBehavesLikeHTTP200(t *testing.T) {
 	assert.So(err, should.BeNil)
 	assert.So(err.Error(), should.Equal, "HTTP 200 OK")
 	assert.So(err.StatusCode(), should.Equal, http.StatusOK)
-	assert.So(err.Content(), should.BeNil)
+	assert.So(err.Content(), should.BeEmpty)
 }
