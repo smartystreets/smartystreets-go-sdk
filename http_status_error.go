@@ -40,5 +40,8 @@ func (e *HTTPStatusError) StatusCode() int {
 }
 
 func (e *HTTPStatusError) Content() string {
+	if e == nil {
+		return ""
+	}
 	return e.content
 }
