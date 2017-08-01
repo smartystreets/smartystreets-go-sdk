@@ -16,6 +16,7 @@ type (
 		StateFilter    []string
 		Preferences    []string
 		Geolocation    geolocation
+		PreferRatio    float64
 
 		Results []*Suggestion
 	}
@@ -38,8 +39,8 @@ func (l *Lookup) populate(query url.Values) {
 	l.populateCityFilter(query)
 	l.populatePreferences(query)
 	l.populateGeolocation(query)
+	l.populatePreferRatio(query)
 }
-
 func (l *Lookup) populatePrefix(query url.Values) {
 	if len(l.Prefix) > 0 {
 		query.Set("prefix", l.Prefix)
@@ -71,5 +72,10 @@ func (l *Lookup) populateGeolocation(query url.Values) {
 		query.Set("geolocate", "false")
 	case GeolocateState:
 		query.Set("geolocate_precision", "state")
+	}
+}
+func (l *Lookup) populatePreferRatio(query url.Values) {
+	if l.PreferRatio > 0 {
+		query.Set("prefer_ratio", strconv.FormatFloat(l.PreferRatio, 'g', 1, 64))
 	}
 }

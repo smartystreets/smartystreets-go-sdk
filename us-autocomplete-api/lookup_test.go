@@ -41,6 +41,15 @@ func (f *LookupSerializationFixture) TestPrefix() {
 	f.So(f.query.Get("prefix"), should.Equal, "Hello, World!")
 }
 
+func (f *LookupSerializationFixture) TestPreferRatio() {
+	f.lookup.PreferRatio = 0.6
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("prefer_ratio"), should.Equal, "0.6")
+}
+
 func (f *LookupSerializationFixture) TestSuggestions() {
 	f.lookup.MaxSuggestions = 7
 
