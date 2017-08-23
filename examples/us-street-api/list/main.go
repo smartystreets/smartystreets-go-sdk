@@ -14,9 +14,7 @@ import (
 const (
 	fieldDelimiter    = '\t'
 	reportingInterval = 10000
-)
 
-const (
 	fieldsPerRecord = 4
 
 	streetField  = 0
