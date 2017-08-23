@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/csv"
 	"io"
 	"log"
@@ -30,15 +29,10 @@ func main() {
 	inFile := openFile("input.txt")
 	defer inFile.Close()
 
-	bufferedReader := bufio.NewReader(inFile)
-	reader := initializeReader(bufferedReader)
-
 	outFile := createFile("output.txt")
 	defer outFile.Close()
 
-	bufferedWriter := bufio.NewWriter(outFile)
-	defer bufferedWriter.Flush()
-
+	reader := initializeReader(inFile)
 	writer := initializeWriter(outFile)
 	defer writer.Flush()
 
