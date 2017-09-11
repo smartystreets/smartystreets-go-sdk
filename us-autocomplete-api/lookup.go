@@ -15,17 +15,17 @@ type (
 		CityFilter     []string
 		StateFilter    []string
 		Preferences    []string
-		Geolocation    geolocation
+		Geolocation    Geolocation
 		PreferRatio    float64
 
 		Results []*Suggestion
 	}
 
-	geolocation int
+	Geolocation int
 )
 
 const (
-	GeolocateCity geolocation = iota
+	GeolocateCity Geolocation = iota
 	GeolocateState
 	GeolocateNone
 )

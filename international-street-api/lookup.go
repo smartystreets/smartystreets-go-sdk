@@ -8,7 +8,7 @@ type Lookup struct {
 	InputID            string
 	Country            string
 	Geocode            bool
-	Language           language
+	Language           Language
 	Freeform           string
 	Address1           string
 	Address2           string
@@ -24,11 +24,11 @@ type Lookup struct {
 
 /**************************************************************************/
 
-type language string
+type Language string
 
 const (
-	Native = language("native")
-	Latin  = language("latin")
+	Native = Language("native")
+	Latin  = Language("latin")
 )
 
 /**************************************************************************/
@@ -37,7 +37,7 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "input_id", l.InputID)
 	populate(query, "country", l.Country)
 	populate(query, "geocode", boolString(l.Geocode))
-	populate(query, "language", string(l.Language))
+	populate(query, "Language", string(l.Language))
 	populate(query, "freeform", l.Freeform)
 	populate(query, "address1", l.Address1)
 	populate(query, "address2", l.Address2)
