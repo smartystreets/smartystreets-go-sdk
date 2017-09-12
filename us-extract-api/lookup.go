@@ -12,7 +12,7 @@ import (
 type Lookup struct {
 	Text string
 
-	HTML                    htmlPayload
+	HTML                    HTMLPayload
 	Aggressive              bool
 	AddressesWithLineBreaks bool
 	AddressesPerLine        int
@@ -20,12 +20,12 @@ type Lookup struct {
 	Result *Result
 }
 
-type htmlPayload string
+type HTMLPayload string
 
 const (
-	HTMLUnspecified htmlPayload = ""      // Indicates that the server may decide if Lookup.Text is HTML or not.
-	HTMLYes         htmlPayload = "true"  // Indicates that the Lookup.Text is known to be HTML.
-	HTMLNo          htmlPayload = "false" // Indicates that the Lookup.Text is known to NOT be HTML.
+	HTMLUnspecified HTMLPayload = ""      // Indicates that the server may decide if Lookup.Text is HTML or not.
+	HTMLYes         HTMLPayload = "true"  // Indicates that the Lookup.Text is known to be HTML.
+	HTMLNo          HTMLPayload = "false" // Indicates that the Lookup.Text is known to NOT be HTML.
 )
 
 func (l *Lookup) populate(request *http.Request) {
