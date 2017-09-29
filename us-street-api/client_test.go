@@ -19,8 +19,7 @@ type ClientFixture struct {
 
 	sender *FakeSender
 	client *Client
-
-	batch *Batch
+	batch  *Batch
 }
 
 func (f *ClientFixture) Setup() {
@@ -94,6 +93,22 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(input.Results, should.BeEmpty)
+}
+
+func (f *ClientFixture) TestNullCandidatesWithinResponseArrayAreIgnoredAfterDeserialization() {
+	f.sender.response = `[null]`
+	lookup := new(Lookup)
+	f.batch.Append(lookup)
+	f.So(func() { f.client.SendBatch(f.batch) }, should.NotPanic)
+	f.So(lookup.Results, should.BeEmpty)
+}
+
+func (f *ClientFixture) TestOutOfRangeCandidatesWithinResponseArrayAreIgnoredAfterDeserialization() {
+	f.sender.response = `[{"input_index": 9999999}]`
+	lookup := new(Lookup)
+	f.batch.Append(lookup)
+	f.So(func() { f.client.SendBatch(f.batch) }, should.NotPanic)
+	f.So(lookup.Results, should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
