@@ -21,10 +21,12 @@ func (b *Batch) Append(record *Lookup) bool {
 
 func (b *Batch) attach(candidates []*Candidate) {
 	for _, candidate := range candidates {
-		// TODO: handle nil reference: candidate
-		i := candidate.InputIndex
-		b.lookups[i].Results = append(b.lookups[i].Results, candidate)
-		// TODO: handle i is index out of range
+		if candidate != nil {
+			if i := candidate.InputIndex; i < len(b.lookups) {
+				lookup := b.lookups[i]
+				lookup.Results = append(lookup.Results, candidate)
+			}
+		}
 	}
 }
 
