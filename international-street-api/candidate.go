@@ -42,6 +42,7 @@ type (
 		PremiseExtra                       string `json:"premise_extra,omitempty"`
 		PremiseNumber                      string `json:"premise_number,omitempty"`
 		PremiseType                        string `json:"premise_type,omitempty"`
+		PremisePrefixNumber                string `json:"premise_prefix_number,omitempty"`
 		Thoroughfare                       string `json:"thoroughfare,omitempty"`
 		ThoroughfarePredirection           string `json:"thoroughfare_predirection,omitempty"`
 		ThoroughfarePostdirection          string `json:"thoroughfare_postdirection,omitempty"`
