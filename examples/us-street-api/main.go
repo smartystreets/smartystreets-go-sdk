@@ -12,6 +12,7 @@ import (
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
+	// You don't have to store your keys in environment variables, but we recommend it.
 	client := wireup.NewClientBuilder().
 		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
 		//ViaProxy("https://my-proxy.my-company.com"). // uncomment this line to point to the specified proxy.
