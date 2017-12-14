@@ -36,9 +36,9 @@ func main() {
 
 	incoming := make(chan *street.Lookup, 1024*48)
 	outgoing := make(chan *street.Lookup, 1024*48)
-	client := wireup.NewClientBuilder().
-		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
-		BuildUSStreetAPIClient()
+	client := wireup.BuildUSStreetAPIClient(
+		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+	)
 
 	// This processes all records provided to the incoming channel
 	// in appropriately sized batches and puts the results on the
