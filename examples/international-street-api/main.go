@@ -12,10 +12,10 @@ import (
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
-	client := wireup.NewClientBuilder().
-		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
-		//WithDebugHTTPOutput(). // uncomment this line to see detailed HTTP request/response information.
-		BuildInternationalStreetAPIClient()
+	client := wireup.BuildInternationalStreetAPIClient(
+		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		//wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+	)
 
 	lookup := &street.Lookup{
 		Address1:           "Rua Padre Antonio D'Angelo 121",

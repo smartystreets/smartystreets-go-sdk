@@ -12,9 +12,10 @@ import (
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
-	client := wireup.NewClientBuilder().
-		WithSecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")).
-		BuildUSZIPCodeAPIClient()
+	client := wireup.BuildUSZIPCodeAPIClient(
+		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		//wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+	)
 
 	batch := zipcode.NewBatch()
 	for batch.Append(&zipcode.Lookup{City: "PROVO", State: "UT", ZIPCode: "84604"}) {
