@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
@@ -17,6 +17,22 @@ import (
 
 // ClientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully functional Client for use in an application.
+//
+// Deprecated: This type (and all associated functions and methods) will be unexported in the future.
+//
+// Instead of this kind of wireup:
+//
+// 	client := NewClientBuilder().
+// 		WithSecretKeyCredential("auth-id", "auth-token").
+// 		WithTimeout(time.Second*20).
+// 		BuildUSStreetAPIClient()
+//
+// Please migrate to this approach instead:
+//
+// 	client := BuildUSStreetAPIClient(
+// 		SecretKeyCredential("auth-id", "auth-token"),
+// 		Timeout(time.Second*20),
+// 	)
 type ClientBuilder struct {
 	credential sdk.Credential
 	baseURL    *url.URL
@@ -29,7 +45,7 @@ type ClientBuilder struct {
 	headers    http.Header
 }
 
-// NewClientBuilder creates a new client builder, ready to receive calls to its chain-able methods.
+// Deprecated: (see ClientBuilder godoc for details)
 func NewClientBuilder() *ClientBuilder {
 	return &ClientBuilder{
 		credential: &internal.NopCredential{},
@@ -45,17 +61,13 @@ func initializeHeadersWithUserAgent() http.Header {
 	return headers
 }
 
-// WithSecretKeyCredential allows the caller to set the authID and authToken for use with the client.
-// In all but very few cases calling this method with a valid authID and authToken is required.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
 	b.credential = sdk.NewSecretKeyCredential(authID, authToken)
 	return b
 }
 
-// WithSecretKeyCredential allows the caller to specify the url that the client will use.
-// In all but very few use cases the default value is sufficient and this method should not be called.
-// The address provided should be a url that consists of only the scheme and host. Any other elements
-// (such as a path, query string, or fragment) will be ignored.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithCustomBaseURL(address string) *ClientBuilder {
 	parsed, err := url.Parse(address)
 	if err != nil {
@@ -65,8 +77,7 @@ func (b *ClientBuilder) WithCustomBaseURL(address string) *ClientBuilder {
 	return b
 }
 
-// WithMaxRetry allows the caller to specify the number of times an API request will be resent in the
-// case of network errors or unexpected results.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithMaxRetry(retries int) *ClientBuilder {
 	if retries < 0 {
 		panic(fmt.Sprintf("Please provide a non-negative number of retry attempts (you supplied %d).", retries))
@@ -75,7 +86,7 @@ func (b *ClientBuilder) WithMaxRetry(retries int) *ClientBuilder {
 	return b
 }
 
-// WithTimeout allows the caller to specify the timeout for all API requests.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 	if duration < 0 {
 		panic(fmt.Sprintf("Please provide a non-negative duration (you supplied %s).", duration.String()))
@@ -84,13 +95,19 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 	return b
 }
 
-// WithDebugHTTPOutput enables detailed HTTP request/response logging using functions from net/http/httputil.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
 	b.debug = true
 	return b
 }
 
-// WithCustomHeader ensures the provided header is added to every API request made with the resulting client.
+// Deprecated: (see ClientBuilder godoc for details)
+func (b *ClientBuilder) WithHTTPRequestTracing() *ClientBuilder {
+	b.trace = true
+	return b
+}
+
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) WithCustomHeader(key, value string) *ClientBuilder {
 	b.headers.Add(key, value)
 	return b
@@ -101,7 +118,7 @@ func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
 	return b
 }
 
-// ViaProxy saves the address of your proxy server through which to send all requests.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
 	proxy, err := url.Parse(address)
 	if err != nil {
@@ -111,36 +128,31 @@ func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
 	return b
 }
 
-// BuildUSStreetAPIClient builds the us-street-api client using the provided
-// configuration details provided by other methods on the ClientBuilder.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
 	return street.NewClient(b.buildHTTPSender())
 }
 
-// BuildUSZIPCodeAPIClient builds the us-zipcode-api client using the provided
-// configuration details provided by other methods on the ClientBuilder.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *zipcode.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USZIPCodeAPI)
 	return zipcode.NewClient(b.buildHTTPSender())
 }
 
-// BuildUSAutocompleteAPIClient builds the us-autocomplete-api client using the provided
-// configuration details provided by other methods on the ClientBuilder.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) BuildUSAutocompleteAPIClient() *autocomplete.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteAPI)
 	return autocomplete.NewClient(b.buildHTTPSender())
 }
 
-// BuildUSExtractAPIClient builds the us-extract-api client using the provided
-// configuration details provided by other methods on the ClientBuilder.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) BuildUSExtractAPIClient() *extract.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USExtractAPI)
 	return extract.NewClient(b.buildHTTPSender())
 }
 
-// BuildInternationalStreetAPIClient builds the international-street-api client using the provided
-// configuration details provided by other methods on the ClientBuilder.
+// Deprecated: (see ClientBuilder godoc for details)
 func (b *ClientBuilder) BuildInternationalStreetAPIClient() *international_street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_InternationalStreetAPI)
 	return international_street.NewClient(b.buildHTTPSender())
@@ -177,12 +189,6 @@ func (b *ClientBuilder) buildTransport() *http.Transport {
 		transport.Proxy = http.ProxyURL(b.proxy)
 	}
 	return transport
-}
-
-// WithHTTPRequestTracing is an experimental feature which may or may not remain.
-func (b *ClientBuilder) WithHTTPRequestTracing() *ClientBuilder {
-	b.trace = true
-	return b
 }
 
 var (
