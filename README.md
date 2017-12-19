@@ -8,7 +8,7 @@ You may have noticed this page is curiously sparse. Don't panic, there are [exam
 
 ---
 
-[![asciicast](https://asciinema.org/a/119332.png)](https://asciinema.org/a/119332)
+[![asciicast](https://asciinema.org/a/153483.png)](https://asciinema.org/a/153483)
 
 ---
 
