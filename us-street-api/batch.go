@@ -1,5 +1,12 @@
 package street
 
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
 	lookups []*Lookup
@@ -54,4 +61,28 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
+func (b *Batch) buildRequest() *http.Request {
+	request, _ := http.NewRequest(http.MethodGet, verifyURL, nil) // We control the method and the URL. This is safe.
+	if b.Length() == 1 {
+		b.serializeGET(request)
+	} else {
+		b.serializePOST(request)
+	}
+	return request
+}
+func (b *Batch) serializeGET(request *http.Request) {
+	request.Method = http.MethodGet
+	query := request.URL.Query()
+	b.lookups[0].encodeQueryString(query)
+	request.URL.RawQuery = query.Encode()
+}
+func (b *Batch) serializePOST(request *http.Request) {
+	request.Method = http.MethodPost
+	payload, _ := json.Marshal(b.lookups) // We control the types being serialized. This is safe.
+	request.Body = ioutil.NopCloser(bytes.NewReader(payload))
+	request.ContentLength = int64(len(payload))
+	request.Header.Set("Content-Type", "application/json")
+}
+
+const verifyURL = "/street-address" // Remaining parts will be completed later by the sdk.BaseURLClient.
 const MaxBatchSize = 100
