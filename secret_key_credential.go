@@ -32,5 +32,3 @@ func (c secretKeyCredential) Sign(request *http.Request) error {
 	request.URL.RawQuery = query.Encode()
 	return nil
 }
-
-// FUTURE: implement HTML key credential
