@@ -1,5 +1,12 @@
 package zipcode
 
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
 type Batch struct {
 	lookups []*Lookup
@@ -50,4 +57,28 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
+func (batch *Batch) buildRequest() *http.Request {
+	request, _ := http.NewRequest(http.MethodGet, placeholderURL, nil)
+	if batch.Length() == 1 {
+		batch.serializeGET(request)
+	} else {
+		batch.serializePOST(request)
+	}
+	return request
+}
+func (batch *Batch) serializeGET(request *http.Request) {
+	request.Method = http.MethodGet
+	query := request.URL.Query()
+	query.Set("input_id", batch.lookups[0].InputID)
+	request.URL.RawQuery = query.Encode()
+}
+func (batch *Batch) serializePOST(request *http.Request) {
+	request.Method = http.MethodPost
+	payload, _ := json.Marshal(batch.lookups) // We control the types being serialized. This is safe.
+	request.Body = ioutil.NopCloser(bytes.NewReader(payload))
+	request.ContentLength = int64(len(payload))
+	request.Header.Set("Content-Type", "application/json")
+}
+
+const placeholderURL = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
 const MaxBatchSize = 100

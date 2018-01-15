@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/smartystreets/assertions/should"
@@ -29,6 +30,22 @@ func (f *ClientFixture) Setup() {
 	f.batch = NewBatch()
 }
 
+func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+
+	err := f.client.SendBatch(f.batch)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Method, should.Equal, "GET")
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup")
+	f.So(f.sender.requestBody, should.BeNil)
+	f.So(f.sender.request.URL.String(), should.StartWith, placeholderURL)
+	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id":{"42"}})
+}
+
 func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBackIntoBatch() {
 	f.sender.response = `[
 		{"input_index": 0, "input_id": "42"},
@@ -50,6 +67,7 @@ func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBac
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup")
 	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
 	f.So(f.sender.request.URL.String(), should.Equal, placeholderURL)
+	f.So(f.sender.request.Header.Get("Content-Type"), should.Equal, "application/json")
 
 	f.So(input0.Result, should.Resemble, &Result{InputID: "42"})
 	f.So(input1.Result, should.Resemble, &Result{InputID: "43", InputIndex: 1})
