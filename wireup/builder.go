@@ -15,25 +15,9 @@ import (
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
 
-// ClientBuilder is responsible for accepting credentials and other configuration options to combine
+// clientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully functional Client for use in an application.
-//
-// Deprecated: This type (and all associated functions and methods) will be unexported in the future.
-//
-// Instead of this kind of wireup:
-//
-// 	client := NewClientBuilder().
-// 		WithSecretKeyCredential("auth-id", "auth-token").
-// 		WithTimeout(time.Second*20).
-// 		BuildUSStreetAPIClient()
-//
-// Please migrate to this approach instead:
-//
-// 	client := BuildUSStreetAPIClient(
-// 		SecretKeyCredential("auth-id", "auth-token"),
-// 		Timeout(time.Second*20),
-// 	)
-type ClientBuilder struct {
+type clientBuilder struct {
 	credential sdk.Credential
 	baseURL    *url.URL
 	proxy      *url.URL
@@ -45,9 +29,8 @@ type ClientBuilder struct {
 	headers    http.Header
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func NewClientBuilder() *ClientBuilder {
-	return &ClientBuilder{
+func newClientBuilder() *clientBuilder {
+	return &clientBuilder{
 		credential: &internal.NopCredential{},
 		retries:    4,
 		timeout:    time.Second * 10,
@@ -61,14 +44,12 @@ func initializeHeadersWithUserAgent() http.Header {
 	return headers
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithSecretKeyCredential(authID, authToken string) *ClientBuilder {
+func (b *clientBuilder) withSecretKeyCredential(authID, authToken string) *clientBuilder {
 	b.credential = sdk.NewSecretKeyCredential(authID, authToken)
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithCustomBaseURL(address string) *ClientBuilder {
+func (b *clientBuilder) withCustomBaseURL(address string) *clientBuilder {
 	parsed, err := url.Parse(address)
 	if err != nil {
 		panic(fmt.Sprint("Could not parse provided address:", err.Error()))
@@ -77,8 +58,7 @@ func (b *ClientBuilder) WithCustomBaseURL(address string) *ClientBuilder {
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithMaxRetry(retries int) *ClientBuilder {
+func (b *clientBuilder) withMaxRetry(retries int) *clientBuilder {
 	if retries < 0 {
 		panic(fmt.Sprintf("Please provide a non-negative number of retry attempts (you supplied %d).", retries))
 	}
@@ -86,8 +66,7 @@ func (b *ClientBuilder) WithMaxRetry(retries int) *ClientBuilder {
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
+func (b *clientBuilder) withTimeout(duration time.Duration) *clientBuilder {
 	if duration < 0 {
 		panic(fmt.Sprintf("Please provide a non-negative duration (you supplied %s).", duration.String()))
 	}
@@ -95,31 +74,27 @@ func (b *ClientBuilder) WithTimeout(duration time.Duration) *ClientBuilder {
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithDebugHTTPOutput() *ClientBuilder {
+func (b *clientBuilder) withDebugHTTPOutput() *clientBuilder {
 	b.debug = true
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithHTTPRequestTracing() *ClientBuilder {
+func (b *clientBuilder) withHTTPRequestTracing() *clientBuilder {
 	b.trace = true
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) WithCustomHeader(key, value string) *ClientBuilder {
+func (b *clientBuilder) withCustomHeader(key, value string) *clientBuilder {
 	b.headers.Add(key, value)
 	return b
 }
 
-func (b *ClientBuilder) WithoutKeepAlive() *ClientBuilder {
+func (b *clientBuilder) withoutKeepAlive() *clientBuilder {
 	b.close = true
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
+func (b *clientBuilder) viaProxy(address string) *clientBuilder {
 	proxy, err := url.Parse(address)
 	if err != nil {
 		panic(fmt.Sprint("Could not parse provided address:", err.Error()))
@@ -128,48 +103,43 @@ func (b *ClientBuilder) ViaProxy(address string) *ClientBuilder {
 	return b
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) BuildUSStreetAPIClient() *street.Client {
+func (b *clientBuilder) buildUSStreetAPIClient() *street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
 	return street.NewClient(b.buildHTTPSender())
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) BuildUSZIPCodeAPIClient() *zipcode.Client {
+func (b *clientBuilder) buildUSZIPCodeAPIClient() *zipcode.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USZIPCodeAPI)
 	return zipcode.NewClient(b.buildHTTPSender())
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) BuildUSAutocompleteAPIClient() *autocomplete.Client {
+func (b *clientBuilder) buildUSAutocompleteAPIClient() *autocomplete.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteAPI)
 	return autocomplete.NewClient(b.buildHTTPSender())
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) BuildUSExtractAPIClient() *extract.Client {
+func (b *clientBuilder) buildUSExtractAPIClient() *extract.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USExtractAPI)
 	return extract.NewClient(b.buildHTTPSender())
 }
 
-// Deprecated: (see ClientBuilder godoc for details)
-func (b *ClientBuilder) BuildInternationalStreetAPIClient() *international_street.Client {
+func (b *clientBuilder) buildInternationalStreetAPIClient() *international_street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_InternationalStreetAPI)
 	return international_street.NewClient(b.buildHTTPSender())
 }
 
-func (b *ClientBuilder) ensureBaseURLNotNil(u *url.URL) {
+func (b *clientBuilder) ensureBaseURLNotNil(u *url.URL) {
 	if b.baseURL == nil {
 		b.baseURL = u
 	}
 }
 
-func (b *ClientBuilder) buildHTTPSender() *internal.HTTPSender {
+func (b *clientBuilder) buildHTTPSender() *internal.HTTPSender {
 	client := b.buildHTTPClient()
 	return internal.NewHTTPSender(client)
 }
 
-func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
+func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	// inner-most
 	wrapped = &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
 	wrapped = internal.NewTracingClient(wrapped, b.trace)
@@ -183,7 +153,7 @@ func (b *ClientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	return wrapped
 }
 
-func (b *ClientBuilder) buildTransport() *http.Transport {
+func (b *clientBuilder) buildTransport() *http.Transport {
 	transport := &http.Transport{}
 	if b.proxy != nil {
 		transport.Proxy = http.ProxyURL(b.proxy)
