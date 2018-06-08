@@ -112,3 +112,12 @@ func ViaProxy(address string) Option {
 		builder.viaProxy(address)
 	}
 }
+
+// WithMaxIdleConnections sets MaxIdleConnsPerHost on the http.Transport used to send requests.
+// Docs for http.Transport.MaxIdleConnsPerHost: https://golang.org/pkg/net/http/#Transport
+// Also see: https://stackoverflow.com/questions/22881090/golang-about-maxidleconnsperhost-in-the-http-clients-transport
+func WithMaxIdleConnections(max int) Option {
+	return func(builder *clientBuilder) {
+		builder.withMaxIdleConnections(max)
+	}
+}

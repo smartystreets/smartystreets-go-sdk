@@ -27,6 +27,7 @@ type clientBuilder struct {
 	close      bool
 	trace      bool
 	headers    http.Header
+	idleConns  int
 }
 
 func newClientBuilder() *clientBuilder {
@@ -103,6 +104,11 @@ func (b *clientBuilder) viaProxy(address string) *clientBuilder {
 	return b
 }
 
+func (b *clientBuilder) withMaxIdleConnections(max int) *clientBuilder {
+	b.idleConns = max
+	return b
+}
+
 func (b *clientBuilder) buildUSStreetAPIClient() *street.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USStreetAPI)
 	return street.NewClient(b.buildHTTPSender())
@@ -157,6 +163,9 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 	transport := &http.Transport{}
 	if b.proxy != nil {
 		transport.Proxy = http.ProxyURL(b.proxy)
+	}
+	if b.idleConns > 0 {
+		transport.MaxIdleConnsPerHost = b.idleConns
 	}
 	return transport
 }
