@@ -192,9 +192,9 @@ func (b *ClientBuilder) buildTransport() *http.Transport {
 }
 
 var (
-	defaultBaseURL_InternationalStreetAPI, _ = url.Parse("https://international-street.api.smartystreets.com")
-	defaultBaseURL_USStreetAPI, _            = url.Parse("https://us-street.api.smartystreets.com")
-	defaultBaseURL_USZIPCodeAPI, _           = url.Parse("https://us-zipcode.api.smartystreets.com")
-	defaultBaseURL_USAutocompleteAPI, _      = url.Parse("https://us-autocomplete.api.smartystreets.com")
-	defaultBaseURL_USExtractAPI, _           = url.Parse("https://us-extract.api.smartystreets.com")
+	defaultBaseURL_InternationalStreetAPI = &url.URL{Scheme: "https", Host: "international-street.api.smartystreets.com"}
+	defaultBaseURL_USStreetAPI            = &url.URL{Scheme: "https", Host: "us-street.api.smartystreets.com"}
+	defaultBaseURL_USZIPCodeAPI           = &url.URL{Scheme: "https", Host: "us-zipcode.api.smartystreets.com"}
+	defaultBaseURL_USAutocompleteAPI      = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smartystreets.com"}
+	defaultBaseURL_USExtractAPI           = &url.URL{Scheme: "https", Host: "us-extract.api.smartystreets.com"}
 )
