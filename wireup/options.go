@@ -37,7 +37,9 @@ func BuildInternationalStreetAPIClient(options ...Option) *international_street.
 func configure(options ...Option) *clientBuilder {
 	builder := newClientBuilder()
 	for _, option := range options {
-		option(builder)
+		if option != nil {
+			option(builder)
+		}
 	}
 	return builder
 }
