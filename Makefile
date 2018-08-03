@@ -1,14 +1,24 @@
 #!/usr/bin/make -f
 
+REPO_NAME := smartystreets-go-sdk
+REPO_PATH := github.com/smartystreets/$(REPO_NAME)
+FULL_PATH := $(GOPATH)/src/$(REPO_PATH)
+
 test: compile
 	go test -short ./...
 
 compile:
 	go build ./...
 
-dependencies:
+dependencies: gopath
 	go get github.com/smartystreets/gunit
 	go get github.com/smartystreets/assertions
+	go get github.com/smartystreets/clock
+	go get github.com/smartystreets/logging
+
+gopath:
+	@mkdir -p $(dir $(FULL_PATH))
+	@test -e $(FULL_PATH) || ln -sf $(PWD) $(FULL_PATH) # gopath compatibility
 
 cover: compile
 	go test -coverprofile=coverage.out
