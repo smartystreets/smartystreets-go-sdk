@@ -4,7 +4,7 @@ REPO_NAME := smartystreets-go-sdk
 REPO_PATH := github.com/smartystreets/$(REPO_NAME)
 FULL_PATH := $(GOPATH)/src/$(REPO_PATH)
 
-test: compile
+test:
 	go test -short ./...
 
 compile:
