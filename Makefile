@@ -3,7 +3,6 @@
 REPO_NAME := smartystreets-go-sdk
 REPO_PATH := github.com/smartystreets/$(REPO_NAME)
 FULL_PATH := $(GOPATH)/src/$(REPO_PATH)
-SOURCE_VERSION := 8.1
 VERSION_FILE = ./version.go
 
 test:
@@ -34,20 +33,12 @@ integrate: compile
 	@go run examples/us-zipcode-api/main.go > /dev/null
 
 publish:
-	$(eval VERSION := $(shell $(MAKE) calculate-version))
-	@echo "package sdk\n\nconst VERSION = \"$(VERSION)\"" > "$(VERSION_FILE)"
+	tagit -p
+	@echo "package sdk\n\nconst VERSION = \"$(shell git describe)\"" > "$(VERSION_FILE)"
 	git add "$(VERSION_FILE)"
-	git commit -m "Incremented version number to $(VERSION)"
+	git commit -m "Incremented version number to $(shell git describe)"
 	git tag -a "$(VERSION)" -m ""
 	git push origin master --tags
-
-calculate-version:
-	$(eval PREFIX := $(SOURCE_VERSION).)
-	$(eval CURRENT := $(shell git describe 2>/dev/null))
-	$(eval EXPECTED := $(PREFIX)$(shell git tag -l "$(PREFIX)*" | wc -l | xargs expr -1 +))
-	$(eval INCREMENTED := $(PREFIX)$(shell git tag -l "$(PREFIX)*" | wc -l | xargs expr 0 +))
-	@if [ "$(CURRENT)" != "$(EXPECTED)" ]; then echo $(INCREMENTED) ; else echo $(CURRENT); fi
-
 
 #########################################################33
 
