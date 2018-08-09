@@ -33,10 +33,9 @@ integrate: compile
 	@go run examples/us-zipcode-api/main.go > /dev/null
 
 publish:
-	$(eval VERSION := $(shell bumpit -p $(shell git describe) --dirty))
+	$(eval VERSION := $(shell tagit -p --dry-run))
 	@echo "package sdk\n\nconst VERSION = \"$(VERSION)\"" > "$(VERSION_FILE)"
-	git add "$(VERSION_FILE)"
-	git commit -m "Incremented version number to $(VERSION)"
+	git add "$(VERSION_FILE)" && git commit -m "Incremented version to v$(VERSION)."
 	tagit -p
 	git push origin master --tags
 
