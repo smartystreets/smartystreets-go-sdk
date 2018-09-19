@@ -23,7 +23,7 @@ integrate: compile test
 	@go run examples/us-zipcode-api/main.go > /dev/null
 
 package: compile test
-	echo "package sdk\n\nconst VERSION = \"$(VERSION)\"" > "$(VERSION_FILE)"
+	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
 
 ##########################################################
 
