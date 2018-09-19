@@ -1,1 +1,3 @@
-package sdk\n\nconst VERSION = "8.1.5"
+package sdk
+
+const VERSION = "8.1.4"
