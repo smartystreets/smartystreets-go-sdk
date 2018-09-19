@@ -4,21 +4,25 @@ VERSION_FILE := version.go
 VERSION      := $(shell tagit -p --dryrun)
 
 clean:
-	git checkout "$(VERSION_FILE)"
+	@git checkout "$(VERSION_FILE)"
 
 test: clean
 	go test -short ./...
 
-compile:
+compile: clean
 	go build ./...
 
 cover: compile
 	go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
-integrate: test compile
-	find examples/ -type f -name "main.go" -exec go run "{}" > /dev/null \;
+integrate: compile test
+	@go run examples/international-street-api/main.go > /dev/null
+	@go run examples/us-street-api/main.go > /dev/null
+	@go run examples/us-autocomplete-api/main.go > /dev/null
+	@go run examples/us-extract-api/main.go > /dev/null
+	@go run examples/us-zipcode-api/main.go > /dev/null
 
-package: clean test compile
+package: compile test
 	echo "package sdk\n\nconst VERSION = \"$(VERSION)\"" > "$(VERSION_FILE)"
 
 ##########################################################
