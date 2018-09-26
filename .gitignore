@@ -2,5 +2,4 @@
 *.swp
 __MACOSX
 /.idea/
-/workspace/
 /coverage.out

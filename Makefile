@@ -22,18 +22,10 @@ integrate: compile test
 	@go run examples/us-extract-api/main.go > /dev/null
 	@go run examples/us-zipcode-api/main.go > /dev/null
 
-package: compile test
-	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
-
-##########################################################
-
-workspace:
-	docker-compose run sdk /bin/sh
-
-release:
-	docker-compose run sdk make package \
+publish: compile test
+	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)" \
 		&& git commit -am "Incremented version to $(VERSION)" \
 		&& tagit -p \
 		&& git push origin master --tags
 
-.PHONY: clean test compile cover integrate package workspace release
+.PHONY: clean test compile cover integrate package publish
