@@ -130,7 +130,7 @@ func (f *ClientFixture) TestOutOfRangeCandidatesWithinResponseArrayAreIgnoredAft
 	f.So(lookup.Results, should.BeEmpty)
 }
 
-func (f *ClientFixture) FocusTestFullJSONResponseDeserialization() {
+func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.sender.response = `[
   {
 	"input_id": "blah",
