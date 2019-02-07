@@ -60,6 +60,7 @@ type (
 		TimeZone                 string  `json:"time_zone,omitempty"`
 		UTCOffset                float32 `json:"utc_offset,omitempty"`
 		DST                      bool    `json:"dst,omitempty"`
+		EWSMatch                 bool    `json:"ews_match,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:
@@ -74,6 +75,6 @@ type (
 		LACSLinkCode      string `json:"lacslink_code,omitempty"`
 		LACSLinkIndicator string `json:"lacslink_indicator,omitempty"`
 		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`
-		EWSMatch          bool   `json:"ews_match,omitempty"`
+		EWSMatch          bool   `json:"ews_match,omitempty"` // deprecated
 	}
 )

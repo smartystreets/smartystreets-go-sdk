@@ -160,8 +160,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "plus4_code": "4405",
       "delivery_point": "14",
       "delivery_point_check_digit": "0",
-      "urbanization": "urbanization",
-	  "ews_match": true
+      "urbanization": "urbanization"
     },
     "metadata": {
       "record_type": "S",
@@ -179,7 +178,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "precision": "Zip9",
       "time_zone": "Mountain",
       "utc_offset": -7,
-      "dst": true
+      "dst": true,
+	  "ews_match": true
     },
     "analysis": {
       "dpv_match_code": "S",
@@ -190,8 +190,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "footnotes": "footnotes",
       "lacslink_code": "lacslink_code",
       "lacslink_indicator": "lacslink_indicator",
-      "suitelink_match": true,
-      "ews_match": true
+      "suitelink_match": true
     }
   }
 ]`
@@ -247,6 +246,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				TimeZone:                 "Mountain",
 				UTCOffset:                -7,
 				DST:                      true,
+				EWSMatch:                 true,
 			},
 			Analysis: Analysis{
 				DPVMatchCode:      "S",
@@ -258,7 +258,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				LACSLinkCode:      "lacslink_code",
 				LACSLinkIndicator: "lacslink_indicator",
 				SuiteLinkMatch:    true,
-				EWSMatch:          true,
+				EWSMatch:          false,
 			},
 		},
 	})
