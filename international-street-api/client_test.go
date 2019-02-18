@@ -45,7 +45,11 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
 
-	f.So(f.input.Results, should.Resemble, []*Candidate{{Address1: "1"}, {Address1: "2"}, {Address1: "3"}})
+	f.So(f.input.Results, should.Resemble, []*Candidate{
+		{RootLevel: RootLevel{Address1: "1"}},
+		{RootLevel: RootLevel{Address1: "2"}},
+		{RootLevel: RootLevel{Address1: "3"}},
+	})
 }
 
 func (f *ClientFixture) TestNilLookupNOP() {
