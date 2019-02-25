@@ -24,6 +24,7 @@ func main() {
 		City:          "Baltimore",
 		State:         "MD",
 		MaxCandidates: 10, // This input produces more than one candidate!
+		MatchStrategy: street.MatchInvalid,
 	}
 	lookup2 := &street.Lookup{
 		Street: "1600 Pennsylvania Avenue",
