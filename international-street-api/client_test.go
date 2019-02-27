@@ -46,7 +46,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
 
 	f.So(f.input.Results, should.Resemble, []*Candidate{{Address1: "1"}, {Address1: "2"}, {Address1: "3"}})
-	
+
 }
 
 func (f *ClientFixture) TestNilLookupNOP() {
@@ -84,6 +84,149 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(f.input.Results, should.BeEmpty)
+}
+
+func (f *ClientFixture) TestFullJSONResponseDeserialization() {
+	f.sender.response = `[
+  {
+	"input_id": "blah",
+	"organization": "blah",
+	"address1": "Rua Antônio Loes Marin, 121",
+	"address2": "Casa Verde",
+	"address3": "São Paulo - SP",
+	"address4": "02516-050",
+	"address5": "blank",
+	"address6": "also empty",
+	"address7": "there",
+	"address8": "is",
+	"address9": "nothing",
+	"address10": "to",
+	"address11": "show",
+	"address12": "here",
+	"components": {
+	  "super_administrative_area": "super_blah",
+	  "administrative_area": "SP",
+	  "sub_administrative_area": "sub_blah",
+	  "building": "building",
+	  "dependent_locality": "Casa Verde",
+	  "dependent_locality_name": "dependent_locality_name",
+	  "double_dependent_locality": "x2",
+	  "country_iso_3": "BRA",
+	  "locality": "São Paulo",
+	  "postal_code": "02516-050",
+	  "postal_code_short": "02516-050",
+	  "postal_code_extra": "ditto++",
+	  "premise": "121",
+	  "premise_extra": "premise_extra",
+	  "premise_number": "121",
+	  "premise_type": "premise_type",
+	  "premise_prefix_number": "prefix",
+	  "thoroughfare": "Rua Antônio Lopes Marin",
+	  "thoroughfare_predirection": "Q",
+	  "thoroughfare_postdirection": "K",
+	  "thoroughfare_name": "Rua Antônio Lopes Marin",
+	  "thoroughfare_trailing_type": "Rua",
+	  "thoroughfare_type": "empty",
+	  "dependent_thoroughfare": "dependent",
+	  "dependent_thoroughfare_predirection": "before_dependent",
+	  "dependent_thoroughfare_postdirection": "after_dependent",
+	  "dependent_thoroughfare_name": "dependent_name",
+	  "dependent_thoroughfare_trailing_type": "dependent_trail",
+	  "dependent_thoroughfare_type": "dependent_type",
+	  "building_leading_type": "leading_type",
+	  "building_name": "building_name",
+	  "building_trailing_type": "building_trail",
+	  "sub_building_type": "almost_bldg_type",
+	  "sub_building_number": "almost_bldg_number",
+	  "sub_building_name": "almost_bldg_name",
+	  "sub_building": "almost_bldg",
+	  "post_box": "box",
+	  "post_box_type": "cube",
+	  "post_box_number": "blank"
+	},
+	"metadata": {
+	  "latitude": -23.509659,
+	  "longitude": -46.659711,
+	  "geocode_precision": "Premise",
+	  "max_geocode_precision": "DeliveryPoint",
+	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code"
+	},
+    "analysis": {
+	  "verification_status": "Verified",
+	  "address_precision": "Premise",
+	  "max_address_precision": "DeliveryPoint"
+	}
+  }
+]`
+	lookup := new(Lookup)
+	response := []byte(f.sender.response)
+	err := deserializeResponse(response, lookup)
+	candidate := lookup.Results[0]
+	component := candidate.Components
+	metadata := candidate.Metadata
+	analysis := candidate.Analysis
+	f.So(err, should.BeNil)
+	f.So(candidate.InputID, should.Equal, "blah")
+	f.So(candidate.Organization, should.Equal, "blah")
+	f.So(candidate.Address1, should.Equal, "Rua Antônio Loes Marin, 121")
+	f.So(candidate.Address2, should.Equal, "Casa Verde")
+	f.So(candidate.Address3, should.Equal, "São Paulo - SP")
+	f.So(candidate.Address4, should.Equal, "02516-050")
+	f.So(candidate.Address5, should.Equal, "blank")
+	f.So(candidate.Address6, should.Equal, "also empty")
+	f.So(candidate.Address7, should.Equal, "there")
+	f.So(candidate.Address8, should.Equal, "is")
+	f.So(candidate.Address9, should.Equal, "nothing")
+	f.So(candidate.Address10, should.Equal, "to")
+	f.So(candidate.Address11, should.Equal, "show")
+	f.So(candidate.Address12, should.Equal, "here")
+	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
+	f.So(component.AdministrativeArea, should.Equal, "SP")
+	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
+	f.So(component.Building, should.Equal, "building")
+	f.So(component.DependentLocality, should.Equal, "Casa Verde")
+	f.So(component.DependentLocalityName, should.Equal, "dependent_locality_name")
+	f.So(component.DoubleDependentLocality, should.Equal, "x2")
+	f.So(component.CountryISO3, should.Equal, "BRA")
+	f.So(component.Locality, should.Equal, "São Paulo")
+	f.So(component.PostalCode, should.Equal, "02516-050")
+	f.So(component.PostalCodeShort, should.Equal, "02516-050")
+	f.So(component.PostalCodeExtra, should.Equal, "ditto++")
+	f.So(component.Premise, should.Equal, "121")
+	f.So(component.PremiseExtra, should.Equal, "premise_extra")
+	f.So(component.PremiseNumber, should.Equal, "121")
+	f.So(component.PremiseType, should.Equal, "premise_type")
+	f.So(component.PremisePrefixNumber, should.Equal, "prefix")
+	f.So(component.Thoroughfare, should.Equal, "Rua Antônio Lopes Marin")
+	f.So(component.ThoroughfarePredirection, should.Equal, "Q")
+	f.So(component.ThoroughfarePostdirection, should.Equal, "K")
+	f.So(component.ThoroughfareName, should.Equal, "Rua Antônio Lopes Marin")
+	f.So(component.ThoroughfareTrailingType, should.Equal, "Rua")
+	f.So(component.ThoroughfareType, should.Equal, "empty")
+	f.So(component.DependentThoroughfare, should.Equal, "dependent")
+	f.So(component.DependentThoroughfarePredirection, should.Equal, "before_dependent")
+	f.So(component.DependentThoroughfarePostdirection, should.Equal, "after_dependent")
+	f.So(component.DependentThoroughfareName, should.Equal, "dependent_name")
+	f.So(component.DependentThoroughfareTrailingType, should.Equal, "dependent_trail")
+	f.So(component.DependentThoroughfareType, should.Equal, "dependent_type")
+	f.So(component.BuildingLeadingType, should.Equal, "leading_type")
+	f.So(component.BuildingName, should.Equal, "building_name")
+	f.So(component.BuildingTrailingType, should.Equal, "building_trail")
+	f.So(component.SubBuildingType, should.Equal, "almost_bldg_type")
+	f.So(component.SubBuildingNumber, should.Equal, "almost_bldg_number")
+	f.So(component.SubBuildingName, should.Equal, "almost_bldg_name")
+	f.So(component.SubBuilding, should.Equal, "almost_bldg")
+	f.So(component.PostBox, should.Equal, "box")
+	f.So(component.PostBoxType, should.Equal, "cube")
+	f.So(component.PostBoxNumber, should.Equal, "blank")
+	f.So(metadata.Latitude, should.Equal, -23.509659)
+	f.So(metadata.Longitude, should.Equal, -46.659711)
+	f.So(metadata.GeocodePrecision, should.Equal, "Premise")
+	f.So(metadata.MaxGeocodePrecision, should.Equal, "DeliveryPoint")
+	f.So(metadata.AddressFormat, should.Equal, "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code")
+	f.So(analysis.VerificationStatus, should.Equal, "Verified")
+	f.So(analysis.AddressPrecision, should.Equal, "Premise")
+	f.So(analysis.MaxAddressPrecision, should.Equal, "DeliveryPoint")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
