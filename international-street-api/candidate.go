@@ -4,27 +4,23 @@ type (
 	// Candidate contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#http-response-output
 	Candidate struct {
-		InputID string `json:"input_id,omitempty"`
-		RootLevel
-		Components Components `json:"components,omitempty"`
-		Metadata   Metadata   `json:"metadata,omitempty"`
-		Analysis   Analysis   `json:"analysis,omitempty"`
-	}
-
-	RootLevel struct {
-		Organization string `json:"organization,omitempty"`
-		Address1     string `json:"address1,omitempty"`
-		Address2     string `json:"address2,omitempty"`
-		Address3     string `json:"address3,omitempty"`
-		Address4     string `json:"address4,omitempty"`
-		Address5     string `json:"address5,omitempty"`
-		Address6     string `json:"address6,omitempty"`
-		Address7     string `json:"address7,omitempty"`
-		Address8     string `json:"address8,omitempty"`
-		Address9     string `json:"address9,omitempty"`
-		Address10    string `json:"address10,omitempty"`
-		Address11    string `json:"address11,omitempty"`
-		Address12    string `json:"address12,omitempty"`
+		InputID      string     `json:"input_id,omitempty"`
+		Organization string     `json:"organization,omitempty"`
+		Address1     string     `json:"address1,omitempty"`
+		Address2     string     `json:"address2,omitempty"`
+		Address3     string     `json:"address3,omitempty"`
+		Address4     string     `json:"address4,omitempty"`
+		Address5     string     `json:"address5,omitempty"`
+		Address6     string     `json:"address6,omitempty"`
+		Address7     string     `json:"address7,omitempty"`
+		Address8     string     `json:"address8,omitempty"`
+		Address9     string     `json:"address9,omitempty"`
+		Address10    string     `json:"address10,omitempty"`
+		Address11    string     `json:"address11,omitempty"`
+		Address12    string     `json:"address12,omitempty"`
+		Components   Components `json:"components,omitempty"`
+		Metadata     Metadata   `json:"metadata,omitempty"`
+		Analysis     Analysis   `json:"analysis,omitempty"`
 	}
 
 	// Components contains all output fields defined here:
@@ -84,16 +80,8 @@ type (
 	// Analysis contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#analysis
 	Analysis struct {
-		VerificationStatus  string  `json:"verification_status,omitempty"`
-		AddressPrecision    string  `json:"address_precision,omitempty"`
-		MaxAddressPrecision string  `json:"max_address_precision,omitempty"`
-		Changes             Changes `json:"changes,omitempty"`
-	}
-
-	// Changes contains all output fields defined here:
-	// https://smartystreets.com/docs/international-street-api#changes
-	Changes struct {
-		RootLevel
-		Components Components `json:"components,omitempty"`
+		VerificationStatus  string `json:"verification_status,omitempty"`
+		AddressPrecision    string `json:"address_precision,omitempty"`
+		MaxAddressPrecision string `json:"max_address_precision,omitempty"`
 	}
 )
