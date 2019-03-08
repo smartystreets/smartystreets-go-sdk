@@ -16,10 +16,18 @@ func main() {
 
 	client := wireup.BuildUSExtractAPIClient(
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		//wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
-	lookup := &extract.Lookup{Text: "Meet me at 3214 N University Ave Provo UT 84604 just after 3pm."}
+	// For complete list of lookup fields, refer to:
+	// https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields
+
+	lookup := &extract.Lookup{
+		Text:                    "Meet me at 3214 N University Ave Provo UT 84604 just after 3pm.",
+		Aggressive:              true,
+		AddressesWithLineBreaks: false,
+		AddressesPerLine:        1,
+	}
 
 	if err := client.SendLookup(lookup); err != nil {
 		log.Fatal("Error sending batch:", err)

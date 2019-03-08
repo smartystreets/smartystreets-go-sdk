@@ -8,13 +8,13 @@ import (
 )
 
 func TestOptionsFixture(t *testing.T) {
-    gunit.Run(new(OptionsFixture), t)
+	gunit.Run(new(OptionsFixture), t)
 }
 
 type OptionsFixture struct {
-    *gunit.Fixture
+	*gunit.Fixture
 }
 
 func (this *OptionsFixture) TestConfigure_NilOptionIgnored() {
-	this.So(func() { configure(nil)}, should.NotPanic)
+	this.So(func() { configure(nil) }, should.NotPanic)
 }

@@ -14,15 +14,22 @@ func main() {
 
 	client := wireup.BuildInternationalStreetAPIClient(
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		//wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
+	// For complete list of input fields, refer to:
+	// https://smartystreets.com/docs/cloud/international-street-api#http-input-fields
+
 	lookup := &street.Lookup{
+		InputID:            "ID-8675309",
+		Geocode:            false,
+		Organization:       "John Doe",
 		Address1:           "Rua Padre Antonio D'Angelo 121",
 		Address2:           "Casa Verde",
 		Locality:           "Sao Paulo",
 		AdministrativeArea: "SP",
 		Country:            "Brazil",
+		PostalCode:         "02516-050",
 	}
 
 	if err := client.SendLookup(lookup); err != nil {

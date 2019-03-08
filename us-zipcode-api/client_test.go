@@ -43,7 +43,7 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup")
 	f.So(f.sender.requestBody, should.BeNil)
 	f.So(f.sender.request.URL.String(), should.StartWith, placeholderURL)
-	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id":{"42"}})
+	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}})
 }
 
 func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBackIntoBatch() {
