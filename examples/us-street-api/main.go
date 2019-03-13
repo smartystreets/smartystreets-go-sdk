@@ -23,7 +23,7 @@ func main() {
 	// https://smartystreets.com/docs/us-street-api#input-fields
 
 	lookup1 := &street.Lookup{
-		InputID:       "24601",
+		InputID:       "24601", // Optional ID from your system
 		Addressee:     "John Doe",
 		Street:        "1 Rosedale",
 		Street2:       "closet under the stairs",

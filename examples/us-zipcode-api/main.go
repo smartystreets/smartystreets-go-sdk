@@ -18,7 +18,7 @@ func main() {
 	)
 
 	// For complete list of input fields, refer to:
-	// https://smartystreets.com/docs/us-street-api#input-fields
+	// https://smartystreets.com/docs/us-zipcode-api#input-fields
 
 	lookup1 := &zipcode.Lookup{
 		InputID: "dfc33cb6-829e-4fea-aa1b-b6d6580f0817", // Optional ID from your system
