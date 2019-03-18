@@ -57,4 +57,3 @@ const (
 	MatchRange   = MatchStrategy("range")
 	MatchInvalid = MatchStrategy("invalid")
 )
-

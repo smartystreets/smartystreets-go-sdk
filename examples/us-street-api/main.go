@@ -15,24 +15,35 @@ func main() {
 	// You don't have to store your keys in environment variables, but we recommend it.
 	client := wireup.BuildUSStreetAPIClient(
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		//wireup.ViaProxy("https://my-proxy.my-company.com"), // uncomment this line to point to the specified proxy.
-		//wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+		// wireup.ViaProxy("https://my-proxy.my-company.com"), // uncomment this line to point to the specified proxy.
+		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
+	// Documentation for input fields can be found at:
+	// https://smartystreets.com/docs/us-street-api#input-fields
+
 	lookup1 := &street.Lookup{
+		InputID:       "24601", // Optional ID from your system
+		Addressee:     "John Doe",
 		Street:        "1 Rosedale",
+		Street2:       "closet under the stairs",
+		Secondary:     "APT 2",
+		Urbanization:  "", // Only applies to Puerto Rico addresses
 		City:          "Baltimore",
 		State:         "MD",
-		MaxCandidates: 10, // This input produces more than one candidate!
-		MatchStrategy: street.MatchInvalid,
+		ZIPCode:       "21229",
+		MaxCandidates: 3,
+		MatchStrategy: street.MatchInvalid, // "invalid" is the most permissive match
 	}
 	lookup2 := &street.Lookup{
-		Street: "1600 Pennsylvania Avenue",
-		City:   "Washington",
-		State:  "DC",
+		Street:        "1600 Pennsylvania Avenue",
+		LastLine:      "Washington, DC",
+		MaxCandidates: 5,
 	}
 	lookup3 := &street.Lookup{
-		Street: "1600 Amphitheatre Parkway Mountain View, CA 94043",
+		InputID:       "8675309",
+		Street:        "1600 Amphitheatre Parkway Mountain View, CA 94043",
+		MaxCandidates: 1,
 	}
 
 	batch := street.NewBatch()

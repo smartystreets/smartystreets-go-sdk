@@ -143,7 +143,6 @@ func (f *LookupSerializationFixture) TestAddress4() {
 	f.So(f.query.Get("address4"), should.Equal, "four")
 }
 
-
 func (f *LookupSerializationFixture) TestLocality() {
 	f.lookup.Locality = "Provo"
 
