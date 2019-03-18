@@ -19,7 +19,7 @@ func main() {
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
-	// For complete list of lookup fields, refer to:
+	// Documentation for input fields can be found at:
 	// https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields
 
 	lookup := &extract.Lookup{

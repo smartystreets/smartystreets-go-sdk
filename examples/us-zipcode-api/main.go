@@ -17,7 +17,7 @@ func main() {
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
-	// For complete list of input fields, refer to:
+	// Documentation for input fields can be found at:
 	// https://smartystreets.com/docs/us-zipcode-api#input-fields
 
 	lookup1 := &zipcode.Lookup{
@@ -33,12 +33,9 @@ func main() {
 	}
 
 	batch := zipcode.NewBatch()
-	for batch.Append(lookup1) {
-		fmt.Print(".")
-	}
-	for batch.Append(lookup2) {
-		fmt.Print(".")
-	}
+	batch.Append(lookup1)
+	batch.Append(lookup2)
+
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())
 
 	if err := client.SendBatch(batch); err != nil {

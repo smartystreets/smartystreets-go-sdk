@@ -17,15 +17,15 @@ func main() {
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
-	// For complete list of lookup fields, refer to:
+	// Documentation for input fields can be found at:
 	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
 
 	lookup := &autocomplete.Lookup{
-		Prefix:         "123 main",
-		MaxSuggestions: 10,
-		CityFilter:     []string{"Geneva", "Florence", "Bethlehem"},
-		StateFilter:    []string{"Alabama", "Florida"},
-		Preferences:    []string{"Geneva,AL"},
+		Prefix:         "4770 Lincoln Ave O",
+		MaxSuggestions: 5,
+		CityFilter:     []string{"Ogden"},
+		StateFilter:    []string{"IL"},
+		Preferences:    []string{"Fallon, IL"},
 		Geolocation:    autocomplete.GeolocateNone,
 		PreferRatio:    0.3333333333,
 	}

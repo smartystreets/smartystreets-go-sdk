@@ -21,7 +21,7 @@ func main() {
 	// https://smartystreets.com/docs/cloud/international-street-api#http-input-fields
 
 	lookup := &street.Lookup{
-		InputID:            "ID-8675309",
+		InputID:            "ID-8675309", // Optional ID from your system
 		Geocode:            false,
 		Organization:       "John Doe",
 		Address1:           "Rua Padre Antonio D'Angelo 121",
