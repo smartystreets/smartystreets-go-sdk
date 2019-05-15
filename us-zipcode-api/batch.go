@@ -57,24 +57,26 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
-func (batch *Batch) buildRequest() *http.Request {
+func (b *Batch) buildRequest() *http.Request {
 	request, _ := http.NewRequest(http.MethodGet, placeholderURL, nil)
-	if batch.Length() == 1 {
-		batch.serializeGET(request)
+	if b.Length() == 1 {
+		b.serializeGET(request)
 	} else {
-		batch.serializePOST(request)
+		b.serializePOST(request)
 	}
 	return request
 }
-func (batch *Batch) serializeGET(request *http.Request) {
+
+func (b *Batch) serializeGET(request *http.Request) {
 	request.Method = http.MethodGet
 	query := request.URL.Query()
-	query.Set("input_id", batch.lookups[0].InputID)
+	b.lookups[0].encodeQueryString(query)
 	request.URL.RawQuery = query.Encode()
 }
-func (batch *Batch) serializePOST(request *http.Request) {
+
+func (b *Batch) serializePOST(request *http.Request) {
 	request.Method = http.MethodPost
-	payload, _ := json.Marshal(batch.lookups) // We control the types being serialized. This is safe.
+	payload, _ := json.Marshal(b.lookups) // We control the types being serialized. This is safe.
 	request.Body = ioutil.NopCloser(bytes.NewReader(payload))
 	request.ContentLength = int64(len(payload))
 	request.Header.Set("Content-Type", "application/json")
