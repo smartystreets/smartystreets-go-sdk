@@ -50,6 +50,11 @@ func (b *clientBuilder) withSecretKeyCredential(authID, authToken string) *clien
 	return b
 }
 
+func (b *clientBuilder) withWebsiteKeyCredential(key, hostnameOrIP string) *clientBuilder {
+	b.credential = sdk.NewWebsiteKeyCredential(key, hostnameOrIP)
+	return b
+}
+
 func (b *clientBuilder) withCustomBaseURL(address string) *clientBuilder {
 	parsed, err := url.Parse(address)
 	if err != nil {

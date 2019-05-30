@@ -54,6 +54,15 @@ func SecretKeyCredential(authID, authToken string) Option {
 	}
 }
 
+// WebsiteKeyCredential sets the key and hostnameOrIP for use with the client.
+// This kind of authentication is generally only used for client-side applications but it
+// included here for completeness.
+func WebsiteKeyCredential(key, hostnameOrIP string) Option {
+	return func(builder *clientBuilder) {
+		builder.withWebsiteKeyCredential(key, hostnameOrIP)
+	}
+}
+
 // CustomBaseURL specifies the url that the client will use.
 // In all but very few use cases the default value is sufficient and this method should not be called.
 // The address provided should be a url that consists of only the scheme and host. Any other elements
