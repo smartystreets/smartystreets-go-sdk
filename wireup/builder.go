@@ -1,6 +1,7 @@
 package wireup
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -18,16 +19,17 @@ import (
 // clientBuilder is responsible for accepting credentials and other configuration options to combine
 // all components necessary to assemble a fully functional Client for use in an application.
 type clientBuilder struct {
-	credential sdk.Credential
-	baseURL    *url.URL
-	proxy      *url.URL
-	retries    int
-	timeout    time.Duration
-	debug      bool
-	close      bool
-	trace      bool
-	headers    http.Header
-	idleConns  int
+	credential    sdk.Credential
+	baseURL       *url.URL
+	proxy         *url.URL
+	retries       int
+	timeout       time.Duration
+	debug         bool
+	close         bool
+	trace         bool
+	headers       http.Header
+	idleConns     int
+	http2Disabled bool
 }
 
 func newClientBuilder() *clientBuilder {
@@ -97,6 +99,11 @@ func (b *clientBuilder) withCustomHeader(key, value string) *clientBuilder {
 
 func (b *clientBuilder) withoutKeepAlive() *clientBuilder {
 	b.close = true
+	return b
+}
+
+func (b *clientBuilder) disableHTTP2() *clientBuilder {
+	b.http2Disabled = true
 	return b
 }
 
@@ -171,6 +178,9 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 	}
 	if b.idleConns > 0 {
 		transport.MaxIdleConnsPerHost = b.idleConns
+	}
+	if b.http2Disabled { // https://golang.org/pkg/net/http/ ("Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map.")
+		transport.TLSNextProto = make(map[string]func(authority string, c *tls.Conn) http.RoundTripper, 0)
 	}
 	return transport
 }

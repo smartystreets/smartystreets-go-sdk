@@ -132,3 +132,12 @@ func WithMaxIdleConnections(max int) Option {
 		builder.withMaxIdleConnections(max)
 	}
 }
+
+// DisableHTTP2 prevents clients from making use of the http2 protocol. This is achieved by following the instructions
+// from the http package documentation (see: https://golang.org/pkg/net/http):
+// > "Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map."
+func DisableHTTP2() Option {
+	return func(builder *clientBuilder) {
+		builder.disableHTTP2()
+	}
+}
