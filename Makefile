@@ -12,6 +12,8 @@ test: clean
 compile: clean
 	go build ./...
 
+build: test compile
+
 cover: compile
 	go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
@@ -30,4 +32,4 @@ publish: compile test version
 		&& tagit -p \
 		&& git push origin master --tags
 
-.PHONY: clean test compile cover integrate version package publish
+.PHONY: clean test compile build cover integrate version package publish

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/smartystreets/smartystreets-go-sdk.svg?branch=master)](https://travis-ci.org/smartystreets/smartystreets-go-sdk)
+
 # smartystreets-go-sdk
 
 The official client libraries for accessing SmartyStreets APIs from Go.
