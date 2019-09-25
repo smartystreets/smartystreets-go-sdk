@@ -43,7 +43,7 @@ func main() {
 	}
 
 	for i, input := range batch.Records() {
-		fmt.Println("Input:", i, input.City, input.State, input.ZIPCode)
+		fmt.Println("Input:", i, input.InputID, input.City, input.State, input.ZIPCode)
 		fmt.Printf("%#v\n", input.Result)
 		fmt.Println()
 	}

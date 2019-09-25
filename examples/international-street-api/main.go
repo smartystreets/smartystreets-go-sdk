@@ -41,6 +41,7 @@ func main() {
 
 	for c, candidate := range lookup.Results {
 		fmt.Println("Candidate:", c)
+		display(candidate.InputID)
 		display(candidate.Address1)
 		display(candidate.Address2)
 		display(candidate.Address3)

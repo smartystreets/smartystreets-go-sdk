@@ -60,6 +60,7 @@ func main() {
 		fmt.Println()
 		for j, candidate := range input.Results {
 			fmt.Println("  Candidate:", j)
+			fmt.Println(" Input ID: ", candidate.InputID)
 			fmt.Println(" ", candidate.DeliveryLine1)
 			fmt.Println(" ", candidate.LastLine)
 			fmt.Println()
