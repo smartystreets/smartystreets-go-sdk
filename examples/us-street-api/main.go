@@ -33,7 +33,9 @@ func main() {
 		State:         "MD",
 		ZIPCode:       "21229",
 		MaxCandidates: 3,
-		MatchStrategy: street.MatchInvalid, // "invalid" is the most permissive match
+		MatchStrategy: street.MatchInvalid, // "invalid" is the most permissive match,
+											// this will always return at least one result even if the address is invalid.
+											// Refer to the documentation for additional MatchStrategy options.
 	}
 	lookup2 := &street.Lookup{
 		Street:        "1600 Pennsylvania Avenue",
