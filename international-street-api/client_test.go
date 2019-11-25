@@ -43,7 +43,10 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(f.sender.request.URL.Path, should.Equal, verifyURL)
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
-
+	f.So(f.input.Results, should.Resemble, []*Candidate{
+		{RootLevel: RootLevel{Address1: "1"}},
+		{RootLevel: RootLevel{Address1: "2"}},
+		{RootLevel: RootLevel{Address1: "3"}}})
 	f.So(f.input.Results, should.Resemble, []*Candidate{
 		{RootLevel: RootLevel{Address1: "1"}},
 		{RootLevel: RootLevel{Address1: "2"}},
@@ -88,7 +91,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Results, should.BeEmpty)
 }
 
-func (f *ClientFixture) TestFullJSONResponseDeserialization() {
+func (f *ClientFixture) FocusTestFullJSONResponseDeserialization() {
 	f.sender.response = `[
 {
 	"input_id": "blah",
@@ -105,59 +108,59 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"address10": "to",
 	"address11": "show",
 	"address12": "here",
-"components": {
-	 "super_administrative_area": "super_blah",
-	 "administrative_area": "SP",
-	 "sub_administrative_area": "sub_blah",
-	 "building": "building",
-	 "dependent_locality": "Casa Verde",
-	 "dependent_locality_name": "dependent_locality_name",
-	 "double_dependent_locality": "x2",
-	 "country_iso_3": "BRA",
-	 "locality": "São Paulo",
-	 "postal_code": "02516-050",
-	 "postal_code_short": "02516-050",
-	 "postal_code_extra": "ditto++",
-	 "premise": "121",
-	 "premise_extra": "premise_extra",
-	 "premise_number": "121",
-	 "premise_type": "premise_type",
-	 "premise_prefix_number": "prefix",
-	 "thoroughfare": "Rua Antônio Lopes Marin",
-	 "thoroughfare_predirection": "Q",
-	 "thoroughfare_postdirection": "K",
-	 "thoroughfare_name": "Rua Antônio Lopes Marin",
-	 "thoroughfare_trailing_type": "Rua",
-	 "thoroughfare_type": "empty",
-	 "dependent_thoroughfare": "dependent",
-	 "dependent_thoroughfare_predirection": "before_dependent",
-	 "dependent_thoroughfare_postdirection": "after_dependent",
-	 "dependent_thoroughfare_name": "dependent_name",
-	 "dependent_thoroughfare_trailing_type": "dependent_trail",
-	 "dependent_thoroughfare_type": "dependent_type",
-	 "building_leading_type": "leading_type",
-	 "building_name": "building_name",
-	 "building_trailing_type": "building_trail",
-	 "sub_building_type": "almost_bldg_type",
-	 "sub_building_number": "almost_bldg_number",
-	 "sub_building_name": "almost_bldg_name",
-	 "sub_building": "almost_bldg",
-	 "post_box": "box",
-	 "post_box_type": "cube",
-	 "post_box_number": "blank"
+	"components": {
+	  "super_administrative_area": "super_blah",
+	  "administrative_area": "SP",
+	  "sub_administrative_area": "sub_blah",
+	  "building": "building",
+	  "dependent_locality": "Casa Verde",
+	  "dependent_locality_name": "dependent_locality_name",
+	  "double_dependent_locality": "x2",
+	  "country_iso_3": "BRA",
+	  "locality": "São Paulo",
+	  "postal_code": "02516-050",
+	  "postal_code_short": "02516-050",
+	  "postal_code_extra": "ditto++",
+	  "premise": "121",
+	  "premise_extra": "premise_extra",
+	  "premise_number": "121",
+	  "premise_type": "premise_type",
+	  "premise_prefix_number": "prefix",
+	  "thoroughfare": "Rua Antônio Lopes Marin",
+	  "thoroughfare_predirection": "Q",
+	  "thoroughfare_postdirection": "K",
+	  "thoroughfare_name": "Rua Antônio Lopes Marin",
+	  "thoroughfare_trailing_type": "Rua",
+	  "thoroughfare_type": "empty",
+	  "dependent_thoroughfare": "dependent",
+	  "dependent_thoroughfare_predirection": "before_dependent",
+	  "dependent_thoroughfare_postdirection": "after_dependent",
+	  "dependent_thoroughfare_name": "dependent_name",
+	  "dependent_thoroughfare_trailing_type": "dependent_trail",
+	  "dependent_thoroughfare_type": "dependent_type",
+	  "building_leading_type": "leading_type",
+	  "building_name": "building_name",
+	  "building_trailing_type": "building_trail",
+	  "sub_building_type": "almost_bldg_type",
+	  "sub_building_number": "almost_bldg_number",
+	  "sub_building_name": "almost_bldg_name",
+	  "sub_building": "almost_bldg",
+	  "post_box": "box",
+	  "post_box_type": "cube",
+	  "post_box_number": "blank"
 	},
 	"metadata": {
-	 "latitude": -23.509659,
-	 "longitude": -46.659711,
-	 "geocode_precision": "Premise",
-	 "max_geocode_precision": "DeliveryPoint",
-	 "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code"
+	  "latitude": -23.509659,
+	  "longitude": -46.659711,
+	  "geocode_precision": "Premise",
+	  "max_geocode_precision": "DeliveryPoint",
+	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code"
 	},
     "analysis": {
-	 "verification_status": "Verified",
-	 "address_precision": "Premise",
-	 "max_address_precision": "DeliveryPoint",
-	 "changes": {
+	  "verification_status": "Verified",
+	  "address_precision": "Premise",
+	  "max_address_precision": "DeliveryPoint",
+	  "changes": {
 		"organization": "blank",
 		"address1": "Verified-AliasChange",
 		"address2": "Verified-AliasChange",
