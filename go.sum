@@ -1,8 +1,8 @@
-github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf h1:6V1qxN6Usn4jy8unvggSJz/NC790tefw8Zdy6OZS5co=
-github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf/go.mod h1:OnSkiWE9lh6wB0YB77sQom3nweQdgAjqCqsofrRNTgc=
-github.com/smartystreets/clock v0.0.0-20180622225331-ccbde14dc671 h1:wvSmZdRIBm4DONZZdBPoD/yjtj2wLiYowPDr55IZHxI=
-github.com/smartystreets/clock v0.0.0-20180622225331-ccbde14dc671/go.mod h1:BsOg323oIf8BtWXjDSLZHE2jVzhjSahj1I+0ehz15rg=
-github.com/smartystreets/gunit v0.0.0-20180314194857-6f0d6275bdcd h1:p5kvxG4NHogJX1brTLtvUSGdW0/aBvIyqDSW7tmnsmQ=
-github.com/smartystreets/gunit v0.0.0-20180314194857-6f0d6275bdcd/go.mod h1:XUKj4gbqj2QvJk/OdLWzyZ3FYli0f+MdpngyryX0gcw=
-github.com/smartystreets/logging v0.0.0-20180120051237-fcc265ebff02 h1:ja8mc9Oq8jnzSxBBZAOkxYudug16fUi5YdSTueqp9qQ=
-github.com/smartystreets/logging v0.0.0-20180120051237-fcc265ebff02/go.mod h1:CFznTL3ZATteeeLCfHP4kXU02NEeNiHsmMyxC6Fy2k0=
+github.com/smartystreets/assertions v1.0.1 h1:voD4ITNjPL5jjBfgR/r8fPIIBrliWrWHeiJApdr3r4w=
+github.com/smartystreets/assertions v1.0.1/go.mod h1:kHHU4qYBaI3q23Pp3VPrmWhuIUrLW/7eUrw0BU5VaoM=
+github.com/smartystreets/clock v1.0.1 h1:84Q4VNk3r1PD3p5a/KgAvtlXzq7wyY6DYLvQpJopILk=
+github.com/smartystreets/clock v1.0.1/go.mod h1:2cAgwF2chCLHHDixwKKktZg2AR95bdR97ByZOsekF9A=
+github.com/smartystreets/gunit v1.0.2 h1:nCXf7TXGchqk8zNVQFTtbeW6rGSrlp9ir9h8wmx0xws=
+github.com/smartystreets/gunit v1.0.2/go.mod h1:EH5qMBab2UclzXUcpR8b93eHsIlp9u+pDQIRp5DZNzQ=
+github.com/smartystreets/logging v1.0.2 h1:ScLtqaKBnjIyTZw218wCALtb4RMMISWsk9xz1QP7EjM=
+github.com/smartystreets/logging v1.0.2/go.mod h1:66odR4LeIkc7lNzxhS+ktkvoSUhsyTM4e0NSXI9Bmac=

@@ -54,6 +54,15 @@ func SecretKeyCredential(authID, authToken string) Option {
 	}
 }
 
+// WebsiteKeyCredential sets the key and hostnameOrIP for use with the client.
+// This kind of authentication is generally only used for client-side applications but it
+// included here for completeness.
+func WebsiteKeyCredential(key, hostnameOrIP string) Option {
+	return func(builder *clientBuilder) {
+		builder.withWebsiteKeyCredential(key, hostnameOrIP)
+	}
+}
+
 // CustomBaseURL specifies the url that the client will use.
 // In all but very few use cases the default value is sufficient and this method should not be called.
 // The address provided should be a url that consists of only the scheme and host. Any other elements
@@ -121,5 +130,14 @@ func ViaProxy(address string) Option {
 func WithMaxIdleConnections(max int) Option {
 	return func(builder *clientBuilder) {
 		builder.withMaxIdleConnections(max)
+	}
+}
+
+// DisableHTTP2 prevents clients from making use of the http2 protocol. This is achieved by following the instructions
+// from the http package documentation (see: https://golang.org/pkg/net/http):
+// > "Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map."
+func DisableHTTP2() Option {
+	return func(builder *clientBuilder) {
+		builder.disableHTTP2()
 	}
 }

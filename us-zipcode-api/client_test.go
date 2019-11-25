@@ -32,7 +32,7 @@ func (f *ClientFixture) Setup() {
 
 func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
-	input := &Lookup{InputID: "42"}
+	input := &Lookup{InputID: "42", ZIPCode: "10001", City: "NYC", State: "NY"}
 	f.batch.Append(input)
 
 	err := f.client.SendBatch(f.batch)
@@ -43,7 +43,7 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup")
 	f.So(f.sender.requestBody, should.BeNil)
 	f.So(f.sender.request.URL.String(), should.StartWith, placeholderURL)
-	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id":{"42"}})
+	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}, "zipcode": {"10001"}, "city": {"NYC"}, "state": {"NY"}})
 }
 
 func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBackIntoBatch() {
@@ -52,8 +52,8 @@ func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBac
 		{"input_index": 1, "input_id": "43"},
 		{"input_index": 2, "input_id": "44"}
 	]`
-	input0 := &Lookup{InputID: "42"}
-	input1 := &Lookup{InputID: "43"}
+	input0 := &Lookup{InputID: "42", ZIPCode: "10001"}
+	input1 := &Lookup{InputID: "43", State: "NY", City: "NYC"}
 	input2 := &Lookup{InputID: "44"}
 	f.batch.Append(input0)
 	f.batch.Append(input1)
@@ -65,7 +65,7 @@ func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBac
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "POST")
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup")
-	f.So(string(f.sender.requestBody), should.Equal, `[{"input_id":"42"},{"input_id":"43"},{"input_id":"44"}]`)
+	f.So(string(f.sender.requestBody), should.Equal, `[{"zipcode":"10001","input_id":"42"},{"city":"NYC","state":"NY","input_id":"43"},{"input_id":"44"}]`)
 	f.So(f.sender.request.URL.String(), should.Equal, placeholderURL)
 	f.So(f.sender.request.Header.Get("Content-Type"), should.Equal, "application/json")
 

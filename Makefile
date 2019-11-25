@@ -12,6 +12,8 @@ test: clean
 compile: clean
 	go build ./...
 
+build: test compile
+
 cover: compile
 	go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
@@ -26,8 +28,8 @@ version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
 
 publish: compile test version
-	git commit -am "Incremented version to $(VERSION)" \
+	git commit -am "Incremented version." \
 		&& tagit -p \
 		&& git push origin master --tags
 
-.PHONY: clean test compile cover integrate version package publish
+.PHONY: clean test compile build cover integrate version package publish
