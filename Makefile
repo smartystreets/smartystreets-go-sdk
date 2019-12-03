@@ -28,6 +28,6 @@ version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
 
 publish: compile test version
-	git commit -am "Incremented version." && tagit -p && git push origin master --tags
+	git commit -am "Incremented version."; tagit -p; git push origin master --tags
 
 .PHONY: clean test compile build cover integrate version package publish
