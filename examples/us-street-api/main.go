@@ -17,6 +17,8 @@ func main() {
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// wireup.ViaProxy("https://my-proxy.my-company.com"), // uncomment this line to point to the specified proxy.
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+		// ...or maybe you want to supply your own http client:
+		// wireup.WithHTTPClient(&http.Client{Timeout: time.Second * 30})
 	)
 
 	// Documentation for input fields can be found at:
