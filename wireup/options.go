@@ -1,6 +1,7 @@
 package wireup
 
 import (
+	"net/http"
 	"time"
 
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
@@ -34,6 +35,7 @@ func BuildUSExtractAPIClient(options ...Option) *extract.Client {
 func BuildInternationalStreetAPIClient(options ...Option) *international_street.Client {
 	return configure(options...).buildInternationalStreetAPIClient()
 }
+
 func configure(options ...Option) *clientBuilder {
 	builder := newClientBuilder()
 	for _, option := range options {
@@ -139,5 +141,20 @@ func WithMaxIdleConnections(max int) Option {
 func DisableHTTP2() Option {
 	return func(builder *clientBuilder) {
 		builder.disableHTTP2()
+	}
+}
+
+// WithHTTPClient allows the caller to supply their own *http.Client. This is useful if you want full
+// control over the http client and its properties, but keep in mind that it reduces the following
+// options to no-ops (you would need to specify any of those details on the *http.Client you provide):
+//
+// - DisableHTTP2
+// - WithMaxIdleConnections
+// - ViaProxy
+// - Timeout
+//
+func WithHTTPClient(client *http.Client) Option {
+	return func(builder *clientBuilder) {
+		builder.client = client
 	}
 }

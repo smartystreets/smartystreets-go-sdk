@@ -30,6 +30,7 @@ type clientBuilder struct {
 	headers       http.Header
 	idleConns     int
 	http2Disabled bool
+	client        *http.Client
 }
 
 func newClientBuilder() *clientBuilder {
@@ -159,7 +160,7 @@ func (b *clientBuilder) buildHTTPSender() *internal.HTTPSender {
 
 func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	// inner-most
-	wrapped = &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
+	wrapped = b.buildClient()
 	wrapped = internal.NewTracingClient(wrapped, b.trace)
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = internal.NewRetryClient(wrapped, b.retries)
@@ -169,6 +170,13 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	// outer-most
 	return wrapped
+}
+
+func (b *clientBuilder) buildClient() *http.Client {
+	if b.client != nil {
+		return b.client
+	}
+	return &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
 }
 
 func (b *clientBuilder) buildTransport() *http.Transport {
