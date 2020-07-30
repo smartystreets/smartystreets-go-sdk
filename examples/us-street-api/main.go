@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -55,7 +56,7 @@ func main() {
 	batch.Append(lookup2)
 	batch.Append(lookup3)
 
-	if err := client.SendBatch(batch); err != nil {
+	if err := client.SendBatchWithContext(context.Background(), batch); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

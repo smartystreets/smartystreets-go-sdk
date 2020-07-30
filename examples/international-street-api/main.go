@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -32,7 +33,7 @@ func main() {
 		PostalCode:         "02516-050",
 	}
 
-	if err := client.SendLookup(lookup); err != nil {
+	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

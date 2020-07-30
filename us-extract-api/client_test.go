@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -28,16 +29,18 @@ func (f *ClientFixture) Setup() {
 	f.input = new(Lookup)
 }
 
-func (f *ClientFixture) TestLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
+func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	err := f.client.SendLookup(f.input)
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "POST")
 	f.So(f.sender.request.URL.Path, should.Equal, extractURL)
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
 	f.So(readBody(f.sender.request), should.Equal, "42")
 
 	f.So(f.input.Result, should.Resemble, &Result{Metadata: Metadata{Lines: 42}})

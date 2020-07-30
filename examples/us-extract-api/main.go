@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -29,7 +30,7 @@ func main() {
 		AddressesPerLine:        1,
 	}
 
-	if err := client.SendLookup(lookup); err != nil {
+	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

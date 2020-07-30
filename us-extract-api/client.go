@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -19,9 +20,18 @@ func NewClient(sender sdk.RequestSender) *Client {
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendLookup(lookup *Lookup) error {
+	return c.SendLookupWithContext(context.Background(), lookup)
+}
+
+func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
 	if lookup == nil || len(lookup.Text) == 0 {
 		return nil
-	} else if response, err := c.sender.Send(buildRequest(lookup)); err != nil {
+	}
+
+	request := buildRequest(lookup)
+	request = request.WithContext(ctx)
+	response, err := c.sender.Send(request)
+	if err != nil {
 		return err
 	} else {
 		return deserializeResponse(response, lookup)

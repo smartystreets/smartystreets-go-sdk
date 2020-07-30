@@ -1,6 +1,7 @@
 package street
 
 import (
+	"context"
 	"errors"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
@@ -35,12 +36,14 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	]`
 	f.input.Freeform = "42"
 
-	err := f.client.SendLookup(f.input)
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, verifyURL)
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
 	f.So(f.input.Results, should.Resemble, []*Candidate{
@@ -91,7 +94,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Results, should.BeEmpty)
 }
 
-func (f *ClientFixture) FocusTestFullJSONResponseDeserialization() {
+func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.sender.response = `[
 {
 	"input_id": "blah",

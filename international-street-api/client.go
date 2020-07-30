@@ -1,6 +1,7 @@
 package street
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -22,6 +23,21 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 	if lookup == nil || (len(lookup.Address1) == 0 && len(lookup.Freeform) == 0) {
 		return nil
 	} else if response, err := c.sender.Send(buildRequest(lookup)); err != nil {
+		return err
+	} else {
+		return deserializeResponse(response, lookup)
+	}
+}
+
+func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
+	if lookup == nil || (len(lookup.Address1) == 0 && len(lookup.Freeform) == 0) {
+		return nil
+	}
+
+	request := buildRequest(lookup)
+	request = request.WithContext(ctx)
+	response, err := c.sender.Send(request)
+	if err != nil {
 		return err
 	} else {
 		return deserializeResponse(response, lookup)

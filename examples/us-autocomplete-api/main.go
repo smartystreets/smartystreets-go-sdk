@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -30,7 +31,7 @@ func main() {
 		PreferRatio:    0.3333333333,
 	}
 
-	if err := client.SendLookup(lookup); err != nil {
+	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

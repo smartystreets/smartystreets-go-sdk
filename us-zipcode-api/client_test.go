@@ -1,6 +1,7 @@
 package zipcode
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -35,7 +36,8 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	input := &Lookup{InputID: "42", ZIPCode: "10001", City: "NYC", State: "NY"}
 	f.batch.Append(input)
 
-	err := f.client.SendBatch(f.batch)
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -44,6 +46,7 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	f.So(f.sender.requestBody, should.BeNil)
 	f.So(f.sender.request.URL.String(), should.StartWith, placeholderURL)
 	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}, "zipcode": {"10001"}, "city": {"NYC"}, "state": {"NY"}})
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
 }
 
 func (f *ClientFixture) TestLookupBatchSerializedAndSent__ResultsIncorporatedBackIntoBatch() {

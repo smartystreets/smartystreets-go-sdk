@@ -1,6 +1,7 @@
 package street
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
@@ -18,9 +19,17 @@ func NewClient(sender sdk.RequestSender) *Client {
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendBatch(batch *Batch) error {
+	return c.SendBatchWithContext(context.Background(), batch)
+}
+
+func (c *Client) SendBatchWithContext(ctx context.Context, batch *Batch) error {
 	if batch == nil || batch.Length() == 0 {
 		return nil
-	} else if response, err := c.sender.Send(batch.buildRequest()); err != nil {
+	}
+	request := batch.buildRequest()
+	request = request.WithContext(ctx)
+	response, err := c.sender.Send(request)
+	if err != nil {
 		return err
 	} else {
 		return deserializeResponse(response, batch)

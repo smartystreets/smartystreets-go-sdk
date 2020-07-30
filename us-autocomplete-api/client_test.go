@@ -1,6 +1,7 @@
 package autocomplete
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -28,7 +29,7 @@ func (f *ClientFixture) Setup() {
 	f.input = new(Lookup)
 }
 
-func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsIncorporatedIntoLookup() {
+func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	f.sender.response = `{"suggestions":[
 		{"text": "1"},
 		{"text": "2"},
@@ -36,7 +37,8 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	]}`
 	f.input.Prefix = "42"
 
-	err := f.client.SendLookup(f.input)
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -44,6 +46,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
 	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	f.So(f.input.Results, should.Resemble, []*Suggestion{{Text: "1"}, {Text: "2"}, {Text: "3"}})
 }

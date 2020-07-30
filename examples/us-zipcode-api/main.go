@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -38,7 +39,7 @@ func main() {
 
 	fmt.Println("\nBatch full, preparing to send inputs:", batch.Length())
 
-	if err := client.SendBatch(batch); err != nil {
+	if err := client.SendBatchWithContext(context.Background(), batch); err != nil {
 		log.Fatal("Error sending batch:", err)
 	}
 

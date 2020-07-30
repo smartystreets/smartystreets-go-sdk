@@ -1,6 +1,7 @@
 package street
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -29,12 +30,13 @@ func (f *ClientFixture) Setup() {
 	f.batch = NewBatch()
 }
 
-func (f *ClientFixture) TestSingleAddressBatch_SentInQueryStringAsGET() {
+func (f *ClientFixture) TestSingleAddressBatchWithContext_SentInQueryStringAsGET() {
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
 
-	err := f.client.SendBatch(f.batch)
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -44,6 +46,7 @@ func (f *ClientFixture) TestSingleAddressBatch_SentInQueryStringAsGET() {
 	f.So(f.sender.request.ContentLength, should.Equal, 0)
 	f.So(f.sender.request.URL.String(), should.StartWith, verifyURL)
 	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}})
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
 }
 
 func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesIncorporatedIntoBatch() {
