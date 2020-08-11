@@ -160,8 +160,8 @@ func WithHTTPClient(client *http.Client) Option {
 }
 
 // WithLicense allows the caller to specify the subscription license (aka "track") they wish to use.
-func WithLicense(licenses ...string) Option {
+func WithLicense(license string) Option {
 	return func(builder *clientBuilder) {
-		builder.licenses = licenses
+		builder.licenses = append(builder.licenses, license)
 	}
 }
