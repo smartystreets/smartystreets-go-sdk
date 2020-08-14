@@ -34,7 +34,7 @@ func (this *LicenseClientFixture) Setup() {
 }
 
 func (this *LicenseClientFixture) TestLicenseIsAddedToTheRequestBeforeItIsSentToTheInnerHandler() {
-	this.client = NewLicenseClient(this.inner, "0", "1", "2", "3")
+	this.client = NewLicenseClient(this.inner, "0", "1", "", "2", "3")
 
 	response, err := this.client.Do(this.request)
 
