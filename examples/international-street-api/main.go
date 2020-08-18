@@ -15,7 +15,7 @@ func main() {
 
 	client := wireup.BuildInternationalStreetAPIClient(
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		// wireup.WithLicenses("international-select-plus-gbr-cloud"),
+		// wireup.WithLicenses("fake-license"),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
