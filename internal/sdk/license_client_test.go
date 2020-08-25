@@ -10,7 +10,7 @@ import (
 )
 
 func TestLicenseClientFixture(t *testing.T) {
-    gunit.Run(new(LicenseClientFixture), t)
+	gunit.Run(new(LicenseClientFixture), t)
 }
 
 type LicenseClientFixture struct {

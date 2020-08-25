@@ -3,11 +3,14 @@
 VERSION_FILE := version.go
 VERSION      := $(shell tagit -p --dryrun)
 
-clean:
-	@git checkout "$(VERSION_FILE)"
-
 test: clean
 	go test -short ./...
+
+fmt:
+	go fmt ./...
+
+clean:
+	@git checkout "$(VERSION_FILE)"
 
 compile: clean
 	go build ./...
@@ -30,4 +33,4 @@ version:
 publish: compile test version
 	git commit -am "Incremented version."; tagit -p; git push origin master --tags
 
-.PHONY: clean test compile build cover integrate version package publish
+.PHONY: test fmt clean compile build cover integrate version package publish
