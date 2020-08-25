@@ -67,7 +67,7 @@ func WebsiteKeyCredential(key, hostnameOrIP string) Option {
 
 // CustomBaseURL specifies the url that the client will use.
 // In all but very few use cases the default value is sufficient and this method should not be called.
-// The address provided should be a url that consists of only the scheme and host. Any other elements
+// The address provided will be consulted for scheme, host, and path values. Any other URL components
 // (such as a path, query string, or fragment) will be ignored.
 func CustomBaseURL(address string) Option {
 	return func(builder *clientBuilder) {
