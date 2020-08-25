@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
@@ -15,20 +16,47 @@ func TestBaseURLClientFixture(t *testing.T) {
 
 type BaseURLClientFixture struct {
 	*gunit.Fixture
+
+	inner    *FakeHTTPClient
+	original *http.Request
+	override *url.URL
+}
+
+func (f *BaseURLClientFixture) Setup() {
+	f.inner = &FakeHTTPClient{}
+	f.inner.response = &http.Response{StatusCode: 123}
+}
+func (f *BaseURLClientFixture) do() {
+	client := NewBaseURLClient(f.inner, f.override)
+	response, err := client.Do(f.original)
+	f.So(err, should.BeNil)
+	f.So(response, should.Equal, f.inner.response)
+}
+func (f *BaseURLClientFixture) assertFinalURL(expected string) {
+	f.So(f.inner.request.URL.String(), should.Equal, expected)
 }
 
 func (f *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
-	inner := &FakeHTTPClient{}
-	inner.response = &http.Response{StatusCode: 123}
-	original, _ := http.NewRequest("GET", "http://www.google.com/the/path/stays", nil)
-	override, _ := url.Parse("https://smartystreets.com/the/path/is/ignored")
-	client := NewBaseURLClient(inner, override)
+	f.original = httptest.NewRequest("GET", "http://original.com/original", nil)
+	f.override, _ = url.Parse( /*********/ "https://override.com/override")
 
-	response, err := client.Do(original)
+	f.do()
 
-	f.So(err, should.BeNil)
-	f.So(response, should.Equal, inner.response)
-	f.So(original.URL.String(), should.Equal, override.Scheme+"://"+override.Host+original.URL.Path)
-	f.So(original.URL.Scheme, should.Equal, override.Scheme)
-	f.So(original.URL.Host, should.Equal, override.Host)
+	f.assertFinalURL("https://override.com/override/original")
+}
+func (f *BaseURLClientFixture) TestHostWithPortInOverridingAddress() {
+	f.original = httptest.NewRequest("GET", "https://us-street.api.smartystreets.com/street-address", nil)
+	f.override, _ = url.Parse( /**********/ "https://10.33.17.209:85/override")
+
+	f.do()
+
+	f.assertFinalURL( /*******************/ "https://10.33.17.209:85/override/street-address")
+}
+func (f *BaseURLClientFixture) TestNoPathSpecifiedInOverridingAddress() {
+	f.original = httptest.NewRequest("GET", "https://us-street.api.smartystreets.com/street-address", nil)
+	f.override, _ = url.Parse( /**********/ "https://10.33.17.209:85/")
+
+	f.do()
+
+	f.assertFinalURL( /*******************/ "https://10.33.17.209:85/street-address")
 }
