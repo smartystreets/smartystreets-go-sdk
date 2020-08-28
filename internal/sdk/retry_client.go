@@ -85,4 +85,4 @@ func minDuration(a, b time.Duration) time.Duration {
 	return b
 }
 
-const maxBackOffDuration = 120
+const maxBackOffDuration = 10
