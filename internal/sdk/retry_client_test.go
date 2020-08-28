@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"errors"
+	"math/rand"
 	"net/http"
 	"strings"
 	"testing"
@@ -35,7 +36,7 @@ func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmedi
 }
 func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	f.inner = &FakeMultiHTTPClient{}
-	client := NewRetryClient(f.inner, 10).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
@@ -112,7 +113,7 @@ func (f *RetryClientFixture) assertInternalServerError() {
 
 func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	inner := &FakeHTTPClient{}
-	client := NewRetryClient(inner, 0)
+	client := NewRetryClient(inner, 0, rand.New(rand.NewSource(0)))
 	f.So(client, should.Equal, inner)
 }
 
@@ -141,13 +142,13 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 /**************************************************************************/
 
 func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("GET", "/?body=request", nil)
 	return client.Do(request)
 }
 func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)

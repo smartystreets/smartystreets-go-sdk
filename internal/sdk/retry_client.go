@@ -18,14 +18,14 @@ type RetryClient struct {
 	rand       *rand.Rand
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
-		rand:       rand.New(rand.NewSource(0)),
+		rand:       rand,
 	}
 }
 
