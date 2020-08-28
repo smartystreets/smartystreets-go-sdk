@@ -127,9 +127,15 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	f.So(f.inner.call, should.Equal, 20)
 	f.So(f.sleeper.Naps, should.Resemble,
 
-		[]time.Duration{time.Second * 2, time.Second * 2, time.Second * 3, time.Second * 6, time.Second * 5, time.Second * 6,
-			time.Second * 7, 7 * time.Second, 8 * time.Second, 8 * time.Second, 8 * time.Second, 7 * time.Second, 9 * time.Second,
-			8 * time.Second, 2 * time.Second, 6 * time.Second, 1 * time.Second, 0 * time.Second, 0 * time.Second})
+		[]time.Duration{
+			time.Second * 2, // randomly between 0-2
+			time.Second * 2, // randomlyl between 0-4
+			time.Second * 3, // randomly between 0-8
+			// the rest are randomly between 0-10 (capped)
+			6 * time.Second, 5 * time.Second, 6 * time.Second, 7 * time.Second,
+			7 * time.Second, 8 * time.Second, 8 * time.Second, 8 * time.Second,
+			7 * time.Second, 9 * time.Second, 8 * time.Second, 2 * time.Second,
+			6 * time.Second, 1 * time.Second, 0 * time.Second, 0 * time.Second})
 }
 
 /**************************************************************************/
