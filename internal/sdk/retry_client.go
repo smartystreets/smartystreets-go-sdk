@@ -3,6 +3,7 @@ package sdk
 import (
 	"bytes"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -14,15 +15,17 @@ type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
 	sleeper    *clock.Sleeper
+	rand       *rand.Rand
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
+		rand:       rand,
 	}
 }
 
@@ -58,12 +61,23 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 }
 
 func (r *RetryClient) backOff(attempt int) bool {
+	if attempt == 0 {
+		return true
+	}
 	if attempt > r.maxRetries {
 		return false
 	}
-	backOff := time.Second * time.Duration(attempt)
-	r.sleeper.Sleep(minDuration(backOff, maxBackOffDuration))
+	backOffCap := min(maxBackOffDuration, 2<<attempt)
+	backOff := time.Second * time.Duration(r.rand.Intn(backOffCap))
+	r.sleeper.Sleep(backOff)
 	return true
+}
+
+func min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
 }
 
 func minDuration(a, b time.Duration) time.Duration {
@@ -73,4 +87,4 @@ func minDuration(a, b time.Duration) time.Duration {
 	return b
 }
 
-const maxBackOffDuration = time.Second * 10
+const maxBackOffDuration = 10

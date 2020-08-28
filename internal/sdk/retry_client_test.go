@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"errors"
+	"math/rand"
 	"net/http"
 	"strings"
 	"testing"
@@ -35,7 +36,7 @@ func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmedi
 }
 func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	f.inner = &FakeMultiHTTPClient{}
-	client := NewRetryClient(f.inner, 10).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
@@ -77,7 +78,7 @@ func (f *RetryClientFixture) assertRequestWasSuccessful() {
 func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(f.inner.call, should.Equal, 5)
 	f.So(f.sleeper.Naps, should.Resemble,
-		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
+		[]time.Duration{2 * time.Second, 2 * time.Second, 3 * time.Second, 6 * time.Second})
 }
 
 /**************************************************************************/
@@ -112,7 +113,7 @@ func (f *RetryClientFixture) assertInternalServerError() {
 
 func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	inner := &FakeHTTPClient{}
-	client := NewRetryClient(inner, 0)
+	client := NewRetryClient(inner, 0, rand.New(rand.NewSource(0)))
 	f.So(client, should.Equal, inner)
 }
 
@@ -126,24 +127,28 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, 20)
 	f.So(f.sleeper.Naps, should.Resemble,
+
 		[]time.Duration{
-			time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4, // incrementing
-			time.Second * 5, time.Second * 6, time.Second * 7, time.Second * 8, time.Second * 9, // incrementing
-			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
-			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
-		})
+			time.Second * 2, // randomly between 0-2
+			time.Second * 2, // randomly between 0-4
+			time.Second * 3, // randomly between 0-8
+			// the rest are randomly between 0-10 (capped)
+			6 * time.Second, 5 * time.Second, 6 * time.Second, 7 * time.Second,
+			7 * time.Second, 8 * time.Second, 8 * time.Second, 8 * time.Second,
+			7 * time.Second, 9 * time.Second, 8 * time.Second, 2 * time.Second,
+			6 * time.Second, 1 * time.Second, 0 * time.Second, 0 * time.Second})
 }
 
 /**************************************************************************/
 
 func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("GET", "/?body=request", nil)
 	return client.Do(request)
 }
 func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
 	client.sleeper = f.sleeper
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
