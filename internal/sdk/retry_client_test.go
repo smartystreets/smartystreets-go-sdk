@@ -130,7 +130,7 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 
 		[]time.Duration{
 			time.Second * 2, // randomly between 0-2
-			time.Second * 2, // randomlyl between 0-4
+			time.Second * 2, // randomly between 0-4
 			time.Second * 3, // randomly between 0-8
 			// the rest are randomly between 0-10 (capped)
 			6 * time.Second, 5 * time.Second, 6 * time.Second, 7 * time.Second,
