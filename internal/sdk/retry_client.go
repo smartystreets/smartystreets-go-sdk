@@ -80,11 +80,5 @@ func min(x, y int) int {
 	return y
 }
 
-func minDuration(a, b time.Duration) time.Duration {
-	if a < b {
-		return a
-	}
-	return b
-}
-
+const maxBackOffDurationInSeconds = 10
 const maxBackOffDuration = 10
