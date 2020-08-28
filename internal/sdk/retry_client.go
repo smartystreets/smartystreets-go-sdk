@@ -25,7 +25,7 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
-		rand: rand.New(rand.NewSource(0)),
+		rand:       rand.New(rand.NewSource(0)),
 	}
 }
 
