@@ -15,6 +15,7 @@ type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
 	sleeper    *clock.Sleeper
+	rand       *rand.Rand
 }
 
 func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
@@ -24,6 +25,7 @@ func NewRetryClient(inner HTTPClient, maxRetries int) HTTPClient {
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
+		rand: rand.New(rand.NewSource(0)),
 	}
 }
 
@@ -66,7 +68,7 @@ func (r *RetryClient) backOff(attempt int) bool {
 		return false
 	}
 	backOffCap := min(maxBackOffDuration, 2<<attempt)
-	backOff := time.Second * time.Duration(rand.Intn(backOffCap))
+	backOff := time.Second * time.Duration(r.rand.Intn(backOffCap))
 	r.sleeper.Sleep(backOff)
 	return true
 }

@@ -77,7 +77,7 @@ func (f *RetryClientFixture) assertRequestWasSuccessful() {
 func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(f.inner.call, should.Equal, 5)
 	f.So(f.sleeper.Naps, should.Resemble,
-		[]time.Duration{time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4})
+		[]time.Duration{2 * time.Second, 2 * time.Second, 3 * time.Second, 6 * time.Second})
 }
 
 /**************************************************************************/
@@ -126,12 +126,10 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, 20)
 	f.So(f.sleeper.Naps, should.Resemble,
-		[]time.Duration{
-			time.Second * 0, time.Second * 1, time.Second * 2, time.Second * 3, time.Second * 4, // incrementing
-			time.Second * 5, time.Second * 6, time.Second * 7, time.Second * 8, time.Second * 9, // incrementing
-			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
-			time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, time.Second * 10, // max backoff: 10s
-		})
+
+		[]time.Duration{time.Second * 2, time.Second * 2, time.Second * 3, time.Second * 6, time.Second * 5, time.Second * 6,
+			time.Second * 7, 7 * time.Second, 8 * time.Second, 8 * time.Second, 8 * time.Second, 7 * time.Second, 9 * time.Second,
+			8 * time.Second, 2 * time.Second, 6 * time.Second, 1 * time.Second, 0 * time.Second, 0 * time.Second})
 }
 
 /**************************************************************************/
