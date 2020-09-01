@@ -26,6 +26,7 @@ integrate: compile test
 	@go run examples/us-autocomplete-api/main.go > /dev/null
 	@go run examples/us-extract-api/main.go > /dev/null
 	@go run examples/us-zipcode-api/main.go > /dev/null
+	@go run examples/us-reverse-geo-api/main.go > /dev/null
 
 version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
