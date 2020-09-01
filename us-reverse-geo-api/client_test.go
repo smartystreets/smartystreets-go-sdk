@@ -114,7 +114,7 @@ var validResponseJSON = `{
       "distance": 26977.779297,
       "street": "6186 S 45000 W",
       "city": "Fruitland",
-      "state": "UT",
+      "state_abbreviation": "UT",
       "zipcode": "84027"
     },
     {
@@ -124,7 +124,7 @@ var validResponseJSON = `{
       "distance": 34721.824219,
       "street": "340 Hardscrabble Rd",
       "city": "Helper",
-      "state": "UT",
+      "state_abbreviation": "UT",
       "zipcode": "84526"
     }
   ]

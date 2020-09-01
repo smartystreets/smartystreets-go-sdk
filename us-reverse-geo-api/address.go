@@ -12,7 +12,7 @@ type Address struct {
 	Distance          float64 `json:"distance,omitempty"`
 	Street            string  `json:"street,omitempty"`
 	City              string  `json:"city,omitempty"`
-	StateAbbreviation string  `json:"state,omitempty"`
+	StateAbbreviation string  `json:"state_abbreviation,omitempty"`
 	ZIPCode           string  `json:"zipcode,omitempty"`
 }
 
