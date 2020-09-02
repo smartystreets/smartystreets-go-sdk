@@ -8,7 +8,7 @@ type resultListing struct {
 type Address struct {
 	Latitude          float64 `json:"latitude,omitempty"`
 	Longitude         float64 `json:"longitude,omitempty"`
-	License           int     `json:"license,omitempty"`
+	License           License `json:"license,omitempty"`
 	Distance          float64 `json:"distance,omitempty"`
 	Street            string  `json:"street,omitempty"`
 	City              string  `json:"city,omitempty"`
@@ -16,8 +16,19 @@ type Address struct {
 	ZIPCode           string  `json:"zipcode,omitempty"`
 }
 
-// License values defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#licenses
+type License uint16
+
+// License values and associated details defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#licenses
 const (
-	LicenseSmartyStreets  = 0
-	LicenseGatewaySpatial = 1
+	LicenseSmartyStreets  License = 0
+	LicenseGatewaySpatial License = 1
 )
+
+func (this License) String() string {
+	switch this {
+	case LicenseGatewaySpatial:
+		return "Gateway Spatial, LLC"
+	default:
+		return "SmartyStreets"
+	}
+}
