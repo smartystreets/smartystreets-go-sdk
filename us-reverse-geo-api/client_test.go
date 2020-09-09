@@ -50,7 +50,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 		{
 			Latitude:          40.209549,
 			Longitude:         -110.840134,
-			License:           LicenseGatewaySpatial,
+			CoordinateLicense: CoordinateLicenseGatewaySpatial,
 			Distance:          26977.779297,
 			Street:            "6186 S 45000 W",
 			City:              "Fruitland",
@@ -60,7 +60,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 		{
 			Latitude:          39.123411,
 			Longitude:         -110.872123,
-			License:           LicenseSmartyStreets,
+			CoordinateLicense: CoordinateLicenseSmartyStreets,
 			Distance:          34721.824219,
 			Street:            "340 Hardscrabble Rd",
 			City:              "Helper",
@@ -110,7 +110,7 @@ var validResponseJSON = `{
     {
       "latitude": 40.209549,
       "longitude": -110.840134,
-      "license": 1,
+      "coordinate_license": 1,
       "distance": 26977.779297,
       "street": "6186 S 45000 W",
       "city": "Fruitland",
@@ -120,7 +120,7 @@ var validResponseJSON = `{
     {
       "latitude": 39.123411,
       "longitude": -110.872123,
-      "license": 0,
+      "coordinate_license": 0,
       "distance": 34721.824219,
       "street": "340 Hardscrabble Rd",
       "city": "Helper",

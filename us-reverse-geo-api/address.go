@@ -6,27 +6,27 @@ type resultListing struct {
 
 // Address fields defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-response-output
 type Address struct {
-	Latitude          float64 `json:"latitude,omitempty"`
-	Longitude         float64 `json:"longitude,omitempty"`
-	License           License `json:"license,omitempty"`
-	Distance          float64 `json:"distance,omitempty"`
-	Street            string  `json:"street,omitempty"`
-	City              string  `json:"city,omitempty"`
-	StateAbbreviation string  `json:"state_abbreviation,omitempty"`
-	ZIPCode           string  `json:"zipcode,omitempty"`
+	Latitude          float64           `json:"latitude,omitempty"`
+	Longitude         float64           `json:"longitude,omitempty"`
+	CoordinateLicense CoordinateLicense `json:"coordinate_license,omitempty"`
+	Distance          float64           `json:"distance,omitempty"`
+	Street            string            `json:"street,omitempty"`
+	City              string            `json:"city,omitempty"`
+	StateAbbreviation string            `json:"state_abbreviation,omitempty"`
+	ZIPCode           string            `json:"zipcode,omitempty"`
 }
 
-type License uint16
+type CoordinateLicense uint16
 
-// License values and associated details defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#licenses
+// CoordinateLicense values and associated details defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#licenses
 const (
-	LicenseSmartyStreets  License = 0
-	LicenseGatewaySpatial License = 1
+	CoordinateLicenseSmartyStreets  CoordinateLicense = 0
+	CoordinateLicenseGatewaySpatial CoordinateLicense = 1
 )
 
-func (this License) String() string {
+func (this CoordinateLicense) String() string {
 	switch this {
-	case LicenseGatewaySpatial:
+	case CoordinateLicenseGatewaySpatial:
 		return "Gateway Spatial, LLC"
 	default:
 		return "SmartyStreets"

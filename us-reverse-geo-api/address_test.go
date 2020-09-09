@@ -16,7 +16,7 @@ type AddressFixture struct {
 }
 
 func (this *AddressFixture) TestLicenseString() {
-	this.So(LicenseSmartyStreets.String(), should.Equal, "SmartyStreets")
-	this.So(LicenseGatewaySpatial.String(), should.Equal, "Gateway Spatial, LLC")
-	this.So(License(42).String(), should.Equal, "SmartyStreets")
+	this.So(CoordinateLicenseSmartyStreets.String(), should.Equal, "SmartyStreets")
+	this.So(CoordinateLicenseGatewaySpatial.String(), should.Equal, "Gateway Spatial, LLC")
+	this.So(CoordinateLicense(42).String(), should.Equal, "SmartyStreets")
 }
