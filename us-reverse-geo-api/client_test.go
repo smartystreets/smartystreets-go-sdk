@@ -8,6 +8,7 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -50,7 +51,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 		{
 			Latitude:          40.209549,
 			Longitude:         -110.840134,
-			CoordinateLicense: CoordinateLicenseGatewaySpatial,
+			CoordinateLicense: sdk.CoordinateLicenseGatewaySpatial,
 			Distance:          26977.779297,
 			Street:            "6186 S 45000 W",
 			City:              "Fruitland",
@@ -60,7 +61,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 		{
 			Latitude:          39.123411,
 			Longitude:         -110.872123,
-			CoordinateLicense: CoordinateLicenseSmartyStreets,
+			CoordinateLicense: sdk.CoordinateLicenseSmartyStreets,
 			Distance:          34721.824219,
 			Street:            "340 Hardscrabble Rd",
 			City:              "Helper",

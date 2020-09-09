@@ -1,4 +1,4 @@
-package us_reverse_geo
+package sdk
 
 import (
 	"testing"
@@ -7,15 +7,15 @@ import (
 	"github.com/smartystreets/gunit"
 )
 
-func TestAddressFixture(t *testing.T) {
-    gunit.Run(new(AddressFixture), t)
+func TestCoordinateLicenseFixture(t *testing.T) {
+    gunit.Run(new(CoordinateLicenseFixture), t)
 }
 
-type AddressFixture struct {
+type CoordinateLicenseFixture struct {
     *gunit.Fixture
 }
 
-func (this *AddressFixture) TestLicenseString() {
+func (this *CoordinateLicenseFixture) TestLicenseString() {
 	this.So(CoordinateLicenseSmartyStreets.String(), should.Equal, "SmartyStreets")
 	this.So(CoordinateLicenseGatewaySpatial.String(), should.Equal, "Gateway Spatial, LLC")
 	this.So(CoordinateLicense(42).String(), should.Equal, "SmartyStreets")
