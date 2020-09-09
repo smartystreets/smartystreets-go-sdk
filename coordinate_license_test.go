@@ -8,11 +8,11 @@ import (
 )
 
 func TestCoordinateLicenseFixture(t *testing.T) {
-    gunit.Run(new(CoordinateLicenseFixture), t)
+	gunit.Run(new(CoordinateLicenseFixture), t)
 }
 
 type CoordinateLicenseFixture struct {
-    *gunit.Fixture
+	*gunit.Fixture
 }
 
 func (this *CoordinateLicenseFixture) TestLicenseString() {

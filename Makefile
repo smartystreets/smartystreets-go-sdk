@@ -3,10 +3,11 @@
 VERSION_FILE := version.go
 VERSION      := $(shell tagit -p --dryrun)
 
-test: clean
-	go test -short ./...
+test: fmt clean
+	go test -short -cover -count=1 ./...
 
 fmt:
+	go mod tidy
 	go fmt ./...
 
 clean:

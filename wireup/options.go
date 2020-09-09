@@ -42,8 +42,6 @@ func BuildUSReverseGeocodingAPIClient(options ...Option) *us_reverse_geo.Client 
 	return configure(options...).buildUSReverseGeocodingAPIClient()
 }
 
-
-
 func configure(options ...Option) *clientBuilder {
 	builder := newClientBuilder()
 	for _, option := range options {
