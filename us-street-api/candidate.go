@@ -1,5 +1,7 @@
 package street
 
+import sdk "github.com/smartystreets/smartystreets-go-sdk"
+
 type (
 	// Candidate contains all output fields defined here:
 	// https://smartystreets.com/docs/us-street-api#http-response-output
@@ -44,23 +46,24 @@ type (
 	// Metadata contains all output fields defined here:
 	// https://smartystreets.com/docs/us-street-api#metadata
 	Metadata struct {
-		RecordType               string  `json:"record_type,omitempty"`
-		ZIPType                  string  `json:"zip_type,omitempty"`
-		CountyFIPS               string  `json:"county_fips,omitempty"`
-		CountyName               string  `json:"county_name,omitempty"`
-		CarrierRoute             string  `json:"carrier_route,omitempty"`
-		CongressionalDistrict    string  `json:"congressional_district,omitempty"`
-		BuildingDefaultIndicator string  `json:"building_default_indicator,omitempty"`
-		RDI                      string  `json:"rdi,omitempty"`
-		ELOTSequence             string  `json:"elot_sequence,omitempty"`
-		ELOTSort                 string  `json:"elot_sort,omitempty"`
-		Latitude                 float64 `json:"latitude,omitempty"`
-		Longitude                float64 `json:"longitude,omitempty"`
-		Precision                string  `json:"precision,omitempty"`
-		TimeZone                 string  `json:"time_zone,omitempty"`
-		UTCOffset                float32 `json:"utc_offset,omitempty"`
-		DST                      bool    `json:"dst,omitempty"`
-		EWSMatch                 bool    `json:"ews_match,omitempty"`
+		RecordType               string                `json:"record_type,omitempty"`
+		ZIPType                  string                `json:"zip_type,omitempty"`
+		CountyFIPS               string                `json:"county_fips,omitempty"`
+		CountyName               string                `json:"county_name,omitempty"`
+		CarrierRoute             string                `json:"carrier_route,omitempty"`
+		CongressionalDistrict    string                `json:"congressional_district,omitempty"`
+		BuildingDefaultIndicator string                `json:"building_default_indicator,omitempty"`
+		RDI                      string                `json:"rdi,omitempty"`
+		ELOTSequence             string                `json:"elot_sequence,omitempty"`
+		ELOTSort                 string                `json:"elot_sort,omitempty"`
+		Latitude                 float64               `json:"latitude,omitempty"`
+		Longitude                float64               `json:"longitude,omitempty"`
+		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitempty"`
+		Precision                string                `json:"precision,omitempty"`
+		TimeZone                 string                `json:"time_zone,omitempty"`
+		UTCOffset                float32               `json:"utc_offset,omitempty"`
+		DST                      bool                  `json:"dst,omitempty"`
+		EWSMatch                 bool                  `json:"ews_match,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:

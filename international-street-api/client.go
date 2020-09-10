@@ -20,13 +20,7 @@ func NewClient(sender sdk.RequestSender) *Client {
 
 // SendLookup sends the lookup, populating the output if the request was successful.
 func (c *Client) SendLookup(lookup *Lookup) error {
-	if lookup == nil || (len(lookup.Address1) == 0 && len(lookup.Freeform) == 0) {
-		return nil
-	} else if response, err := c.sender.Send(buildRequest(lookup)); err != nil {
-		return err
-	} else {
-		return deserializeResponse(response, lookup)
-	}
+	return c.SendLookupWithContext(context.Background(), lookup)
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
@@ -39,9 +33,8 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
-	} else {
-		return deserializeResponse(response, lookup)
 	}
+	return deserializeResponse(response, lookup)
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {

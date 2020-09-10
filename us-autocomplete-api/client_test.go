@@ -44,7 +44,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
-	f.So(string(f.sender.request.URL.Query().Get("prefix")), should.Equal, "42")
+	f.So(f.sender.request.URL.Query().Get("prefix"), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?prefix=42")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
