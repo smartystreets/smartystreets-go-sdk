@@ -247,7 +247,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				ELOTSort:                 "A",
 				Latitude:                 40.27658,
 				Longitude:                -111.65759,
-				CoordinateLicense:        sdk.CoordinateLicenseGatewaySpatial,
+				CoordinateLicense:        sdk.CoordinateLicenseSmartyStreetsProprietary,
 				Precision:                "Rooftop",
 				TimeZone:                 "Mountain",
 				UTCOffset:                -7,
