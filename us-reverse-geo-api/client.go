@@ -40,13 +40,11 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	return deserializeResponse(response, lookup)
 }
 
-func deserializeResponse(response []byte, lookup *Lookup) error {
-	var results resultListing
-	err := json.Unmarshal(response, &results)
+func deserializeResponse(body []byte, lookup *Lookup) error {
+	err := json.Unmarshal(body, &lookup.Response)
 	if err != nil {
 		return err
 	}
-	lookup.Results = results.Listing
 	return nil
 }
 

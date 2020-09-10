@@ -2,18 +2,27 @@ package us_reverse_geo
 
 import "github.com/smartystreets/smartystreets-go-sdk"
 
-type resultListing struct {
-	Listing []Address `json:"results"`
+// Response structure defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-response-output
+type Response struct {
+	Results []Result `json:"results"`
 }
 
-// Address fields defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-response-output
+type Result struct {
+	Coordinate Coordinate `json:"coordinate"`
+	Address    Address    `json:"address"`
+	Distance   float64    `json:"distance"`
+}
+
+type Coordinate struct {
+	Latitude  float64               `json:"latitude"`
+	Longitude float64               `json:"longitude"`
+	Accuracy  string                `json:"accuracy"`
+	License   sdk.CoordinateLicense `json:"license"`
+}
+
 type Address struct {
-	Latitude          float64               `json:"latitude,omitempty"`
-	Longitude         float64               `json:"longitude,omitempty"`
-	CoordinateLicense sdk.CoordinateLicense `json:"coordinate_license,omitempty"`
-	Distance          float64               `json:"distance,omitempty"`
-	Street            string                `json:"street,omitempty"`
-	City              string                `json:"city,omitempty"`
-	StateAbbreviation string                `json:"state_abbreviation,omitempty"`
-	ZIPCode           string                `json:"zipcode,omitempty"`
+	Street            string `json:"street"`
+	City              string `json:"city"`
+	StateAbbreviation string `json:"state_abbreviation"`
+	ZIPCode           string `json:"zipcode"`
 }

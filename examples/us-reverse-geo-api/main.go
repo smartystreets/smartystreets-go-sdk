@@ -31,7 +31,7 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: (%f, %f)\n", lookup.Latitude, lookup.Longitude)
-	for s, address := range lookup.Results {
+	for s, address := range lookup.Response.Results {
 		fmt.Printf("#%d: %#v\n", s, address)
 	}
 
