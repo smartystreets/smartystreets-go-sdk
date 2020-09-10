@@ -10,6 +10,7 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -178,7 +179,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "elot_sort": "A",
       "latitude": 40.27658,
       "longitude": -111.65759,
-      "precision": "Zip9",
+      "coordinate_license": 1,
+      "precision": "Rooftop",
       "time_zone": "Mountain",
       "utc_offset": -7,
       "dst": true,
@@ -245,7 +247,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				ELOTSort:                 "A",
 				Latitude:                 40.27658,
 				Longitude:                -111.65759,
-				Precision:                "Zip9",
+				CoordinateLicense:        sdk.CoordinateLicenseGatewaySpatial,
+				Precision:                "Rooftop",
 				TimeZone:                 "Mountain",
 				UTCOffset:                -7,
 				DST:                      true,
