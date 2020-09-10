@@ -54,7 +54,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 					Latitude:  40.209549,
 					Longitude: -110.840134,
 					Accuracy:  "Rooftop",
-					License:   sdk.CoordinateLicenseGatewaySpatial,
+					License:   sdk.CoordinateLicenseSmartyStreetsProprietary,
 				},
 				Distance: 26977.779297,
 				Address: Address{
