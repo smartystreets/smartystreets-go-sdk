@@ -32,7 +32,7 @@ func (f *ClientFixture) Setup() {
 
 func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	f.sender.response = validResponseJSON
-	f.input.Latitude = 40
+	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
 
 	ctx := context.WithValue(context.Background(), "key", "value")
@@ -42,9 +42,9 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, lookupURL)
-	f.So(f.sender.request.URL.Query().Get("latitude"), should.Equal, "40.00000000")
+	f.So(f.sender.request.URL.Query().Get("latitude"), should.Equal, "40.12345679")
 	f.So(f.sender.request.URL.Query().Get("longitude"), should.Equal, "-111.00000000")
-	f.So(f.sender.request.URL.String(), should.Equal, lookupURL+"?latitude=40.00000000&longitude=-111.00000000")
+	f.So(f.sender.request.URL.String(), should.Equal, lookupURL+"?latitude=40.12345679&longitude=-111.00000000")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	f.So(f.input.Response, should.Resemble, Response{

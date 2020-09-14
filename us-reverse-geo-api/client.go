@@ -51,8 +51,8 @@ func deserializeResponse(body []byte, lookup *Lookup) error {
 func buildRequest(lookup *Lookup) *http.Request {
 	request, _ := http.NewRequest("GET", lookupURL, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
-	query.Set("latitude", strconv.FormatFloat(lookup.Latitude, 'f', 8, 32))
-	query.Set("longitude", strconv.FormatFloat(lookup.Longitude, 'f', 8, 32))
+	query.Set("latitude", strconv.FormatFloat(lookup.Latitude, 'f', 8, 64))
+	query.Set("longitude", strconv.FormatFloat(lookup.Longitude, 'f', 8, 64))
 	request.URL.RawQuery = query.Encode()
 	return request
 }
