@@ -3,10 +3,11 @@
 VERSION_FILE := version.go
 VERSION      := $(shell tagit -p --dryrun)
 
-test: clean
-	go test -short ./...
+test: fmt clean
+	go test -short -cover -count=1 ./...
 
 fmt:
+	go mod tidy
 	go fmt ./...
 
 clean:
@@ -26,6 +27,7 @@ integrate: compile test
 	@go run examples/us-autocomplete-api/main.go > /dev/null
 	@go run examples/us-extract-api/main.go > /dev/null
 	@go run examples/us-zipcode-api/main.go > /dev/null
+	@go run examples/us-reverse-geo-api/main.go > /dev/null
 
 version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"

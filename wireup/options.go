@@ -7,6 +7,7 @@ import (
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
+	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
@@ -34,6 +35,11 @@ func BuildUSExtractAPIClient(options ...Option) *extract.Client {
 // BuildInternationalStreetAPIClient builds a client for the International Street API using the provided options.
 func BuildInternationalStreetAPIClient(options ...Option) *international_street.Client {
 	return configure(options...).buildInternationalStreetAPIClient()
+}
+
+// BuildUSReverseGeocodingAPIClient builds a client for the US Reverse Geocoding API using the provided options.
+func BuildUSReverseGeocodingAPIClient(options ...Option) *us_reverse_geo.Client {
+	return configure(options...).buildUSReverseGeocodingAPIClient()
 }
 
 func configure(options ...Option) *clientBuilder {

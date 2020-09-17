@@ -13,6 +13,7 @@ import (
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
+	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
 )
@@ -149,6 +150,11 @@ func (b *clientBuilder) buildInternationalStreetAPIClient() *international_stree
 	return international_street.NewClient(b.buildHTTPSender())
 }
 
+func (b *clientBuilder) buildUSReverseGeocodingAPIClient() *us_reverse_geo.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_USReverseGeocodingAPI)
+	return us_reverse_geo.NewClient(b.buildHTTPSender())
+}
+
 func (b *clientBuilder) ensureBaseURLNotNil(u *url.URL) {
 	if b.baseURL == nil {
 		b.baseURL = u
@@ -202,4 +208,5 @@ var (
 	defaultBaseURL_USZIPCodeAPI           = &url.URL{Scheme: "https", Host: "us-zipcode.api.smartystreets.com"}
 	defaultBaseURL_USAutocompleteAPI      = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smartystreets.com"}
 	defaultBaseURL_USExtractAPI           = &url.URL{Scheme: "https", Host: "us-extract.api.smartystreets.com"}
+	defaultBaseURL_USReverseGeocodingAPI  = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smartystreets.com"}
 )
