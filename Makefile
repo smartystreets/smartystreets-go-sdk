@@ -1,12 +1,13 @@
 #!/usr/bin/make -f
 
 VERSION_FILE := version.go
-VERSION      := $(shell tagit -p --dryrun)
+VERSION      := $(shell bumpit -p `git describe`)
 
 test: fmt clean
 	go test -short -cover -count=1 ./...
 
 fmt:
+	@go version
 	go mod tidy
 	go fmt ./...
 
