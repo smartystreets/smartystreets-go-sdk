@@ -73,6 +73,7 @@ type (
 		DPVFootnotes      string `json:"dpv_footnotes,omitempty"`
 		DPVCMRACode       string `json:"dpv_cmra,omitempty"`
 		DPVVacantCode     string `json:"dpv_vacant,omitempty"`
+		DPVNoStat         string `json:"dpv_no_stat,omitempty"`
 		Active            string `json:"active,omitempty"`
 		Footnotes         string `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
 		LACSLinkCode      string `json:"lacslink_code,omitempty"`
