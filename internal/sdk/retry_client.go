@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/smartystreets/clock"
@@ -15,6 +16,7 @@ type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
 	sleeper    *clock.Sleeper
+	lock       *sync.Mutex
 	rand       *rand.Rand
 }
 
@@ -25,6 +27,7 @@ func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand) HTTPClien
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
+		lock:       new(sync.Mutex),
 		rand:       rand,
 	}
 }
@@ -68,11 +71,15 @@ func (r *RetryClient) backOff(attempt int) bool {
 		return false
 	}
 	backOffCap := min(maxBackOffDuration, 2<<attempt)
-	backOff := time.Second * time.Duration(r.rand.Intn(backOffCap))
+	backOff := time.Second * time.Duration(r.random(backOffCap))
 	r.sleeper.Sleep(backOff)
 	return true
 }
-
+func (r *RetryClient) random(cap int) int {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	return r.rand.Intn(cap)
+}
 func min(x, y int) int {
 	if x < y {
 		return x
@@ -80,5 +87,4 @@ func min(x, y int) int {
 	return y
 }
 
-const maxBackOffDurationInSeconds = 10
 const maxBackOffDuration = 10
