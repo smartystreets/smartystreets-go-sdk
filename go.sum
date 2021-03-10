@@ -1,8 +1,8 @@
-github.com/smartystreets/assertions v1.1.0 h1:MkTeG1DMwsrdH7QtLXy5W+fUxWq+vmb6cLmyJ7aRtF0=
-github.com/smartystreets/assertions v1.1.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
-github.com/smartystreets/clock v1.0.3 h1:rZ2gtRux+yALko49BywVFcrWcfRg8V86Q+wwYP+SCWs=
-github.com/smartystreets/clock v1.0.3/go.mod h1:SeXxrsL1+0aE4256nYPPBWwuA9BGfiXu5+bxfXFsPGA=
-github.com/smartystreets/gunit v1.3.4 h1:iHc8Rfhb/uCOc9a3KGuD3ut22L+hLIVaqR1o5fS6zC4=
-github.com/smartystreets/gunit v1.3.4/go.mod h1:ZjM1ozSIMJlAz/ay4SG8PeKF00ckUp+zMHZXV9/bvak=
+github.com/smartystreets/assertions v1.2.0 h1:42S6lae5dvLc7BrLu/0ugRtcFVjoJNMC/N3yZFZkDFs=
+github.com/smartystreets/assertions v1.2.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
+github.com/smartystreets/clock v1.0.4 h1:qa/qxRueSpRCUu1fbIkhAQZ3kkuDgi813Sa3uaZGBmM=
+github.com/smartystreets/clock v1.0.4/go.mod h1:mWuDdNafvfZjQzZ+BMABEOkhdCew1MFhs2YMLMLiEc4=
+github.com/smartystreets/gunit v1.4.2 h1:tyWYZffdPhQPfK5VsMQXfauwnJkqg7Tv5DLuQVYxq3Q=
+github.com/smartystreets/gunit v1.4.2/go.mod h1:ZjM1ozSIMJlAz/ay4SG8PeKF00ckUp+zMHZXV9/bvak=
 github.com/smartystreets/logging v1.1.1 h1:4UlnyYWB7LDd216NTuP3zTVvMQZREtPrDnJbsz0zftI=
 github.com/smartystreets/logging v1.1.1/go.mod h1:NwFCEPbtiTIug+UCtTbDVjgcJNfandE3brDx0x7QEY8=
