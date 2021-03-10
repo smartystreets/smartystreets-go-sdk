@@ -40,6 +40,7 @@ func (this *CustomHeadersClientFixture) TestAllCustomHeadersAreAddedToTheRequest
 	this.headers.Add("A", "1")
 	this.headers.Add("A", "2")
 	this.headers.Add("B", "1")
+	this.headers.Add("Host", "some-domain.com")
 
 	response, err := this.client.Do(this.request)
 
@@ -49,4 +50,5 @@ func (this *CustomHeadersClientFixture) TestAllCustomHeadersAreAddedToTheRequest
 	this.So(this.request.Header["A"], should.Resemble, []string{"1", "2"})
 	this.So(this.request.Header.Get("A"), should.Equal, "1")
 	this.So(this.request.Header.Get("B"), should.Equal, "1")
+	this.So(this.request.Host, should.Equal, "some-domain.com")
 }

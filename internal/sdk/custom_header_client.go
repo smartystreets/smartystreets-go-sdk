@@ -15,14 +15,20 @@ func NewCustomHeadersClient(inner HTTPClient, headers http.Header) *CustomHeader
 }
 
 func (this *CustomHeadersClient) Do(request *http.Request) (*http.Response, error) {
-	this.addHeaders(request.Header)
+	this.addHeaders(request)
 	return this.inner.Do(request)
 }
 
-func (this *CustomHeadersClient) addHeaders(headers http.Header) {
+func (this *CustomHeadersClient) addHeaders(request *http.Request) {
+	headers := request.Header
+
 	for key, values := range this.headers {
 		for _, value := range values {
-			headers.Add(key, value)
+			if key == "Host" {
+				request.Host = value
+			} else {
+				headers.Add(key, value)
+			}
 		}
 	}
 }
