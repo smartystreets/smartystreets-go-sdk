@@ -173,8 +173,8 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewSource(time.Now().UnixNano())))
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
-	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
+	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	wrapped = internal.NewLicenseClient(wrapped, b.licenses...)
 	// outer-most
