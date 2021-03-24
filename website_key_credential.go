@@ -22,7 +22,7 @@ type websiteKeyCredential struct {
 
 func (c websiteKeyCredential) Sign(request *http.Request) error {
 	query := request.URL.Query()
-	query.Set("auth-id", c.key)
+	query.Set("key", c.key)
 	request.URL.RawQuery = query.Encode()
 	request.Header.Set("Referer", c.host)
 	return nil

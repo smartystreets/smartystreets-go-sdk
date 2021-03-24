@@ -22,7 +22,7 @@ func (this *WebsiteKeyCredentialFixture) TestWebsiteKeySigning() {
 
 	credential.Sign(request)
 
-	this.So(request.URL.Query().Get("auth-id"), should.Equal, "12345")
+	this.So(request.URL.Query().Get("key"), should.Equal, "12345")
 	this.So(request.Header.Get("Referer"), should.Equal, "http://abc.com")
 }
 
@@ -32,7 +32,7 @@ func (this *WebsiteKeyCredentialFixture) TestHostAlreadyHasHTTPScheme() {
 
 	credential.Sign(request)
 
-	this.So(request.URL.Query().Get("auth-id"), should.Equal, "12345")
+	this.So(request.URL.Query().Get("key"), should.Equal, "12345")
 	this.So(request.Header.Get("Referer"), should.Equal, "http://abc.com")
 }
 
@@ -42,6 +42,6 @@ func (this *WebsiteKeyCredentialFixture) TestHostAlreadyHasHTTPSScheme() {
 
 	credential.Sign(request)
 
-	this.So(request.URL.Query().Get("auth-id"), should.Equal, "12345")
+	this.So(request.URL.Query().Get("key"), should.Equal, "12345")
 	this.So(request.Header.Get("Referer"), should.Equal, "https://abc.com")
 }
