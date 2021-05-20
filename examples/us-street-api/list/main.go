@@ -38,6 +38,10 @@ func main() {
 	outgoing := make(chan *street.Lookup, 1024*48)
 	client := wireup.BuildUSStreetAPIClient(
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		// The appropriate license values to be used for your subscriptions
+		// can be found on the Subscriptions page the account dashboard.
+		// https://www.smartystreets.com/docs/cloud/licensing
+		wireup.WithLicenses("us-rooftop-geocoding-cloud"),
 	)
 
 	// This processes all records provided to the incoming channel

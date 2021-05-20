@@ -15,6 +15,10 @@ func main() {
 
 	client := wireup.BuildUSAutocompleteProAPIClient(
 		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		// The appropriate license values to be used for your subscriptions
+		// can be found on the Subscriptions page the account dashboard.
+		// https://www.smartystreets.com/docs/cloud/licensing
+		wireup.WithLicenses("us-autocomplete-pro-cloud"),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
