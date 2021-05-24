@@ -7,20 +7,18 @@ import (
 	"net/http"
 	"sync"
 	"time"
-
-	"github.com/smartystreets/clock"
 )
 
 // RetryClient sends failed requests multiple times depending on the parameters passed to NewRetryClient.
 type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
-	sleeper    *clock.Sleeper
+	sleeper    func(time.Duration)
 	lock       *sync.Mutex
 	rand       *rand.Rand
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper func(time.Duration)) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
@@ -29,6 +27,7 @@ func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand) HTTPClien
 		maxRetries: maxRetries,
 		lock:       new(sync.Mutex),
 		rand:       rand,
+		sleeper:    sleeper,
 	}
 }
 
@@ -72,7 +71,7 @@ func (r *RetryClient) backOff(attempt int) bool {
 	}
 	backOffCap := min(maxBackOffDuration, 2<<attempt)
 	backOff := time.Second * time.Duration(r.random(backOffCap))
-	r.sleeper.Sleep(backOff)
+	r.sleeper(backOff)
 	return true
 }
 func (r *RetryClient) random(cap int) int {

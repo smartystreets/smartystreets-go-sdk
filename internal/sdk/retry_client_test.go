@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/clock"
 	"github.com/smartystreets/gunit"
 )
 
@@ -23,11 +22,7 @@ type RetryClientFixture struct {
 	response *http.Response
 	err      error
 
-	sleeper *clock.Sleeper
-}
-
-func (f *RetryClientFixture) Setup() {
-	f.sleeper = clock.StayAwake()
+	naps []time.Duration
 }
 
 func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmediately() {
@@ -36,10 +31,12 @@ func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmedi
 }
 func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	f.inner = &FakeMultiHTTPClient{}
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0))).(*RetryClient)
-	client.sleeper = f.sleeper
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
+}
+func (f *RetryClientFixture) sleep(duration time.Duration) {
+	f.naps = append(f.naps, duration)
 }
 func (f *RetryClientFixture) assertReadErrorReturnedAndRequestNotSent() {
 	f.So(f.response, should.BeNil)
@@ -77,7 +74,7 @@ func (f *RetryClientFixture) assertRequestWasSuccessful() {
 }
 func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(f.inner.call, should.Equal, 5)
-	f.So(f.sleeper.Naps, should.Resemble,
+	f.So(f.naps, should.Resemble,
 		[]time.Duration{2 * time.Second, 2 * time.Second, 3 * time.Second, 6 * time.Second})
 }
 
@@ -113,7 +110,7 @@ func (f *RetryClientFixture) assertInternalServerError() {
 
 func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	inner := &FakeHTTPClient{}
-	client := NewRetryClient(inner, 0, rand.New(rand.NewSource(0)))
+	client := NewRetryClient(inner, 0, rand.New(rand.NewSource(0)), f.sleep)
 	f.So(client, should.Equal, inner)
 }
 
@@ -126,7 +123,7 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, 20)
-	f.So(f.sleeper.Naps, should.Resemble,
+	f.So(f.naps, should.Resemble,
 
 		[]time.Duration{
 			time.Second * 2, // randomly between 0-2
@@ -142,14 +139,12 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 /**************************************************************************/
 
 func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
-	client.sleeper = f.sleeper
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("GET", "/?body=request", nil)
 	return client.Do(request)
 }
 func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, error) {
-	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0))).(*RetryClient)
-	client.sleeper = f.sleeper
+	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
 }
