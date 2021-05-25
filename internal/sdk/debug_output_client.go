@@ -2,17 +2,15 @@ package sdk
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"strings"
-
-	"github.com/smartystreets/logging"
 )
 
 // DebugOutputClient makes use of functions from net/http/httputil to log http request/response details.
 type DebugOutputClient struct {
-	inner  HTTPClient
-	logger *logging.Logger
+	inner HTTPClient
 }
 
 func NewDebugOutputClient(inner HTTPClient, dump bool) HTTPClient {
@@ -23,9 +21,9 @@ func NewDebugOutputClient(inner HTTPClient, dump bool) HTTPClient {
 }
 
 func (d *DebugOutputClient) Do(request *http.Request) (*http.Response, error) {
-	d.logger.Println(dumpRequest(request))
+	log.Println(dumpRequest(request))
 	response, err := d.inner.Do(request)
-	d.logger.Println(dumpResponse(response, err))
+	log.Println(dumpResponse(response, err))
 	return response, err
 }
 

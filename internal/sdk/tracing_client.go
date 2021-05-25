@@ -3,15 +3,13 @@ package sdk
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptrace"
-
-	"github.com/smartystreets/logging"
 )
 
 type TracingClient struct {
-	inner  HTTPClient
-	logger *logging.Logger
+	inner HTTPClient
 }
 
 func NewTracingClient(inner HTTPClient, trace bool) HTTPClient {
@@ -28,7 +26,7 @@ func (d *TracingClient) Do(request *http.Request) (*http.Response, error) {
 	trace.DumpResponse(response, err)
 
 	if err != nil || response.StatusCode != http.StatusOK {
-		d.logger.Println("\n" + trace.String())
+		log.Println("\n" + trace.String())
 	}
 
 	return response, err
