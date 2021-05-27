@@ -79,6 +79,8 @@ type (
 		LACSLinkCode      string `json:"lacslink_code,omitempty"`
 		LACSLinkIndicator string `json:"lacslink_indicator,omitempty"`
 		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`
-		EWSMatch          bool   `json:"ews_match,omitempty"` // deprecated
+		EWSMatch          bool   `json:"ews_match,omitempty"`     // deprecated
+		MatchMode         string `json:"match_mode,omitempty"`    //v2 integration
+		MatchDetails      string `json:"match_details,omitempty"` //v2 integration
 	}
 )
