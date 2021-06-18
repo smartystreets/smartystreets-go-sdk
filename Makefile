@@ -7,7 +7,6 @@ test: fmt clean
 	go test -short -cover -count=1 ./...
 
 fmt:
-	@go version
 	go mod tidy
 	go fmt ./...
 
