@@ -197,8 +197,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "lacslink_code": "lacslink_code",
       "lacslink_indicator": "lacslink_indicator",
       "suitelink_match": true,
-      "match_mode": "match_mode",
-      "match_details": "match_details"
+      "enhanced_match": "enhanced_match"
     }
   }
 ]`
@@ -269,8 +268,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				LACSLinkIndicator: "lacslink_indicator",
 				SuiteLinkMatch:    true,
 				EWSMatch:          false,
-				MatchMode:         "match_mode",
-				MatchDetails:      "match_details",
+				EnhancedMatch:     "enhanced_match",
 			},
 		},
 	})
