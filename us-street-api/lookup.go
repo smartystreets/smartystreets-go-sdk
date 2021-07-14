@@ -53,7 +53,8 @@ func encode(query url.Values, source string, target string) {
 type MatchStrategy string
 
 const (
-	MatchStrict  = MatchStrategy("strict")
-	MatchRange   = MatchStrategy("range")
-	MatchInvalid = MatchStrategy("invalid")
+	MatchStrict   = MatchStrategy("strict")
+	MatchRange    = MatchStrategy("range") // Deprecated
+	MatchInvalid  = MatchStrategy("invalid")
+	MatchEnhanced = MatchStrategy("enhanced")
 )
