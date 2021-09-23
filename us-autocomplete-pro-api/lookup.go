@@ -11,6 +11,7 @@ import (
 type (
 	Lookup struct {
 		Search        string
+		Source        string
 		MaxResults    int
 		CityFilter    []string
 		StateFilter   []string
@@ -44,6 +45,7 @@ func (l Lookup) populate(query url.Values) {
 	l.populatePreferZIP(query)
 	l.populatePreferRatio(query)
 	l.populateGeolocation(query)
+	l.populateSource(query)
 }
 
 func (l Lookup) populateSearch(query url.Values) {
@@ -107,5 +109,10 @@ func (l Lookup) populateGeolocation(query url.Values) {
 		query.Set("prefer_geolocation", "city")
 	case GeolocateNone:
 		query.Set("prefer_geolocation", "none")
+	}
+}
+func (l Lookup) populateSource(query url.Values) {
+	if len(l.Source) > 0 {
+		query.Set("source", l.Source)
 	}
 }

@@ -40,6 +40,14 @@ func (f *LookupSerializationFixture) TestSearch() {
 	f.So(f.query, should.HaveLength, 1)
 	f.So(f.query.Get("search"), should.Equal, "Hello, World!")
 }
+func (f *LookupSerializationFixture) TestSource() {
+	f.lookup.Source = "all"
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("source"), should.Equal, "all")
+}
 
 func (f *LookupSerializationFixture) TestSuggestions() {
 	f.lookup.MaxResults = 7

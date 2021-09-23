@@ -32,6 +32,7 @@ func main() {
 		StateFilter: []string{"IL"},
 		PreferRatio: 3,
 		Geolocation: autocomplete_pro.GeolocateCity,
+		Source:      "all",
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
