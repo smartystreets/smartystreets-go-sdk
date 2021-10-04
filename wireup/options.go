@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
@@ -41,6 +42,11 @@ func BuildUSExtractAPIClient(options ...Option) *extract.Client {
 // BuildInternationalStreetAPIClient builds a client for the International Street API using the provided options.
 func BuildInternationalStreetAPIClient(options ...Option) *international_street.Client {
 	return configure(options...).buildInternationalStreetAPIClient()
+}
+
+// BuildInternationalAutocompleteAPIClient builds a client for the International Autocomplete API using the provided options.
+func BuildInternationalAutocompleteAPIClient(options ...Option) *international_autocomplete.Client {
+	return configure(options...).buildInternationalAutocompleteAPIClient()
 }
 
 // BuildUSReverseGeocodingAPIClient builds a client for the US Reverse Geocoding API using the provided options.

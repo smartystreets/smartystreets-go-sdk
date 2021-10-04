@@ -10,6 +10,7 @@ import (
 
 	"github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
@@ -156,6 +157,11 @@ func (b *clientBuilder) buildInternationalStreetAPIClient() *international_stree
 	return international_street.NewClient(b.buildHTTPSender())
 }
 
+func (b *clientBuilder) buildInternationalAutocompleteAPIClient() *international_autocomplete.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_InternationalAutocompleteAPI)
+	return international_autocomplete.NewClient(b.buildHTTPSender())
+}
+
 func (b *clientBuilder) buildUSReverseGeocodingAPIClient() *us_reverse_geo.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USReverseGeocodingAPI)
 	return us_reverse_geo.NewClient(b.buildHTTPSender())
@@ -209,11 +215,12 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 }
 
 var (
-	defaultBaseURL_InternationalStreetAPI = &url.URL{Scheme: "https", Host: "international-street.api.smartystreets.com"}
-	defaultBaseURL_USStreetAPI            = &url.URL{Scheme: "https", Host: "us-street.api.smartystreets.com"}
-	defaultBaseURL_USZIPCodeAPI           = &url.URL{Scheme: "https", Host: "us-zipcode.api.smartystreets.com"}
-	defaultBaseURL_USAutocompleteAPI      = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smartystreets.com"}
-	defaultBaseURL_USExtractAPI           = &url.URL{Scheme: "https", Host: "us-extract.api.smartystreets.com"}
-	defaultBaseURL_USReverseGeocodingAPI  = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smartystreets.com"}
-	defaultBaseURL_USAutocompleteProAPI   = &url.URL{Scheme: "https", Host: "us-autocomplete-pro.api.smartystreets.com"}
+	defaultBaseURL_InternationalStreetAPI       = &url.URL{Scheme: "https", Host: "international-street.api.smartystreets.com"}
+	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smartystreets.com"}
+	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smartystreets.com"}
+	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smartystreets.com"}
+	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smartystreets.com"}
+	defaultBaseURL_USExtractAPI                 = &url.URL{Scheme: "https", Host: "us-extract.api.smartystreets.com"}
+	defaultBaseURL_USReverseGeocodingAPI        = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smartystreets.com"}
+	defaultBaseURL_USAutocompleteProAPI         = &url.URL{Scheme: "https", Host: "us-autocomplete-pro.api.smartystreets.com"}
 )
