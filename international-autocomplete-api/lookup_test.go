@@ -9,7 +9,7 @@ import (
 )
 
 func TestLookupFixture(t *testing.T) {
-    gunit.Run(new(LookupFixture), t)
+	gunit.Run(new(LookupFixture), t)
 }
 
 type LookupFixture struct {

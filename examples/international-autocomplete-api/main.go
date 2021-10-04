@@ -25,9 +25,9 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
 
 	lookup := &international_autocomplete.Lookup{
-		Country:            "FRA",
-		Search:             "Louis",
-		Locality:           "Paris",
+		Country:  "FRA",
+		Search:   "Louis",
+		Locality: "Paris",
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
