@@ -37,7 +37,7 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {
-	err := json.Unmarshal(response, &lookup.Results)
+	err := json.Unmarshal(response, &lookup.Result)
 	if err != nil {
 		return err
 	}

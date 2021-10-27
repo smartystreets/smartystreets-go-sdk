@@ -1,6 +1,6 @@
 package international_autocomplete_api
 
-type Suggestion struct {
+type Candidate struct {
 	Street             string `json:"street"`
 	Locality           string `json:"locality"`
 	AdministrativeArea string `json:"administrative_area"`

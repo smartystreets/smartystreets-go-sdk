@@ -8,7 +8,7 @@ type Lookup struct {
 	AdministrativeArea string
 	Locality           string
 	PostalCode         string
-	Results            []*Suggestion
+	Result             *Result
 }
 
 func (l Lookup) populate(query url.Values) {

@@ -30,22 +30,24 @@ func (f *ClientFixture) Setup() {
 }
 
 func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
-	f.sender.response = `[
-		{
-			"street": "1",
-			"locality": "2",
-			"administrative_area": "3",
-			"postal_code": "4",
-			"country_iso3": "5"
-		},
-		{
-			"street": "6",
-			"locality": "7",
-			"administrative_area": "8",
-			"postal_code": "9",
-			"country_iso3": "10"
-		}
-	]`
+	f.sender.response = `{
+		"candidates": [
+			{
+				"street": "1",
+				"locality": "2",
+				"administrative_area": "3",
+				"postal_code": "4",
+				"country_iso3": "5"
+			},
+			{
+				"street": "6",
+				"locality": "7",
+				"administrative_area": "8",
+				"postal_code": "9",
+				"country_iso3": "10"
+			}
+		]
+	}`
 	f.input.Search = "42"
 
 	ctx := context.WithValue(context.Background(), "key", "value")
@@ -59,7 +61,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?search=42")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
-	f.So(f.input.Results, should.Resemble, []*Suggestion{
+	f.So(f.input.Result, should.Resemble, &Result{Candidates: []*Candidate{
 		{
 			Street:             "1",
 			Locality:           "2",
@@ -74,7 +76,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 			PostalCode:         "9",
 			CountryIso3:        "10",
 		},
-	})
+	}})
 }
 func (f *ClientFixture) TestNilLookupNOP() {
 	err := f.client.SendLookup(nil)
@@ -90,7 +92,7 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("GOPHERS!")
-	f.sender.response = `{"suggestions":[
+	f.sender.response = `{"candidates":[
 		{"text": "1"},
 		{"text": "2"},
 		{"text": "3"}
@@ -100,7 +102,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Results, should.BeEmpty)
+	f.So(f.input.Result, should.BeNil)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
@@ -110,7 +112,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Results, should.BeEmpty)
+	f.So(f.input.Result, should.BeNil)
 }
 
 //////////////////////////////////////////////////////////////////

@@ -35,8 +35,8 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: [%s]\n", lookup.Search)
-	for s, suggestion := range lookup.Results {
-		fmt.Printf("#%d: %#v\n", s, suggestion)
+	for s, candidate := range lookup.Result.Candidates {
+		fmt.Printf("#%d: %#v\n", s, candidate)
 	}
 
 	log.Println("OK")
