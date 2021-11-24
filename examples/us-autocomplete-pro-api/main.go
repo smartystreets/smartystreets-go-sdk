@@ -26,10 +26,11 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
 
 	lookup := &autocomplete_pro.Lookup{
-		Search:      "4770 Lincoln Ave O",
+		Search:      "1042 W Center",
 		MaxResults:  5,
-		CityFilter:  []string{"Ogden"},
-		StateFilter: []string{"IL"},
+		CityFilter:  []string{"Denver", "Orem"},
+		StateFilter: []string{"CO", "UT"},
+		PreferState: []string{"CO"},
 		PreferRatio: 3,
 		Geolocation: autocomplete_pro.GeolocateCity,
 		Source:      "all",

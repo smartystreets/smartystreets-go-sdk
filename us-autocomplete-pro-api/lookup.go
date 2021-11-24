@@ -60,37 +60,37 @@ func (l Lookup) populateMaxResults(query url.Values) {
 }
 func (l Lookup) populateCityFilter(query url.Values) {
 	if len(l.CityFilter) > 0 {
-		query.Set("include_only_cities", strings.Join(l.CityFilter, ","))
+		query.Set("include_only_cities", strings.Join(l.CityFilter, ";"))
 	}
 }
 func (l Lookup) populateStateFilter(query url.Values) {
 	if len(l.StateFilter) > 0 {
-		query.Set("include_only_states", strings.Join(l.StateFilter, ","))
+		query.Set("include_only_states", strings.Join(l.StateFilter, ";"))
 	}
 }
 func (l Lookup) populateZIPFilter(query url.Values) {
 	if len(l.ZIPFilter) > 0 {
-		query.Set("include_only_zip_codes", strings.Join(l.ZIPFilter, ","))
+		query.Set("include_only_zip_codes", strings.Join(l.ZIPFilter, ";"))
 	}
 }
 func (l Lookup) populateExcludeStates(query url.Values) {
 	if len(l.ExcludeStates) > 0 {
-		query.Set("exclude_states", strings.Join(l.ExcludeStates, ","))
+		query.Set("exclude_states", strings.Join(l.ExcludeStates, ";"))
 	}
 }
 func (l Lookup) populatePreferCity(query url.Values) {
 	if len(l.PreferCity) > 0 {
-		query.Set("prefer_cities", strings.Join(l.PreferCity, ","))
+		query.Set("prefer_cities", strings.Join(l.PreferCity, ";"))
 	}
 }
 func (l Lookup) populatePreferState(query url.Values) {
 	if len(l.PreferState) > 0 {
-		query.Set("prefer_states", strings.Join(l.PreferState, ","))
+		query.Set("prefer_states", strings.Join(l.PreferState, ";"))
 	}
 }
 func (l Lookup) populatePreferZIP(query url.Values) {
 	if len(l.PreferZIP) > 0 {
-		query.Set("prefer_zip_codes", strings.Join(l.PreferZIP, ","))
+		query.Set("prefer_zip_codes", strings.Join(l.PreferZIP, ";"))
 	}
 }
 func (l Lookup) populatePreferRatio(query url.Values) {
