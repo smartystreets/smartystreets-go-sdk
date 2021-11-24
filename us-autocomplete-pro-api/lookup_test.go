@@ -64,7 +64,7 @@ func (f *LookupSerializationFixture) TestStateFilters() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("include_only_states"), should.Equal, "UT,CA")
+	f.So(f.query.Get("include_only_states"), should.Equal, "UT;CA")
 }
 
 func (f *LookupSerializationFixture) TestCityFilters() {
@@ -73,7 +73,7 @@ func (f *LookupSerializationFixture) TestCityFilters() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("include_only_cities"), should.Equal, "Salt Lake City,Provo")
+	f.So(f.query.Get("include_only_cities"), should.Equal, "Salt Lake City;Provo")
 }
 
 func (f *LookupSerializationFixture) TestZIPFilters() {
@@ -82,7 +82,7 @@ func (f *LookupSerializationFixture) TestZIPFilters() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 2)
-	f.So(f.query.Get("include_only_zip_codes"), should.Equal, "84660,84058")
+	f.So(f.query.Get("include_only_zip_codes"), should.Equal, "84660;84058")
 }
 
 func (f *LookupSerializationFixture) TestExcludeStates() {
@@ -91,7 +91,7 @@ func (f *LookupSerializationFixture) TestExcludeStates() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("exclude_states"), should.Equal, "UT,CA")
+	f.So(f.query.Get("exclude_states"), should.Equal, "UT;CA")
 }
 
 func (f *LookupSerializationFixture) TestPreferState() {
@@ -100,7 +100,7 @@ func (f *LookupSerializationFixture) TestPreferState() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("prefer_states"), should.Equal, "UT,CA")
+	f.So(f.query.Get("prefer_states"), should.Equal, "UT;CA")
 }
 
 func (f *LookupSerializationFixture) TestPreferCity() {
@@ -109,7 +109,7 @@ func (f *LookupSerializationFixture) TestPreferCity() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("prefer_cities"), should.Equal, "Salt Lake City,Provo")
+	f.So(f.query.Get("prefer_cities"), should.Equal, "Salt Lake City;Provo")
 }
 
 func (f *LookupSerializationFixture) TestPreferZIP() {
@@ -118,7 +118,7 @@ func (f *LookupSerializationFixture) TestPreferZIP() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 2)
-	f.So(f.query.Get("prefer_zip_codes"), should.Equal, "84660,84058")
+	f.So(f.query.Get("prefer_zip_codes"), should.Equal, "84660;84058")
 }
 
 func (f *LookupSerializationFixture) TestPreferRatio() {
