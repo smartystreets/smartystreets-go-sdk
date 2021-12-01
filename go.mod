@@ -5,4 +5,4 @@ require (
 	github.com/smartystreets/gunit v1.4.2
 )
 
-go 1.13
+go 1.17
