@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"math/rand"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -211,6 +212,12 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 	if b.http2Disabled { // https://golang.org/pkg/net/http/ ("Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map.")
 		transport.TLSNextProto = make(map[string]func(authority string, c *tls.Conn) http.RoundTripper, 0)
 	}
+
+	transport.DialContext  = (&net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
+	}).DialContext
+
 	return transport
 }
 
