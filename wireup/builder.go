@@ -213,7 +213,7 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 		transport.TLSNextProto = make(map[string]func(authority string, c *tls.Conn) http.RoundTripper, 0)
 	}
 
-	transport.DialContext  = (&net.Dialer{
+	transport.DialContext = (&net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
 	}).DialContext
