@@ -14,6 +14,7 @@ func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildUSAutocompleteProAPIClient(
+		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_SUTH_TOKEN")),
 		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
