@@ -39,8 +39,8 @@ func (this *LookupFixture) TestQueryStringEncoding_OnlySerializeNonDefaultFields
 
 func (this *LookupFixture) TestQueryStringEncoding_AllFieldsSerialized() {
 	this.So(this.encode(&Lookup{
-		MatchStrategy: MatchInvalid,
-		MaxCandidates: 10,
+		MatchStrategy: MatchEnhanced,
+		MaxCandidates: 0,
 		InputID:       "InputID",
 		ZIPCode:       "ZIPCode",
 		LastLine:      "LastLine",
@@ -52,8 +52,8 @@ func (this *LookupFixture) TestQueryStringEncoding_AllFieldsSerialized() {
 		State:         "State",
 		Street2:       "Street2",
 	}), should.Resemble, url.Values{
-		"match":        {"invalid"},
-		"candidates":   {"10"},
+		"match":        {"enhanced"},
+		"candidates":   {"5"},
 		"input_id":     {"InputID"},
 		"zipcode":      {"ZIPCode"},
 		"lastline":     {"LastLine"},

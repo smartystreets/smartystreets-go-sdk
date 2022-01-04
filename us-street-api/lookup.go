@@ -37,6 +37,8 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	encode(query, l.InputID, "input_id")
 	if l.MaxCandidates > 0 {
 		encode(query, strconv.Itoa(l.MaxCandidates), "candidates")
+	} else if l.MatchStrategy == MatchEnhanced {
+		encode(query, "5", "candidates")
 	}
 	if l.MatchStrategy != MatchStrict {
 		encode(query, string(l.MatchStrategy), "match")
