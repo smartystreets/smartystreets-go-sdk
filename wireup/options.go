@@ -183,3 +183,10 @@ func WithLicenses(licenses ...string) Option {
 		builder.licenses = append(builder.licenses, licenses...)
 	}
 }
+
+// KeepTryingOnRateLimit will continue trying until the caller is within the bounds of their rate limit.
+func KeepTryingOnRateLimit() Option {
+	return func(builder *clientBuilder) {
+		builder.withMaxRetry(999999)
+	}
+}
