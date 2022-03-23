@@ -75,7 +75,7 @@ func (f *RetryClientFixture) assertRequestWasSuccessful() {
 func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(f.inner.call, should.Equal, 5)
 	f.So(f.naps, should.Resemble,
-		[]time.Duration{2 * time.Second, 2 * time.Second, 3 * time.Second, 6 * time.Second})
+		[]time.Duration{0 * time.Second, 0 * time.Second, 1 * time.Second, 2 * time.Second})
 }
 
 /**************************************************************************/
@@ -117,23 +117,17 @@ func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 /**************************************************************************/
 
 func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
-	f.inner = NewFailingHTTPClient(make([]int, 20)...)
+	retries := 2000
+	f.inner = NewFailingHTTPClient(make([]int, retries)...)
 
-	_, f.err = f.sendPostWithRetry(19)
+	_, f.err = f.sendPostWithRetry(retries - 1)
 
 	f.So(f.err, should.BeNil)
-	f.So(f.inner.call, should.Equal, 20)
-	f.So(f.naps, should.Resemble,
-
-		[]time.Duration{
-			time.Second * 2, // randomly between 0-2
-			time.Second * 2, // randomly between 0-4
-			time.Second * 3, // randomly between 0-8
-			// the rest are randomly between 0-10 (capped)
-			6 * time.Second, 5 * time.Second, 6 * time.Second, 7 * time.Second,
-			7 * time.Second, 8 * time.Second, 8 * time.Second, 8 * time.Second,
-			7 * time.Second, 9 * time.Second, 8 * time.Second, 2 * time.Second,
-			6 * time.Second, 1 * time.Second, 0 * time.Second, 0 * time.Second})
+	f.So(f.inner.call, should.Equal, retries)
+	f.So(f.naps[0], should.Equal, 0)
+	for i := 1; i < len(f.naps); i++ {
+		f.So(f.naps[i], should.BeBetweenOrEqual, 0, time.Second*time.Duration(min(i, maxBackOffDuration)))
+	}
 }
 
 /**************************************************************************/

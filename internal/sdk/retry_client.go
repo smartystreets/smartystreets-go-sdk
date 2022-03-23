@@ -69,16 +69,25 @@ func (r *RetryClient) backOff(attempt int) bool {
 	if attempt > r.maxRetries {
 		return false
 	}
-	backOffCap := min(maxBackOffDuration, 2<<attempt)
+	backOffCap := max(0, min(maxBackOffDuration, attempt))
 	backOff := time.Second * time.Duration(r.random(backOffCap))
 	r.sleeper(backOff)
 	return true
 }
+
 func (r *RetryClient) random(cap int) int {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	return r.rand.Intn(cap)
 }
+
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
+
 func min(x, y int) int {
 	if x < y {
 		return x
