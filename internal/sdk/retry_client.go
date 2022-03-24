@@ -58,6 +58,9 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			break
 		}
+		if response != nil && response.StatusCode == http.StatusTooManyRequests {
+			attempt = backOffRateLimit
+		}
 	}
 	return response, err
 }
@@ -95,4 +98,7 @@ func min(x, y int) int {
 	return y
 }
 
-const maxBackOffDuration = 10
+const (
+	backOffRateLimit   = 5
+	maxBackOffDuration = 10
+)

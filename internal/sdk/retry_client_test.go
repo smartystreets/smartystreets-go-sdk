@@ -130,6 +130,18 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	}
 }
 
+func (f *RetryClientFixture) TestBackOffRateLimited() {
+	retries := 10
+	f.inner = NewFailingHTTPClient(http.StatusTooManyRequests, http.StatusTooManyRequests, http.StatusOK)
+
+	_, f.err = f.sendPostWithRetry(retries - 1)
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 3)
+	f.So(f.naps[0], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+	f.So(f.naps[1], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+}
+
 /**************************************************************************/
 
 func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
