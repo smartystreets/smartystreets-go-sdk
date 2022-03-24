@@ -58,8 +58,12 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			break
 		}
-		if response != nil && response.StatusCode == http.StatusTooManyRequests {
-			attempt = backOffRateLimit
+		if response != nil {
+			if response.StatusCode == http.StatusTooManyRequests {
+				attempt = backOffRateLimit
+			} else if response.StatusCode >= http.StatusBadRequest && response.StatusCode <= http.StatusUnprocessableEntity {
+				break
+			}
 		}
 	}
 	return response, err
