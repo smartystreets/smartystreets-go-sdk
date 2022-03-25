@@ -81,7 +81,7 @@ func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 /**************************************************************************/
 
 func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
-	f.inner = NewFailingHTTPClient(400, 401, 402, 422, 200)
+	f.inner = NewFailingHTTPClient(500, 501, 502, 522, 200)
 
 	f.response, f.err = f.sendPostWithRetry(4)
 
