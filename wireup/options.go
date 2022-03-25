@@ -188,6 +188,5 @@ func WithLicenses(licenses ...string) Option {
 func KeepTryingOnRateLimit() Option {
 	return func(builder *clientBuilder) {
 		builder.withMaxRetry(20)
-		builder.withTimeout(time.Second * 0)
 	}
 }
