@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -41,7 +42,9 @@ func (r *RetryClient) Do(request *http.Request) (*http.Response, error) {
 func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err error) {
 	for attempt := 0; r.backOff(attempt); attempt++ {
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
-			break
+			if r.readBody(response) {
+				break
+			}
 		}
 	}
 	return response, err
@@ -56,7 +59,9 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 	for attempt := 0; r.backOff(attempt); attempt++ {
 		request.Body = ioutil.NopCloser(bytes.NewReader(body))
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
-			break
+			if r.readBody(response) {
+				break
+			}
 		}
 		if response != nil {
 			if response.StatusCode == http.StatusTooManyRequests {
@@ -67,6 +72,17 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 		}
 	}
 	return response, err
+}
+
+func (r *RetryClient) readBody(response *http.Response) bool {
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, response.Body); err == nil {
+		_ = response.Body.Close()
+		response.Body = io.NopCloser(&buf)
+		return true
+	}
+	_ = response.Body.Close()
+	return false
 }
 
 func (r *RetryClient) backOff(attempt int) bool {

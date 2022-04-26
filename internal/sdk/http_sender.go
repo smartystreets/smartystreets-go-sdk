@@ -35,8 +35,11 @@ func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 }
 
 func readResponseBody(response *http.Response) ([]byte, error) {
+	// TODO: Since we already copy response.Body in retry_client.go -> readBody()
+	//       It would behoove us to prevent a second copy in that case.
+
 	if content, err := ioutil.ReadAll(response.Body); err != nil {
-		response.Body.Close()
+		_ = response.Body.Close()
 		return nil, err
 	} else {
 		return content, response.Body.Close()
