@@ -19,7 +19,7 @@ func main() {
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
 		// https://www.smartystreets.com/docs/cloud/licensing
-		wireup.WithLicenses("us-rooftop-geocoding-cloud"),
+		wireup.WithLicenses("us-core-cloud"),
 		// wireup.ViaProxy("https://my-proxy.my-company.com"), // uncomment this line to point to the specified proxy.
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 		// ...or maybe you want to supply your own http client:
