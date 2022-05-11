@@ -77,7 +77,7 @@ func (f *LookupSerializationFixture) TestLanguageLatin() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("Language"), should.Equal, "latin")
+	f.So(f.query.Get("language"), should.Equal, "latin")
 }
 
 func (f *LookupSerializationFixture) TestLanguageNative() {
@@ -86,7 +86,7 @@ func (f *LookupSerializationFixture) TestLanguageNative() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("Language"), should.Equal, "native")
+	f.So(f.query.Get("language"), should.Equal, "native")
 }
 
 func (f *LookupSerializationFixture) TestOrganization() {

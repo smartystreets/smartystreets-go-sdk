@@ -37,7 +37,7 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "input_id", l.InputID)
 	populate(query, "country", l.Country)
 	populate(query, "geocode", boolString(l.Geocode))
-	populate(query, "Language", string(l.Language))
+	populate(query, "language", string(l.Language))
 	populate(query, "freeform", l.Freeform)
 	populate(query, "address1", l.Address1)
 	populate(query, "address2", l.Address2)
