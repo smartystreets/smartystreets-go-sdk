@@ -75,6 +75,10 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 }
 
 func (r *RetryClient) readBody(response *http.Response) bool {
+	if response.Body == nil {
+		return false
+	}
+
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, response.Body); err == nil {
 		_ = response.Body.Close()

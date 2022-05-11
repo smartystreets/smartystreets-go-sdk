@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"errors"
+	"io"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -133,6 +134,7 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 func (f *RetryClientFixture) TestBackOffRateLimited() {
 	retries := 10
 	f.inner = NewFailingHTTPClient(http.StatusTooManyRequests, http.StatusTooManyRequests, http.StatusOK)
+	f.inner.responses[2].Body = io.NopCloser(strings.NewReader("Alohomora"))
 
 	_, f.err = f.sendPostWithRetry(retries - 1)
 
