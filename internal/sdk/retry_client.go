@@ -46,6 +46,9 @@ func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err
 				break
 			}
 		}
+		if !r.handleHttpStatusCode(response, &attempt) {
+			break
+		}
 	}
 	return response, err
 }
@@ -63,15 +66,25 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 				break
 			}
 		}
-		if response != nil {
-			if response.StatusCode == http.StatusTooManyRequests {
-				attempt = backOffRateLimit
-			} else if response.StatusCode >= http.StatusBadRequest && response.StatusCode <= http.StatusUnprocessableEntity {
-				break
-			}
+		if !r.handleHttpStatusCode(response, &attempt) {
+			break
 		}
 	}
 	return response, err
+}
+
+func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int) bool {
+	if response == nil {
+		return true
+	}
+	if response.StatusCode >= http.StatusBadRequest && response.StatusCode <= http.StatusUnprocessableEntity {
+		return false
+	}
+	if response.StatusCode == http.StatusTooManyRequests {
+		r.sleeper(time.Second * time.Duration(r.random(backOffRateLimit)))
+		*attempt = 1
+	}
+	return true
 }
 
 func (r *RetryClient) readBody(response *http.Response) bool {

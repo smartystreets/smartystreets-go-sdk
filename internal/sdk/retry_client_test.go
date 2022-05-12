@@ -131,17 +131,42 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	}
 }
 
-func (f *RetryClientFixture) TestBackOffRateLimited() {
-	retries := 10
-	f.inner = NewFailingHTTPClient(http.StatusTooManyRequests, http.StatusTooManyRequests, http.StatusOK)
-	f.inner.responses[2].Body = io.NopCloser(strings.NewReader("Alohomora"))
+func (f *RetryClientFixture) TestBackOffRateLimitedGet() {
+	retries := 5
+	x := http.StatusTooManyRequests
+	f.inner = NewFailingHTTPClient(x, x, x, x, x, x, x, x, x, x, http.StatusOK) //x10 rate limits > retries
+	f.inner.responses[10].Body = io.NopCloser(strings.NewReader("Alohomora"))
+
+	_, f.err = f.sendGetWithRetry(retries - 1)
+
+	f.So(f.err, should.BeNil)
+	if f.So(f.inner.call, should.Equal, 11) {
+		var napTotal time.Duration
+		for i := 0; i < 10; i++ {
+			napTotal += f.naps[i]
+			f.So(f.naps[i], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+		}
+		f.So(napTotal, should.BeGreaterThan, time.Second*5)
+	}
+}
+
+func (f *RetryClientFixture) TestBackOffRateLimitedPost() {
+	retries := 5
+	x := http.StatusTooManyRequests
+	f.inner = NewFailingHTTPClient(x, x, x, x, x, x, x, x, x, x, http.StatusOK) //x10 rate limits > retries
+	f.inner.responses[10].Body = io.NopCloser(strings.NewReader("Alohomora"))
 
 	_, f.err = f.sendPostWithRetry(retries - 1)
 
 	f.So(f.err, should.BeNil)
-	f.So(f.inner.call, should.Equal, 3)
-	f.So(f.naps[0], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
-	f.So(f.naps[1], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+	if f.So(f.inner.call, should.Equal, 11) {
+		var napTotal time.Duration
+		for i := 0; i < 10; i++ {
+			napTotal += f.naps[i]
+			f.So(f.naps[i], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+		}
+		f.So(napTotal, should.BeGreaterThan, time.Second*5)
+	}
 }
 
 /**************************************************************************/
