@@ -10,7 +10,7 @@ type Lookup struct {
 	ZIPCode string `json:"zipcode,omitempty"`
 	InputID string `json:"input_id,omitempty"`
 
-	Result *Result `json:"-"`
+	Result *Result `json:"result,omitempty"`
 }
 
 func (l *Lookup) encodeQueryString(query url.Values) {
