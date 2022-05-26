@@ -10,14 +10,12 @@ import (
 // Lookup represents all input fields documented here:
 // https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields
 type Lookup struct {
-	Text string
-
-	HTML                    HTMLPayload
-	Aggressive              bool
-	AddressesWithLineBreaks bool
-	AddressesPerLine        int
-
-	Result *Result
+	Text                    string      `json:"text,omitempty"`
+	HTML                    HTMLPayload `json:"html,omitempty"`
+	Aggressive              bool        `json:"aggressive,omitempty"`
+	AddressesWithLineBreaks bool        `json:"addr_line_breaks,omitempty"`
+	AddressesPerLine        int         `json:"addr_per_line,omitempty"`
+	Result                  *Result     `json:"result,omitempty"`
 }
 
 type HTMLPayload string
