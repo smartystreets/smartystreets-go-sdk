@@ -3,10 +3,11 @@ package street
 import (
 	"context"
 	"errors"
-	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/gunit"
 	"net/http"
 	"testing"
+
+	"github.com/smartystreets/assertions/should"
+	"github.com/smartystreets/gunit"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -114,6 +115,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"components": {
 	  "super_administrative_area": "super_blah",
 	  "administrative_area": "SP",
+	  "administrative_area_short": "SP",
+	  "administrative_area_long": "São Paulo",
 	  "sub_administrative_area": "sub_blah",
 	  "building": "building",
 	  "dependent_locality": "Casa Verde",
@@ -148,6 +151,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	  "sub_building_number": "almost_bldg_number",
 	  "sub_building_name": "almost_bldg_name",
 	  "sub_building": "almost_bldg",
+      "level_type": "almost_level_type", 
+      "level_number": "almost_level_number",
 	  "post_box": "box",
 	  "post_box_type": "cube",
 	  "post_box_number": "blank"
@@ -180,6 +185,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"components": {
 	 	  "super_administrative_area": "blank",
 		  "administrative_area": "Verified-NoChange",
+		  "administrative_area_short": "blank",
+		  "administrative_area_long": "blank",
 		  "sub_administrative_area": "blank",
 		  "building": "blank",
 		  "dependent_locality": "Added",
@@ -214,6 +221,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "sub_building_number": "blank",
 		  "sub_building_name": "blank",
 		  "sub_building": "blank",
+		  "level_type": "blank",
+		  "level_number": "blank",
 		  "post_box": "blank",
 		  "post_box_type": "blank",
 		  "post_box_number": "blank"
@@ -248,6 +257,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.Address12, should.Equal, "here")
 	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
 	f.So(component.AdministrativeArea, should.Equal, "SP")
+	f.So(component.AdministrativeAreaShort, should.Equal, "SP")
+	f.So(component.AdministrativeAreaLong, should.Equal, "São Paulo")
 	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
 	f.So(component.Building, should.Equal, "building")
 	f.So(component.DependentLocality, should.Equal, "Casa Verde")
@@ -282,6 +293,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(component.SubBuildingNumber, should.Equal, "almost_bldg_number")
 	f.So(component.SubBuildingName, should.Equal, "almost_bldg_name")
 	f.So(component.SubBuilding, should.Equal, "almost_bldg")
+	f.So(component.LevelType, should.Equal, "almost_level_type")
+	f.So(component.LevelNumber, should.Equal, "almost_level_number")
 	f.So(component.PostBox, should.Equal, "box")
 	f.So(component.PostBoxType, should.Equal, "cube")
 	f.So(component.PostBoxNumber, should.Equal, "blank")

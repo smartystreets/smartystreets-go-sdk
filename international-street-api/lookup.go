@@ -1,6 +1,8 @@
 package street
 
-import "net/url"
+import (
+	"net/url"
+)
 
 // Lookup contains all input fields defined here:
 // https://smartystreets.com/docs/cloud/international-street-api#http-input-fields
@@ -14,6 +16,7 @@ type Lookup struct {
 	Address2           string
 	Address3           string
 	Address4           string
+	Unit               string
 	Organization       string
 	Locality           string
 	AdministrativeArea string
@@ -43,6 +46,7 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "address2", l.Address2)
 	populate(query, "address3", l.Address3)
 	populate(query, "address4", l.Address4)
+	populate(query, "unit", l.Unit)
 	populate(query, "organization", l.Organization)
 	populate(query, "locality", l.Locality)
 	populate(query, "administrative_area", l.AdministrativeArea)
