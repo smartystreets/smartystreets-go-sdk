@@ -32,6 +32,8 @@ type (
 	Components struct {
 		SuperAdministrativeArea            string `json:"super_administrative_area,omitempty"`
 		AdministrativeArea                 string `json:"administrative_area,omitempty"`
+		AdministrativeAreaShort            string `json:"administrative_area_short,omitempty"`
+		AdministrativeAreaLong             string `json:"administrative_area_long,omitempty"`
 		SubAdministrativeArea              string `json:"sub_administrative_area,omitempty"`
 		Building                           string `json:"building,omitempty"`
 		DependentLocality                  string `json:"dependent_locality,omitempty"`
@@ -66,6 +68,8 @@ type (
 		SubBuildingNumber                  string `json:"sub_building_number,omitempty"`
 		SubBuildingName                    string `json:"sub_building_name,omitempty"`
 		SubBuilding                        string `json:"sub_building,omitempty"`
+		LevelType                          string `json:"level_type,omitempty"`
+		LevelNumber                        string `json:"level_number,omitempty"`
 		PostBox                            string `json:"post_box,omitempty"`
 		PostBoxType                        string `json:"post_box_type,omitempty"`
 		PostBoxNumber                      string `json:"post_box_number,omitempty"`

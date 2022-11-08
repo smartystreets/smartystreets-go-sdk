@@ -170,7 +170,6 @@ func DisableHTTP2() Option {
 // - WithMaxIdleConnections
 // - ViaProxy
 // - Timeout
-//
 func WithHTTPClient(client *http.Client) Option {
 	return func(builder *clientBuilder) {
 		builder.client = client

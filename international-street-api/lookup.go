@@ -1,6 +1,8 @@
 package street
 
-import "net/url"
+import (
+	"net/url"
+)
 
 // Lookup contains all input fields defined here:
 // https://smartystreets.com/docs/cloud/international-street-api#http-input-fields
