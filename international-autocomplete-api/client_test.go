@@ -58,7 +58,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
 	f.So(f.sender.request.URL.Query().Get("search"), should.Equal, "42")
-	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?search=42")
+	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?distance=5&max_results=5&search=42")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	f.So(f.input.Result, should.Resemble, &Result{Candidates: []*Candidate{
