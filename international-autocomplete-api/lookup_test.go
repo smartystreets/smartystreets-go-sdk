@@ -63,7 +63,7 @@ func (f *LookupFixture) TestDistance() {
 	f.So(f.query.Get("distance"), should.Equal, "3")
 }
 func (f *LookupFixture) TestGeolocation() {
-	typeList := []InternationalGeolocateType{AdminArea, Locality, PostalCode, None}
+	typeList := []InternationalGeolocateType{AdminArea, Locality, PostalCode, Geocodes, None}
 	for _, geoLocateType := range typeList {
 		f.lookup.Geolocation = geoLocateType
 		f.populate()
