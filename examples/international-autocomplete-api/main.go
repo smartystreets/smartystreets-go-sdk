@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
-
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"log"
+	"os"
 )
 
 func main() {
@@ -15,6 +14,7 @@ func main() {
 
 	client := wireup.BuildInternationalAutocompleteAPIClient(
 		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
 		// https://www.smartystreets.com/docs/cloud/licensing
