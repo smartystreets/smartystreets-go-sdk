@@ -7,8 +7,7 @@ test: fmt clean
 	go test -short -cover -count=1 ./...
 
 fmt:
-	go mod tidy
-	go fmt ./...
+	go mod tidy && go fmt ./...
 
 clean:
 	@git checkout "$(VERSION_FILE)"
