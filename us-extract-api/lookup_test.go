@@ -1,6 +1,7 @@
 package extract
 
 import (
+	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -75,4 +76,17 @@ func (f *LookupFixture) TestPopulate_SimpleParameters_Set() {
 	f.So(f.query().Get("aggressive"), should.Equal, "true")
 	f.So(f.query().Get("addr_line_breaks"), should.Equal, "true")
 	f.So(f.query().Get("addr_per_line"), should.Equal, "42")
+}
+
+func (f *LookupFixture) TestMatchStrategy() {
+	for _, match := range []street.MatchStrategy{street.MatchStrict, street.MatchInvalid, street.MatchEnhanced} {
+		f.lookup.MatchStrategy = match
+		f.lookup.populate(f.request)
+
+		if match != street.MatchStrict {
+			f.So(f.query().Get("match"), should.Equal, string(match))
+		} else {
+			f.So(f.query().Get("match"), should.BeEmpty)
+		}
+	}
 }

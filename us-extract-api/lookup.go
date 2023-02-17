@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,12 +11,13 @@ import (
 // Lookup represents all input fields documented here:
 // https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields
 type Lookup struct {
-	Text                    string      `json:"text,omitempty"`
-	HTML                    HTMLPayload `json:"html,omitempty"`
-	Aggressive              bool        `json:"aggressive,omitempty"`
-	AddressesWithLineBreaks bool        `json:"addr_line_breaks,omitempty"`
-	AddressesPerLine        int         `json:"addr_per_line,omitempty"`
-	Result                  *Result     `json:"result,omitempty"`
+	Text                    string               `json:"text,omitempty"`
+	HTML                    HTMLPayload          `json:"html,omitempty"`
+	Aggressive              bool                 `json:"aggressive,omitempty"`
+	AddressesWithLineBreaks bool                 `json:"addr_line_breaks,omitempty"`
+	AddressesPerLine        int                  `json:"addr_per_line,omitempty"`
+	MatchStrategy           street.MatchStrategy `json:"match,omitempty"`
+	Result                  *Result              `json:"result,omitempty"`
 }
 
 type HTMLPayload string
@@ -48,6 +50,10 @@ func (l *Lookup) setQuery(request *http.Request) {
 
 	if l.AddressesPerLine > 0 {
 		query.Set("addr_per_line", strconv.Itoa(l.AddressesPerLine))
+	}
+
+	if l.MatchStrategy != "" && l.MatchStrategy != street.MatchStrict {
+		query.Set("match", string(l.MatchStrategy))
 	}
 
 	request.URL.RawQuery = query.Encode()

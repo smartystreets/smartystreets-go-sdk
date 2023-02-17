@@ -5,11 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
+	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 	"log"
 	"os"
-
-	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
@@ -25,10 +25,13 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields
 
 	lookup := &extract.Lookup{
-		Text:                    "Meet me at 3214 N University Ave Provo UT 84604 just after 3pm.",
+		Text: "Meet me at 3214 N University Ave Provo UT 84604 just after 3pm. " +
+			"Also, here's a non-postal that will show up with enhanced match! 808 County Road 408 Brady, Tx. " +
+			"is a beautiful place!",
 		Aggressive:              true,
 		AddressesWithLineBreaks: false,
-		AddressesPerLine:        1,
+		AddressesPerLine:        2,
+		MatchStrategy:           street.MatchEnhanced,
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
