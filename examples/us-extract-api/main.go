@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
-	"log"
-	"os"
 )
 
 func main() {
