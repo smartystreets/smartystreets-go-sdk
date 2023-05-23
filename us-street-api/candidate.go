@@ -14,6 +14,7 @@ type (
 		DeliveryLine2        string     `json:"delivery_line_2,omitempty"`
 		LastLine             string     `json:"last_line,omitempty"`
 		DeliveryPointBarcode string     `json:"delivery_point_barcode,omitempty"`
+		SmartyKey            string     `json:"smarty_key,omitempty"`
 		Components           Components `json:"components,omitempty"`
 		Metadata             Metadata   `json:"metadata,omitempty"`
 		Analysis             Analysis   `json:"analysis,omitempty"`
