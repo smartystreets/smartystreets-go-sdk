@@ -25,5 +25,5 @@ type Address struct {
 	City              string `json:"city"`
 	StateAbbreviation string `json:"state_abbreviation"`
 	ZIPCode           string `json:"zipcode"`
-	Source            string `json:"source,omitempty"`
+	Source            string `json:"source"`
 }
