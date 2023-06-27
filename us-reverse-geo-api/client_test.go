@@ -44,7 +44,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request.URL.Path, should.Equal, lookupURL)
 	f.So(f.sender.request.URL.Query().Get("latitude"), should.Equal, "40.12345679")
 	f.So(f.sender.request.URL.Query().Get("longitude"), should.Equal, "-111.00000000")
-	f.So(f.sender.request.URL.String(), should.Equal, lookupURL+"?latitude=40.12345679&longitude=-111.00000000")
+	f.So(f.sender.request.URL.String(), should.Equal, lookupURL+"?latitude=40.12345679&longitude=-111.00000000&source=")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	f.So(f.input.Response, should.Resemble, Response{
