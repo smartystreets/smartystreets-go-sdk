@@ -45,7 +45,7 @@ func (f *BaseURLClientFixture) TestProvidedURLOverridesRequestURL() {
 	f.assertFinalURL("https://override.com/override/original")
 }
 func (f *BaseURLClientFixture) TestHostWithPortInOverridingAddress() {
-	f.original = httptest.NewRequest("GET", "https://us-street.api.smartystreets.com/street-address", nil)
+	f.original = httptest.NewRequest("GET", "https://us-street.api.smarty.com/street-address", nil)
 	f.override, _ = url.Parse( /**********/ "https://1.2.3.4:5/override")
 
 	f.do()
@@ -53,7 +53,7 @@ func (f *BaseURLClientFixture) TestHostWithPortInOverridingAddress() {
 	f.assertFinalURL( /*******************/ "https://1.2.3.4:5/override/street-address")
 }
 func (f *BaseURLClientFixture) TestNoPathSpecifiedInOverridingAddress() {
-	f.original = httptest.NewRequest("GET", "https://us-street.api.smartystreets.com/street-address", nil)
+	f.original = httptest.NewRequest("GET", "https://us-street.api.smarty.com/street-address", nil)
 	f.override, _ = url.Parse( /**********/ "https://1.2.3.4:5/")
 
 	f.do()

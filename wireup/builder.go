@@ -222,12 +222,12 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 }
 
 var (
-	defaultBaseURL_InternationalStreetAPI       = &url.URL{Scheme: "https", Host: "international-street.api.smartystreets.com"}
-	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smartystreets.com"}
-	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smartystreets.com"}
-	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smartystreets.com"}
-	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smartystreets.com"}
-	defaultBaseURL_USExtractAPI                 = &url.URL{Scheme: "https", Host: "us-extract.api.smartystreets.com"}
-	defaultBaseURL_USReverseGeocodingAPI        = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smartystreets.com"}
-	defaultBaseURL_USAutocompleteProAPI         = &url.URL{Scheme: "https", Host: "us-autocomplete-pro.api.smartystreets.com"}
+	defaultBaseURL_InternationalStreetAPI       = &url.URL{Scheme: "https", Host: "international-street.api.smarty.com"}
+	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smarty.com"}
+	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smarty.com"}
+	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smarty.com"}
+	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smarty.com"}
+	defaultBaseURL_USExtractAPI                 = &url.URL{Scheme: "https", Host: "us-extract.api.smarty.com"}
+	defaultBaseURL_USReverseGeocodingAPI        = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smarty.com"}
+	defaultBaseURL_USAutocompleteProAPI         = &url.URL{Scheme: "https", Host: "us-autocomplete-pro.api.smarty.com"}
 )
