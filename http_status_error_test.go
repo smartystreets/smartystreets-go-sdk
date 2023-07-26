@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	"github.com/smarty/assertions"
+	"github.com/smarty/assertions/should"
 )
 
 func TestHTTPStatusError(t *testing.T) {

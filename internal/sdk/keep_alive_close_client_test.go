@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/gunit"
+	"github.com/smarty/assertions/should"
+	"github.com/smarty/gunit"
 )
 
 func TestKeepAliveCloseClientFixture(t *testing.T) {

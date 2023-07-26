@@ -1,14 +1,15 @@
 package extract
 
 import (
-	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/gunit"
+	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+
+	"github.com/smarty/assertions/should"
+	"github.com/smarty/gunit"
 )
 
 func TestLookupFixture(t *testing.T) {
