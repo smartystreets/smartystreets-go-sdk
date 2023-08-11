@@ -3,7 +3,7 @@ package street
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"testing"
@@ -130,7 +130,7 @@ func (f *FakeMultiSender) Send(request *http.Request) ([]byte, error) {
 	f.requests = append(f.requests, request)
 
 	if request.Body != nil {
-		body, _ := ioutil.ReadAll(request.Body)
+		body, _ := io.ReadAll(request.Body)
 		f.requestBodies = append(f.requestBodies, string(body))
 	}
 

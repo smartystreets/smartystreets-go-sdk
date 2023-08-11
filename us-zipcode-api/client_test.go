@@ -3,7 +3,7 @@ package zipcode
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
@@ -133,7 +133,7 @@ func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
 	if request.Body != nil {
-		f.requestBody, _ = ioutil.ReadAll(request.Body)
+		f.requestBody, _ = io.ReadAll(request.Body)
 	}
 	return []byte(f.response), f.err
 }

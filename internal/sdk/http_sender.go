@@ -1,7 +1,7 @@
 package sdk
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
@@ -38,7 +38,7 @@ func readResponseBody(response *http.Response) ([]byte, error) {
 	// TODO: Since we already copy response.Body in retry_client.go -> readBody()
 	//       It would behoove us to prevent a second copy in that case.
 
-	if content, err := ioutil.ReadAll(response.Body); err != nil {
+	if content, err := io.ReadAll(response.Body); err != nil {
 		_ = response.Body.Close()
 		return nil, err
 	} else {
