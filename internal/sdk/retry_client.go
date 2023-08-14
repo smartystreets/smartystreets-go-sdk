@@ -3,9 +3,8 @@ package sdk
 import (
 	"bytes"
 	"io"
-	"math/rand"
 	"net/http"
-	"sync"
+	"strconv"
 	"time"
 )
 
@@ -14,20 +13,18 @@ type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
 	sleeper    func(time.Duration)
-	lock       *sync.Mutex
-	rand       *rand.Rand
+	rateLimit  int
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper func(time.Duration)) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, sleeper func(time.Duration)) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
-		lock:       new(sync.Mutex),
-		rand:       rand,
 		sleeper:    sleeper,
+		rateLimit:  -1,
 	}
 }
 
@@ -80,8 +77,19 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int
 		return false
 	}
 	if response.StatusCode == http.StatusTooManyRequests {
-		r.sleeper(time.Second * time.Duration(r.random(backOffRateLimit)))
-		*attempt = 1
+		if response.Header != nil {
+			if i, err := strconv.Atoi(response.Header.Get("Retry-After")); err == nil {
+				r.rateLimit = i
+				*attempt = 0
+				return true
+			}
+		}
+		if *attempt == 0 {
+			r.rateLimit = 1
+		} else {
+			r.rateLimit += 1
+		}
+		*attempt = 0
 	}
 	return true
 }
@@ -102,24 +110,21 @@ func (r *RetryClient) readBody(response *http.Response) bool {
 }
 
 func (r *RetryClient) backOff(attempt int) bool {
-	if attempt == 0 {
-		return true
-	}
 	if attempt > r.maxRetries {
 		return false
 	}
-	backOffCap := max(0, min(maxBackOffDuration, attempt))
-	backOff := time.Second * time.Duration(r.random(backOffCap))
+	backOffCap := 0
+	if r.rateLimit != -1 {
+		backOffCap = r.rateLimit
+	} else {
+		backOffCap = max(0, min(maxBackOffDuration, attempt))
+	}
+	backOff := time.Second * time.Duration(backOffCap)
 	r.sleeper(backOff)
 	return true
 }
 
-func (r *RetryClient) random(cap int) int {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	return r.rand.Intn(cap)
-}
-
+// TODO: delete in favor of built-in function after upgrading to Go 1.21
 func max(x, y int) int {
 	if x > y {
 		return x
@@ -127,6 +132,7 @@ func max(x, y int) int {
 	return y
 }
 
+// TODO: delete in favor of built-in function after upgrading to Go 1.21
 func min(x, y int) int {
 	if x < y {
 		return x
@@ -135,6 +141,5 @@ func min(x, y int) int {
 }
 
 const (
-	backOffRateLimit   = 5
 	maxBackOffDuration = 10
 )

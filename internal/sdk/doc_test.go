@@ -3,6 +3,7 @@ package sdk
 import (
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type FakeHTTPClient struct {
@@ -19,17 +20,25 @@ func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
 /*////////////////////////////////////////////////////////////////////////*/
 
 type FakeMultiHTTPClient struct {
-	requests  []*http.Request
-	bodies    []string
-	responses []*http.Response
-	errors    []error
-	call      int
+	requests      []*http.Request
+	headers       []*http.Header
+	bodies        []string
+	responses     []*http.Response
+	errors        []error
+	call          int
+	headerKey     string
+	rateLimitTime int
 }
 
 func (f *FakeMultiHTTPClient) Do(request *http.Request) (*http.Response, error) {
 	defer f.increment()
 	f.simulateServerReadingRequestBody(request)
 	f.requests = append(f.requests, request)
+	response := f.responses[f.call]
+	if response.StatusCode == 429 {
+		response.Header = http.Header{}
+		response.Header.Set(f.headerKey, strconv.Itoa(f.rateLimitTime))
+	}
 	return f.responses[f.call], f.errors[f.call]
 }
 
