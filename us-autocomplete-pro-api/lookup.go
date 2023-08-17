@@ -120,6 +120,6 @@ func (l Lookup) populateSource(query url.Values) {
 }
 func (l Lookup) populateSelect(query url.Values) {
 	if len(l.Select) > 0 {
-		query.Set("select", l.Source)
+		query.Set("select", l.Select)
 	}
 }
