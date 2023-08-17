@@ -22,6 +22,7 @@ type (
 		PreferZIP     []string
 		PreferRatio   int
 		Geolocation   Geolocation
+		Select        string
 
 		Results []*Suggestion
 	}
@@ -46,6 +47,7 @@ func (l Lookup) populate(query url.Values) {
 	l.populatePreferRatio(query)
 	l.populateGeolocation(query)
 	l.populateSource(query)
+	l.populateSelect(query)
 }
 
 func (l Lookup) populateSearch(query url.Values) {
@@ -114,5 +116,10 @@ func (l Lookup) populateGeolocation(query url.Values) {
 func (l Lookup) populateSource(query url.Values) {
 	if len(l.Source) > 0 {
 		query.Set("source", l.Source)
+	}
+}
+func (l Lookup) populateSelect(query url.Values) {
+	if len(l.Select) > 0 {
+		query.Set("select", l.Source)
 	}
 }
