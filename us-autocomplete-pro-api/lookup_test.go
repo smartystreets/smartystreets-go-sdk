@@ -149,7 +149,7 @@ func (f *LookupSerializationFixture) TestGeolocateCity_DefaultValue() {
 }
 
 func (f *LookupSerializationFixture) TestSelect() {
-	f.lookup.Select = "Hello World!"
+	f.lookup.Selected = "Hello World!"
 
 	f.populate()
 
