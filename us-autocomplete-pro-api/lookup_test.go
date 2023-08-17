@@ -147,3 +147,12 @@ func (f *LookupSerializationFixture) TestGeolocateCity_DefaultValue() {
 	f.So(f.query, should.HaveLength, 1)
 	f.So(f.query.Get("prefer_geolocation"), should.Equal, "city")
 }
+
+func (f *LookupSerializationFixture) TestSelect() {
+	f.lookup.Selected = "Hello World!"
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("select"), should.Equal, "Hello World!")
+}
