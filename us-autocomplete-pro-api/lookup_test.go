@@ -154,5 +154,5 @@ func (f *LookupSerializationFixture) TestSelect() {
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("select"), should.Equal, "Hello World!")
+	f.So(f.query.Get("selected"), should.Equal, "Hello World!")
 }
