@@ -3,7 +3,6 @@ package sdk
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"sync"
@@ -54,13 +53,13 @@ func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err
 }
 
 func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Response, err error) {
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	for attempt := 0; r.backOff(attempt); attempt++ {
-		request.Body = ioutil.NopCloser(bytes.NewReader(body))
+		request.Body = io.NopCloser(bytes.NewReader(body))
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			if r.readBody(response) {
 				break
@@ -82,6 +81,7 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int
 	}
 	if response.StatusCode == http.StatusTooManyRequests {
 		r.sleeper(time.Second * time.Duration(r.random(backOffRateLimit)))
+		// Setting attempt to 1 will make 429s retry indefinitely; this is intended behavior.
 		*attempt = 1
 	}
 	return true

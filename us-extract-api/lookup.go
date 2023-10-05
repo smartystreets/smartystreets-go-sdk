@@ -1,11 +1,12 @@
 package extract
 
 import (
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
 )
 
 // Lookup represents all input fields documented here:
@@ -64,7 +65,7 @@ func (l *Lookup) setBody(request *http.Request) {
 	}
 
 	body := strings.NewReader(l.Text)
-	request.Body = ioutil.NopCloser(body)
+	request.Body = io.NopCloser(body)
 	request.ContentLength = int64(body.Len())
 }
 func (l *Lookup) setHeaders(request *http.Request) {

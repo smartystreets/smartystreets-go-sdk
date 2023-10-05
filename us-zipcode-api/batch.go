@@ -3,7 +3,7 @@ package zipcode
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -77,7 +77,7 @@ func (b *Batch) serializeGET(request *http.Request) {
 func (b *Batch) serializePOST(request *http.Request) {
 	request.Method = http.MethodPost
 	payload, _ := json.Marshal(b.lookups) // We control the types being serialized. This is safe.
-	request.Body = ioutil.NopCloser(bytes.NewReader(payload))
+	request.Body = io.NopCloser(bytes.NewReader(payload))
 	request.ContentLength = int64(len(payload))
 	request.Header.Set("Content-Type", "application/json")
 }

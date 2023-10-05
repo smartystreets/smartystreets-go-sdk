@@ -1,7 +1,7 @@
 package sdk
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -35,7 +35,7 @@ func (f *FakeMultiHTTPClient) Do(request *http.Request) (*http.Response, error) 
 
 func (f *FakeMultiHTTPClient) simulateServerReadingRequestBody(request *http.Request) {
 	if request.Body != nil {
-		body, _ := ioutil.ReadAll(request.Body)
+		body, _ := io.ReadAll(request.Body)
 		f.bodies = append(f.bodies, string(body))
 	} else {
 		f.bodies = append(f.bodies, request.URL.Query().Get("body"))

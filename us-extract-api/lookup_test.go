@@ -1,7 +1,7 @@
 package extract
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
@@ -33,7 +33,7 @@ func (f *LookupFixture) query() url.Values {
 }
 
 func readBody(request *http.Request) string {
-	bytes, _ := ioutil.ReadAll(request.Body)
+	bytes, _ := io.ReadAll(request.Body)
 	return string(bytes)
 }
 

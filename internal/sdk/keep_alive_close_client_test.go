@@ -1,7 +1,7 @@
 package sdk
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -26,7 +26,7 @@ func (f *KeepAliveCloseClientFixture) Setup() {
 	f.inner.response = &http.Response{
 		ProtoMajor: 1, ProtoMinor: 1,
 		StatusCode: http.StatusTeapot,
-		Body:       ioutil.NopCloser(strings.NewReader("Goodbye, World!")),
+		Body:       io.NopCloser(strings.NewReader("Goodbye, World!")),
 	}
 	f.request = httptest.NewRequest("GET", "/", nil)
 }
