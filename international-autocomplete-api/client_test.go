@@ -36,23 +36,20 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 				"street": "1",
 				"locality": "2",
 				"administrative_area": "3",
-                "super_administrative_area": "4",
-                "sub_administrative_area": "5",
-				"postal_code": "6",
-				"country_iso3": "7"
+				"postal_code": "4",
+				"country_iso3": "5"
 			},
 			{
-				"street": "8",
-				"locality": "9",
-				"administrative_area": "10",
-                "super_administrative_area": "11",
-                "sub_administrative_area": "12",
-				"postal_code": "13",
-				"country_iso3": "14"
+				"street": "6",
+				"locality": "7",
+				"administrative_area": "8",
+				"postal_code": "9",
+				"country_iso3": "10"
 			}
 		]
 	}`
 	f.input.Search = "42"
+	f.input.Country = "FRA"
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
@@ -62,27 +59,23 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.So(f.sender.request.Method, should.Equal, "GET")
 	f.So(f.sender.request.URL.Path, should.Equal, suggestURL)
 	f.So(f.sender.request.URL.Query().Get("search"), should.Equal, "42")
-	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?distance=5&max_results=5&search=42")
+	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"?country=FRA&max_results=5&search=42")
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	f.So(f.input.Result, should.Resemble, &Result{Candidates: []*Candidate{
 		{
-			Street:                  "1",
-			Locality:                "2",
-			AdministrativeArea:      "3",
-			SuperAdministrativeArea: "4",
-			SubAdministrativeArea:   "5",
-			PostalCode:              "6",
-			CountryIso3:             "7",
+			Street:             "1",
+			Locality:           "2",
+			AdministrativeArea: "3",
+			PostalCode:         "4",
+			CountryIso3:        "5",
 		},
 		{
-			Street:                  "8",
-			Locality:                "9",
-			AdministrativeArea:      "10",
-			SuperAdministrativeArea: "11",
-			SubAdministrativeArea:   "12",
-			PostalCode:              "13",
-			CountryIso3:             "14",
+			Street:             "6",
+			Locality:           "7",
+			AdministrativeArea: "8",
+			PostalCode:         "9",
+			CountryIso3:        "10",
 		},
 	}})
 }
@@ -106,6 +99,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 		{"text": "3"}
 	]}` // would be deserialized if not for the err (above)
 	f.input.Search = "HI"
+	f.input.Country = "FRA"
 
 	err := f.client.SendLookup(f.input)
 
@@ -116,11 +110,26 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
 	f.input.Search = "HI"
+	f.input.Country = "FRA"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
 	f.So(f.input.Result, should.BeNil)
+}
+
+func (f *ClientFixture) TestAddressIDAppendsToURL() {
+	f.input.Country = "FRA"
+	f.input.AddressID = "thisisid"
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.NotBeNil)
+
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Method, should.Equal, "GET")
+	f.So(f.sender.request.URL.Path, should.Equal, suggestURL+"/thisisid")
+	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"/thisisid?country=FRA&max_results=5")
 }
 
 //////////////////////////////////////////////////////////////////
