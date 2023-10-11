@@ -25,7 +25,7 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	if lookup == nil {
 		return nil
 	}
-	if len(lookup.SmartyKey) == 0 && len(lookup.DataSet) == 0 {
+	if len(lookup.SmartyKey) == 0 && len(lookup.DataSet) == 0 && len(lookup.DataSubSet) == 0 {
 		return nil
 	}
 
@@ -41,7 +41,16 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 }
 
 func deserializeResponse(body []byte, lookup *Lookup) error {
-	err := json.Unmarshal(body, &lookup.Response)
+	var err error
+
+	switch strings.ToLower(lookup.DataSubSet) {
+	case "financial":
+		err = json.Unmarshal(body, &lookup.FinancialResponse)
+		break
+	case "principal":
+		err = json.Unmarshal(body, &lookup.PrincipalResponse)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -57,11 +66,13 @@ func buildRequest(lookup *Lookup) *http.Request {
 
 func buildLookupURL(lookup *Lookup) string {
 	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.SmartyKey, 1)
-	return strings.Replace(newLookupURL, lookupURLDataSet, lookup.DataSet, 1)
+	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.DataSet, 1)
+	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.DataSubSet, 1)
 }
 
 const (
-	lookupURLSmartyKey = ":smartykey"
-	lookupURLDataSet   = ":dataset"
-	lookupURL          = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet // Remaining parts will be completed later by the sdk.BaseURLClient.
+	lookupURLSmartyKey  = ":smartykey"
+	lookupURLDataSet    = ":dataset"
+	lookupURLDataSubSet = ":datasubset"
+	lookupURL           = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
 )

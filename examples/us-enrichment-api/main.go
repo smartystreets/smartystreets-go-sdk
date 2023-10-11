@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
-
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"log"
+	"os"
 )
 
 func main() {
@@ -15,7 +14,7 @@ func main() {
 
 	client := wireup.BuildUSEnrichmentAPIClient(
 		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
-		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		// wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
 		// https://www.smartystreets.com/docs/cloud/licensing
@@ -27,8 +26,9 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-request-input-fields
 
 	lookup := &us_enrichment.Lookup{
-		SmartyKey: "12345",
-		DataSet:   "property-attributes",
+		SmartyKey:  "7",
+		DataSet:    "property",
+		DataSubSet: "principal",
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
@@ -36,8 +36,8 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: (%s, %s)\n", lookup.SmartyKey, lookup.DataSet)
-	for s, address := range lookup.Response {
-		fmt.Printf("#%d: %#v\n", s, address)
+	for s, response := range lookup.PrincipalResponse {
+		fmt.Printf("#%d: %+v\n", s, response)
 	}
 
 	log.Println("OK")

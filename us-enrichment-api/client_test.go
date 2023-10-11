@@ -30,9 +30,10 @@ func (f *ClientFixture) Setup() {
 }
 
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
-	f.sender.response = validResponseJSON
+	f.sender.response = validFinancialResponse
 	f.input.SmartyKey = "12345"
 	f.input.DataSet = "property"
+	f.input.DataSubSet = "financial"
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
@@ -40,17 +41,20 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, "/"+f.input.SmartyKey+"/"+f.input.DataSet)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+f.input.SmartyKey+"/"+f.input.DataSet+"/"+f.input.DataSubSet)
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
-	f.So(f.input.Response, should.Resemble, []*Response{
+	f.So(f.input.FinancialResponse, should.Resemble, []FinancialResponse{
 		{
-			SmartyKey:   "12345",
-			DataSetName: "property",
-			Attributes: []*Attribute{
-				{Key: "PA1", Value: "67890"},
-				{Key: "PA2", Value: "unknown"},
-			}},
+			SmartyKey:      "7",
+			DataSetName:    "property",
+			DataSubsetName: "financial",
+			Attributes: FinancialAttributes{
+				AssessedImprovementPercent: "Assessed_Improvement_Percent",
+				VeteranTaxExemption:        "Veteran_Tax_Exemption",
+				WidowTaxExemption:          "Widow_Tax_Exemption",
+			},
+		},
 	})
 }
 
@@ -68,41 +72,31 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
-	f.sender.response = validResponseJSON // would be deserialized if not for the err (above)
+	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
 	f.input.SmartyKey = "12345"
 	f.input.DataSet = "property"
+	f.input.DataSubSet = "principal"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Response, should.BeEmpty)
+	f.So(f.input.PrincipalResponse, should.BeEmpty)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
 	f.input.SmartyKey = "12345"
 	f.input.DataSet = "property"
+	f.input.DataSubSet = "principal"
 
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Response, should.BeEmpty)
+	f.So(f.input.PrincipalResponse, should.BeEmpty)
 }
 
-var validResponseJSON = `[
-{
-	"smarty-key": "12345",
-	"data-set-name": "property",
-	"attributes": [{
-			"key": "PA1",
-			"value": "67890"
-		},
-		{
-			"key": "PA2",
-			"value": "unknown"
-		}
-	]
-}]`
+var validFinancialResponse = `[{"smarty_key":"7","data_set_name":"property","data_subset_name":"financial","attributes":{"assessed_improvement_percent":"Assessed_Improvement_Percent","veteran_tax_exemption":"Veteran_Tax_Exemption","widow_tax_exemption":"Widow_Tax_Exemption"}}]`
+var validPrincipalResponse = `[{"smarty_key":"7","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft",lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 
 /**************************************************************************/
 
