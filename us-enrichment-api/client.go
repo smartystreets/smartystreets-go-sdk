@@ -2,7 +2,6 @@ package us_enrichment
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -17,15 +16,33 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-func (c *Client) SendLookup(lookup *Lookup) error {
-	return c.SendLookupWithContext(context.Background(), lookup)
+func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
+	l := &financialLookup{
+		SmartyKey: smartyKey,
+	}
+	err := c.sendLookup(l)
+
+	return err, l.Response
 }
 
-func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
+func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
+	l := &principalLookup{
+		SmartyKey: smartyKey,
+	}
+	err := c.sendLookup(l)
+
+	return err, l.Response
+}
+
+func (c *Client) sendLookup(lookup enrichmentLookup) error {
+	return c.sendLookupWithContext(context.Background(), lookup)
+}
+
+func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
 	if lookup == nil {
 		return nil
 	}
-	if len(lookup.SmartyKey) == 0 && len(lookup.DataSet) == 0 && len(lookup.DataSubSet) == 0 {
+	if len(lookup.GetSmartyKey()) == 0 && len(lookup.GetDataSet()) == 0 {
 		return nil
 	}
 
@@ -37,37 +54,20 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 		return err
 	}
 
-	return deserializeResponse(response, lookup)
+	return lookup.UnmarshalResponse(response)
 }
 
-func deserializeResponse(body []byte, lookup *Lookup) error {
-	var err error
-
-	switch strings.ToLower(lookup.DataSubSet) {
-	case "financial":
-		err = json.Unmarshal(body, &lookup.FinancialResponse)
-		break
-	case "principal":
-		err = json.Unmarshal(body, &lookup.PrincipalResponse)
-	}
-
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func buildRequest(lookup *Lookup) *http.Request {
+func buildRequest(lookup enrichmentLookup) *http.Request {
 	request, _ := http.NewRequest("GET", buildLookupURL(lookup), nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
-func buildLookupURL(lookup *Lookup) string {
-	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.SmartyKey, 1)
-	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.DataSet, 1)
-	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.DataSubSet, 1)
+func buildLookupURL(lookup enrichmentLookup) string {
+	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.GetSmartyKey(), 1)
+	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.GetDataSet(), 1)
+	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.GetDataSubset(), 1)
 }
 
 const (
