@@ -66,3 +66,17 @@ func (this *LookupFixture) TestQueryStringEncoding_AllFieldsSerialized() {
 		"street2":      {"Street2"},
 	})
 }
+
+func (this *LookupFixture) TestQueryStringEncoding_WithOutputFormat() {
+	this.So(this.encode(&Lookup{OutputFormat: FormatDefault}), should.Resemble, url.Values{})
+	this.So(this.encode(&Lookup{OutputFormat: FormatProjectUSA}), should.Resemble, url.Values{"format": {"project-usa"}})
+	this.So(this.encode(&Lookup{OutputFormat: FormatCASS}), should.Resemble, url.Values{"format": {"cass"}})
+}
+
+func (this *LookupFixture) TestQueryStringEncoding_OutputFormatSerialized() {
+	this.So(this.encode(&Lookup{
+		OutputFormat: FormatProjectUSA,
+	}), should.Resemble, url.Values{
+		"format": {"project-usa"},
+	})
+}
