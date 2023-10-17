@@ -38,19 +38,19 @@ type principalLookup struct {
 	Response  []*PrincipalResponse
 }
 
-func (p principalLookup) GetSmartyKey() string {
+func (p *principalLookup) GetSmartyKey() string {
 	return p.SmartyKey
 }
 
-func (p principalLookup) GetDataSet() string {
+func (p *principalLookup) GetDataSet() string {
 	return propertyDataSet
 }
 
-func (p principalLookup) GetDataSubset() string {
+func (p *principalLookup) GetDataSubset() string {
 	return principalDataSubset
 }
 
-func (p principalLookup) UnmarshalResponse(bytes []byte) error {
+func (p *principalLookup) UnmarshalResponse(bytes []byte) error {
 	return json.Unmarshal(bytes, &p.Response)
 }
 

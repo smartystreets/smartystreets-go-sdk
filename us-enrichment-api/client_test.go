@@ -20,31 +20,34 @@ type ClientFixture struct {
 	sender *FakeSender
 	client *Client
 
-	input *Lookup
+	input enrichmentLookup
 }
 
 func (f *ClientFixture) Setup() {
 	f.sender = &FakeSender{}
 	f.client = NewClient(f.sender)
-	f.input = new(Lookup)
+	f.input = new(principalLookup)
 }
 
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
+	smartyKey := "7"
 	f.sender.response = validFinancialResponse
-	f.input.SmartyKey = "12345"
-	f.input.DataSet = "property"
-	f.input.DataSubSet = "financial"
+	f.input = &financialLookup{
+		SmartyKey: smartyKey,
+	}
 
 	ctx := context.WithValue(context.Background(), "key", "value")
-	err := f.client.SendLookupWithContext(ctx, f.input)
+	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+f.input.SmartyKey+"/"+f.input.DataSet+"/"+f.input.DataSubSet)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.GetDataSet()+"/"+f.input.GetDataSubset())
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
-	f.So(f.input.FinancialResponse, should.Resemble, []FinancialResponse{
+	response := f.input.(*financialLookup).Response
+
+	f.So(response, should.Resemble, []*FinancialResponse{
 		{
 			SmartyKey:      "7",
 			DataSetName:    "property",
@@ -59,13 +62,13 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 }
 
 func (f *ClientFixture) TestNilLookupNOP() {
-	err := f.client.SendLookup(nil)
+	err := f.client.sendLookup(nil)
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
-	err := f.client.SendLookup(new(Lookup))
+	err := f.client.sendLookup(new(principalLookup))
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
@@ -73,26 +76,22 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
 	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
-	f.input.SmartyKey = "12345"
-	f.input.DataSet = "property"
-	f.input.DataSubSet = "principal"
+	f.input = &principalLookup{SmartyKey: "12345"}
 
-	err := f.client.SendLookup(f.input)
+	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.PrincipalResponse, should.BeEmpty)
+	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input.SmartyKey = "12345"
-	f.input.DataSet = "property"
-	f.input.DataSubSet = "principal"
+	f.input = &principalLookup{SmartyKey: "12345"}
 
-	err := f.client.SendLookup(f.input)
+	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.PrincipalResponse, should.BeEmpty)
+	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
 }
 
 var validFinancialResponse = `[{"smarty_key":"7","data_set_name":"property","data_subset_name":"financial","attributes":{"assessed_improvement_percent":"Assessed_Improvement_Percent","veteran_tax_exemption":"Veteran_Tax_Exemption","widow_tax_exemption":"Widow_Tax_Exemption"}}]`

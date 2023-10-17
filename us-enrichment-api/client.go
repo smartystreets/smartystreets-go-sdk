@@ -42,7 +42,7 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	if lookup == nil {
 		return nil
 	}
-	if len(lookup.GetSmartyKey()) == 0 && len(lookup.GetDataSet()) == 0 {
+	if len(lookup.GetSmartyKey()) == 0 {
 		return nil
 	}
 
