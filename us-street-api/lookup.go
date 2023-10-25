@@ -70,5 +70,4 @@ type OutputFormat string
 const (
 	FormatDefault    = OutputFormat("default")
 	FormatProjectUSA = OutputFormat("project-usa")
-	FormatCASS       = OutputFormat("cass")
 )
