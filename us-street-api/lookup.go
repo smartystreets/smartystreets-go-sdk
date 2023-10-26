@@ -20,6 +20,7 @@ type Lookup struct {
 	InputID       string        `json:"input_id,omitempty"`
 	MaxCandidates int           `json:"candidates,omitempty"` // Default value: 1
 	MatchStrategy MatchStrategy `json:"match,omitempty"`
+	OutputFormat  OutputFormat  `json:"format,omitempty"`
 
 	Results []*Candidate `json:"results,omitempty"`
 }
@@ -43,6 +44,9 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	if l.MatchStrategy != MatchStrict {
 		encode(query, string(l.MatchStrategy), "match")
 	}
+	if l.OutputFormat != FormatDefault {
+		encode(query, string(l.OutputFormat), "format")
+	}
 }
 func encode(query url.Values, source string, target string) {
 	if source != "" {
@@ -59,4 +63,11 @@ const (
 	MatchRange    = MatchStrategy("range") // Deprecated
 	MatchInvalid  = MatchStrategy("invalid")
 	MatchEnhanced = MatchStrategy("enhanced")
+)
+
+type OutputFormat string
+
+const (
+	FormatDefault    = OutputFormat("default")
+	FormatProjectUSA = OutputFormat("project-usa")
 )
