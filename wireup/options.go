@@ -8,6 +8,7 @@ import (
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
@@ -32,6 +33,11 @@ func BuildUSAutocompleteAPIClient(options ...Option) *autocomplete.Client {
 // BuildUSAutocompleteProAPIClient builds a client for the US Autocomplete API using the provided options.
 func BuildUSAutocompleteProAPIClient(options ...Option) *autocomplete_pro.Client {
 	return configure(options...).buildUSAutocompleteProAPIClient()
+}
+
+// BuildUSEnrichmentAPIClient builds a client for the US Enrichment API using the provided options.
+func BuildUSEnrichmentAPIClient(options ...Option) *us_enrichment.Client {
+	return configure(options...).buildUSEnrichmentAPIClient()
 }
 
 // BuildUSExtractAPIClient builds a client for the US Extract API using the provided options.
