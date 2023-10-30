@@ -401,7 +401,7 @@ type FinancialAttributes struct {
 	ContactValue               string `json:"contact_value"`
 	ContactZip                 string `json:"contact_zip"`
 	ContactZip4                string `json:"contact_zip4"`
-	DeedDocumentPage           string `json:"deed_ document_page"`
+	DeedDocumentPage           string `json:"deed_document_page"`
 	DeedDocumentBook           string `json:"deed_document_book"`
 	DeedDocumentNumber         string `json:"deed_document_number"`
 	DeedOwnerFirstName         string `json:"deed_owner_first_name"`
