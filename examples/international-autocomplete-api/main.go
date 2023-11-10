@@ -34,7 +34,11 @@ func main() {
 		log.Fatal("Error sending batch:", err)
 	}
 
-	fmt.Printf("Results for input: [%s]\n", lookup.Search)
+	if len(lookup.Search) > 0 {
+		fmt.Printf("Results for input: [%s]\n", lookup.Search)
+	} else {
+		fmt.Printf("Results for input: [%s]\n", lookup.AddressID)
+	}
 	for s, candidate := range lookup.Result.Candidates {
 		fmt.Printf("#%d: %#v\n", s, candidate)
 	}

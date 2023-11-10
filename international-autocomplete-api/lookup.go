@@ -1,7 +1,6 @@
 package international_autocomplete_api
 
 import (
-	"math"
 	"net/url"
 	"strconv"
 )
@@ -12,30 +11,21 @@ const (
 )
 
 type Lookup struct {
-	Country            string
-	Search             string
-	MaxResults         int
-	Distance           int
-	Geolocation        InternationalGeolocateType
-	AdministrativeArea string
-	Locality           string
-	PostalCode         string
-	Latitude           float64
-	Longitude          float64
-	Result             *Result
+	Country    string
+	Search     string
+	AddressID  string
+	MaxResults int
+	Locality   string
+	PostalCode string
+	Result     *Result
 }
 
 func (l Lookup) populate(query url.Values) {
 	l.populateCountry(query)
 	l.populateSearch(query)
 	l.populateMaxResults(query)
-	l.populateDistance(query)
-	l.populateGeolocation(query)
-	l.populateAdministrativeArea(query)
 	l.populateLocality(query)
 	l.populatePostalCode(query)
-	l.populateLatitude(query)
-	l.populateLongitude(query)
 }
 func (l Lookup) populateCountry(query url.Values) {
 	if len(l.Country) > 0 {
@@ -54,25 +44,6 @@ func (l Lookup) populateMaxResults(query url.Values) {
 	}
 	query.Set("max_results", strconv.Itoa(maxResults))
 }
-func (l Lookup) populateDistance(query url.Values) {
-	distance := l.Distance
-	if distance < 1 {
-		distance = distanceDefault
-	}
-	query.Set("distance", strconv.Itoa(distance))
-}
-func (l Lookup) populateGeolocation(query url.Values) {
-	if l.Geolocation != None {
-		query.Set("geolocation", string(l.Geolocation))
-	} else {
-		query.Del("geolocation")
-	}
-}
-func (l Lookup) populateAdministrativeArea(query url.Values) {
-	if len(l.AdministrativeArea) > 0 {
-		query.Set("include_only_administrative_area", l.AdministrativeArea)
-	}
-}
 func (l Lookup) populateLocality(query url.Values) {
 	if len(l.Locality) > 0 {
 		query.Set("include_only_locality", l.Locality)
@@ -83,23 +54,3 @@ func (l Lookup) populatePostalCode(query url.Values) {
 		query.Set("include_only_postal_code", l.PostalCode)
 	}
 }
-func (l Lookup) populateLatitude(query url.Values) {
-	if math.Floor(l.Latitude) != 0 {
-		query.Set("latitude", strconv.FormatFloat(l.Latitude, 'f', 8, 64))
-	}
-}
-func (l Lookup) populateLongitude(query url.Values) {
-	if math.Floor(l.Longitude) != 0 {
-		query.Set("longitude", strconv.FormatFloat(l.Longitude, 'f', 8, 64))
-	}
-}
-
-type InternationalGeolocateType string
-
-const (
-	AdminArea  = InternationalGeolocateType("adminarea")
-	Locality   = InternationalGeolocateType("locality")
-	PostalCode = InternationalGeolocateType("postalcode")
-	Geocodes   = InternationalGeolocateType("geocodes")
-	None       = InternationalGeolocateType("")
-)

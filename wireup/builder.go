@@ -229,7 +229,7 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 
 var (
 	defaultBaseURL_InternationalStreetAPI       = &url.URL{Scheme: "https", Host: "international-street.api.smarty.com"}
-	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smarty.com"}
+	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smarty.com/v2"}
 	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smarty.com"}
 	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smarty.com"}
 	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smarty.com"}
