@@ -27,13 +27,11 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
 
 	lookup := &autocomplete_pro.Lookup{
-		Search:      "1042 W Center",
+		Search:      "104",
 		MaxResults:  5,
-		CityFilter:  []string{"Denver", "Orem"},
-		StateFilter: []string{"CO", "UT"},
+		CityFilter:  []string{"Denver,Aurora,CO", "Provo,UT"},
 		PreferState: []string{"CO"},
 		PreferRatio: 3,
-		Geolocation: autocomplete_pro.GeolocateCity,
 		Source:      "all",
 	}
 
