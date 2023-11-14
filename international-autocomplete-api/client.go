@@ -56,5 +56,4 @@ func buildRequest(lookup *Lookup) *http.Request {
 	return request
 }
 
-// TODO support /lookup and /v2/lookup
-const suggestURL = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
+const suggestURL = "/v2/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
