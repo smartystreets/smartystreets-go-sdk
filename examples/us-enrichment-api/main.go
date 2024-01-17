@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 	"log"
 	"os"
+
+	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	)
 
 	// Documentation for input fields can be found at:
-	// https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-request-input-fields
+	// https://www.smarty.com/docs/cloud/us-address-enrichment-api#http-request-input-fields
 
 	smartyKey := "1682393594"
 
