@@ -12,6 +12,8 @@ type enrichmentLookup interface {
 	UnmarshalResponse([]byte) error
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 type financialLookup struct {
 	SmartyKey string
 	Response  []*FinancialResponse
@@ -33,6 +35,8 @@ func (f *financialLookup) UnmarshalResponse(bytes []byte) error {
 	return json.Unmarshal(bytes, &f.Response)
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 type principalLookup struct {
 	SmartyKey string
 	Response  []*PrincipalResponse
@@ -53,6 +57,8 @@ func (p *principalLookup) GetDataSubset() string {
 func (p *principalLookup) UnmarshalResponse(bytes []byte) error {
 	return json.Unmarshal(bytes, &p.Response)
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 const (
 	financialDataSubset = "financial"
