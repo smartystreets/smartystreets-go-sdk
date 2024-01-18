@@ -18,7 +18,7 @@ type enrichmentLookup interface {
 	GetDataSet() string
 	GetDataSubset() string
 	GetLookup() *Lookup
-	GetResponse() any
+	GetResponse() interface{}
 	UnmarshalResponse([]byte) error
 }
 
@@ -45,7 +45,7 @@ func (f *financialLookup) GetLookup() *Lookup {
 	return f.Lookup
 }
 
-func (f *financialLookup) GetResponse() any {
+func (f *financialLookup) GetResponse() interface{} {
 	return f.Response
 }
 
@@ -76,7 +76,7 @@ func (p *principalLookup) GetLookup() *Lookup {
 	return p.Lookup
 }
 
-func (f *principalLookup) GetResponse() any {
+func (f *principalLookup) GetResponse() interface{} {
 	return f.Response
 }
 

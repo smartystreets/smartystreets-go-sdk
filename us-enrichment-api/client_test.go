@@ -32,9 +32,7 @@ func (f *ClientFixture) Setup() {
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	smartyKey := "123"
 	f.sender.response = validFinancialResponse
-	f.input = &financialLookup{
-		SmartyKey: smartyKey,
-	}
+	f.input = &financialLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
@@ -76,7 +74,7 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
 	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
-	f.input = &principalLookup{SmartyKey: "12345"}
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
@@ -86,7 +84,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input = &principalLookup{SmartyKey: "12345"}
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 

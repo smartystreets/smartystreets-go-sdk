@@ -16,7 +16,7 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-func (c *Client) SendPropertyLookup(lookup *Lookup) (error, any) {
+func (c *Client) SendPropertyLookup(lookup *Lookup) (error, interface{}) {
 	var propertyLookup enrichmentLookup
 
 	switch lookup.DataSubset {
@@ -56,7 +56,7 @@ func (c *Client) sendLookup(lookup enrichmentLookup) error {
 }
 
 func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
-	if lookup == nil {
+	if lookup == nil || lookup.GetLookup() == nil {
 		return nil
 	}
 	if len(lookup.GetSmartyKey()) == 0 {
