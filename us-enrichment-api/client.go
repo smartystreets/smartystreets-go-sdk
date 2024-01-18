@@ -16,9 +16,26 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
+func (c *Client) SendPropertyLookup(lookup *Lookup) (error, any) {
+	var propertyLookup enrichmentLookup
+
+	switch lookup.DataSubset {
+	case FinancialDataSubset:
+		propertyLookup = &financialLookup{Lookup: lookup}
+	case PrincipalDataSubset:
+		propertyLookup = &principalLookup{Lookup: lookup}
+	default:
+		//TODO: return unknown datasubset
+		return nil, nil
+	}
+
+	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.GetResponse()
+}
+
 func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
 	l := &financialLookup{
-		SmartyKey: smartyKey,
+		Lookup: &Lookup{SmartyKey: smartyKey, DataSubset: FinancialDataSubset},
 	}
 	err := c.sendLookup(l)
 
@@ -27,7 +44,7 @@ func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*Financ
 
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
 	l := &principalLookup{
-		SmartyKey: smartyKey,
+		Lookup: &Lookup{SmartyKey: smartyKey, DataSubset: PrincipalDataSubset},
 	}
 	err := c.sendLookup(l)
 

@@ -4,23 +4,33 @@ import (
 	"encoding/json"
 )
 
+type Lookup struct {
+	SmartyKey  string
+	DataSubset string
+	Include    string
+	Exclude    string
+
+	ETag string
+}
+
 type enrichmentLookup interface {
 	GetSmartyKey() string
 	GetDataSet() string
 	GetDataSubset() string
-
+	GetLookup() *Lookup
+	GetResponse() any
 	UnmarshalResponse([]byte) error
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type financialLookup struct {
-	SmartyKey string
-	Response  []*FinancialResponse
+	Lookup   *Lookup
+	Response []*FinancialResponse
 }
 
 func (f *financialLookup) GetSmartyKey() string {
-	return f.SmartyKey
+	return f.Lookup.SmartyKey
 }
 
 func (f *financialLookup) GetDataSet() string {
@@ -28,7 +38,15 @@ func (f *financialLookup) GetDataSet() string {
 }
 
 func (f *financialLookup) GetDataSubset() string {
-	return financialDataSubset
+	return f.Lookup.DataSubset
+}
+
+func (f *financialLookup) GetLookup() *Lookup {
+	return f.Lookup
+}
+
+func (f *financialLookup) GetResponse() any {
+	return f.Response
 }
 
 func (f *financialLookup) UnmarshalResponse(bytes []byte) error {
@@ -38,12 +56,12 @@ func (f *financialLookup) UnmarshalResponse(bytes []byte) error {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type principalLookup struct {
-	SmartyKey string
-	Response  []*PrincipalResponse
+	Lookup   *Lookup
+	Response []*PrincipalResponse
 }
 
 func (p *principalLookup) GetSmartyKey() string {
-	return p.SmartyKey
+	return p.Lookup.SmartyKey
 }
 
 func (p *principalLookup) GetDataSet() string {
@@ -51,7 +69,15 @@ func (p *principalLookup) GetDataSet() string {
 }
 
 func (p *principalLookup) GetDataSubset() string {
-	return principalDataSubset
+	return p.Lookup.DataSubset
+}
+
+func (p *principalLookup) GetLookup() *Lookup {
+	return p.Lookup
+}
+
+func (f *principalLookup) GetResponse() any {
+	return f.Response
 }
 
 func (p *principalLookup) UnmarshalResponse(bytes []byte) error {
@@ -61,7 +87,7 @@ func (p *principalLookup) UnmarshalResponse(bytes []byte) error {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	financialDataSubset = "financial"
-	principalDataSubset = "principal"
+	FinancialDataSubset = "financial"
+	PrincipalDataSubset = "principal"
 	propertyDataSet     = "property"
 )
