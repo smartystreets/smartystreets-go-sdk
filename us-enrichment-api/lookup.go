@@ -2,24 +2,24 @@ package us_enrichment
 
 import (
 	"encoding/json"
+	"net/url"
 )
 
 type Lookup struct {
-	SmartyKey  string
-	DataSubset string
-	Include    string
-	Exclude    string
-
-	ETag string
+	SmartyKey string
+	Include   string
+	Exclude   string
+	ETag      string
 }
 
 type enrichmentLookup interface {
-	GetSmartyKey() string
-	GetDataSet() string
-	GetDataSubset() string
-	GetLookup() *Lookup
-	GetResponse() interface{}
-	UnmarshalResponse([]byte) error
+	getSmartyKey() string
+	getDataSet() string
+	getDataSubset() string
+	getLookup() *Lookup
+	getResponse() interface{}
+	unmarshalResponse([]byte) error
+	populate(query url.Values)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -29,28 +29,33 @@ type financialLookup struct {
 	Response []*FinancialResponse
 }
 
-func (f *financialLookup) GetSmartyKey() string {
+func (f *financialLookup) getSmartyKey() string {
 	return f.Lookup.SmartyKey
 }
 
-func (f *financialLookup) GetDataSet() string {
+func (f *financialLookup) getDataSet() string {
 	return propertyDataSet
 }
 
-func (f *financialLookup) GetDataSubset() string {
-	return f.Lookup.DataSubset
+func (f *financialLookup) getDataSubset() string {
+	return financialDataSubset
 }
 
-func (f *financialLookup) GetLookup() *Lookup {
+func (f *financialLookup) getLookup() *Lookup {
 	return f.Lookup
 }
 
-func (f *financialLookup) GetResponse() interface{} {
+func (f *financialLookup) getResponse() interface{} {
 	return f.Response
 }
 
-func (f *financialLookup) UnmarshalResponse(bytes []byte) error {
+func (f *financialLookup) unmarshalResponse(bytes []byte) error {
 	return json.Unmarshal(bytes, &f.Response)
+}
+
+func (e *financialLookup) populate(query url.Values) {
+	e.Lookup.populateInclude(query)
+	e.Lookup.populateExclude(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -60,34 +65,51 @@ type principalLookup struct {
 	Response []*PrincipalResponse
 }
 
-func (p *principalLookup) GetSmartyKey() string {
+func (p *principalLookup) getSmartyKey() string {
 	return p.Lookup.SmartyKey
 }
 
-func (p *principalLookup) GetDataSet() string {
+func (p *principalLookup) getDataSet() string {
 	return propertyDataSet
 }
 
-func (p *principalLookup) GetDataSubset() string {
-	return p.Lookup.DataSubset
+func (p *principalLookup) getDataSubset() string {
+	return principalDataSubset
 }
 
-func (p *principalLookup) GetLookup() *Lookup {
+func (p *principalLookup) getLookup() *Lookup {
 	return p.Lookup
 }
 
-func (f *principalLookup) GetResponse() interface{} {
+func (f *principalLookup) getResponse() interface{} {
 	return f.Response
 }
 
-func (p *principalLookup) UnmarshalResponse(bytes []byte) error {
+func (p *principalLookup) unmarshalResponse(bytes []byte) error {
 	return json.Unmarshal(bytes, &p.Response)
+}
+
+func (e *principalLookup) populate(query url.Values) {
+	e.Lookup.populateInclude(query)
+	e.Lookup.populateExclude(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	FinancialDataSubset = "financial"
-	PrincipalDataSubset = "principal"
+	financialDataSubset = "financial"
+	principalDataSubset = "principal"
 	propertyDataSet     = "property"
 )
+
+func (l Lookup) populateInclude(query url.Values) {
+	if len(l.Include) > 0 {
+		query.Set("include", l.Include)
+	}
+}
+
+func (l Lookup) populateExclude(query url.Values) {
+	if len(l.Include) > 0 {
+		query.Set("exclude", l.Exclude)
+	}
+}

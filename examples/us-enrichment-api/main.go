@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
@@ -27,6 +28,15 @@ func main() {
 	smartyKey := "1682393594"
 
 	err, results := client.SendPropertyPrincipalLookup(smartyKey)
+
+	lookup := us_enrichment.Lookup{
+		SmartyKey: smartyKey,
+		Include:   "property_address_city",
+		Exclude:   "",
+		ETag:      "",
+	}
+
+	err, results = client.SendPropertyPrincipalWithLookup(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

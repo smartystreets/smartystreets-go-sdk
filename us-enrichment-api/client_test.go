@@ -40,7 +40,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.GetDataSet()+"/"+f.input.GetDataSubset())
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.getDataSet()+"/"+f.input.getDataSubset())
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	response := f.input.(*financialLookup).Response

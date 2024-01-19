@@ -24,6 +24,7 @@ func NewHTTPSender(client HTTPClient) *HTTPSender {
 	return &HTTPSender{client: client}
 }
 
+// TODO: Return headers
 func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 	if response, err := s.client.Do(request); err != nil {
 		return nil, err

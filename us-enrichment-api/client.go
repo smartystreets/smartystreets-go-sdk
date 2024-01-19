@@ -16,39 +16,24 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-func (c *Client) SendPropertyLookup(lookup *Lookup) (error, interface{}) {
-	var propertyLookup enrichmentLookup
-
-	switch lookup.DataSubset {
-	case FinancialDataSubset:
-		propertyLookup = &financialLookup{Lookup: lookup}
-	case PrincipalDataSubset:
-		propertyLookup = &principalLookup{Lookup: lookup}
-	default:
-		//TODO: return unknown datasubset
-		return nil, nil
-	}
-
-	err := c.sendLookup(propertyLookup)
-	return err, propertyLookup.GetResponse()
+func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
+	return c.SendPropertyFinancialWithLookup(&Lookup{SmartyKey: smartyKey})
 }
 
-func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
-	l := &financialLookup{
-		Lookup: &Lookup{SmartyKey: smartyKey, DataSubset: FinancialDataSubset},
-	}
-	err := c.sendLookup(l)
-
-	return err, l.Response
+func (c *Client) SendPropertyFinancialWithLookup(lookup *Lookup) (error, []*FinancialResponse) {
+	propertyLookup := &financialLookup{Lookup: lookup}
+	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.Response
 }
 
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
-	l := &principalLookup{
-		Lookup: &Lookup{SmartyKey: smartyKey, DataSubset: PrincipalDataSubset},
-	}
-	err := c.sendLookup(l)
+	return c.SendPropertyPrincipalWithLookup(&Lookup{SmartyKey: smartyKey})
+}
 
-	return err, l.Response
+func (c *Client) SendPropertyPrincipalWithLookup(lookup *Lookup) (error, []*PrincipalResponse) {
+	propertyLookup := &principalLookup{Lookup: lookup}
+	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.Response
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
@@ -56,35 +41,38 @@ func (c *Client) sendLookup(lookup enrichmentLookup) error {
 }
 
 func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
-	if lookup == nil || lookup.GetLookup() == nil {
+	if lookup == nil || lookup.getLookup() == nil {
 		return nil
 	}
-	if len(lookup.GetSmartyKey()) == 0 {
+	if len(lookup.getSmartyKey()) == 0 {
 		return nil
 	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
 
+	//TODO: Need to get the headers from the response for Etag
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
 	}
 
-	return lookup.UnmarshalResponse(response)
+	return lookup.unmarshalResponse(response)
 }
 
 func buildRequest(lookup enrichmentLookup) *http.Request {
 	request, _ := http.NewRequest("GET", buildLookupURL(lookup), nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
+	lookup.populate(query)
+	request.Header.Add(lookupETagHeader, lookup.getLookup().ETag)
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {
-	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.GetSmartyKey(), 1)
-	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.GetDataSet(), 1)
-	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.GetDataSubset(), 1)
+	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
+	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1)
 }
 
 const (
@@ -92,4 +80,5 @@ const (
 	lookupURLDataSet    = ":dataset"
 	lookupURLDataSubSet = ":datasubset"
 	lookupURL           = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
+	lookupETagHeader    = "Etag"
 )
