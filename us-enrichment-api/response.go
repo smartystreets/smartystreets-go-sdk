@@ -9,8 +9,8 @@ type PrincipalResponse struct {
 }
 
 type PrincipalAttributes struct {
-	StFloorSqft                     string `json:"1st_floor_sqft"`
-	NdFloorSqft                     string `json:"2nd_floor_sqft"`
+	FirstFloorSqft                  string `json:"1st_floor_sqft"`
+	SecondFloorSqft                 string `json:"2nd_floor_sqft"`
 	Acres                           string `json:"acres"`
 	AddressInfoPrivacy              string `json:"address_info_privacy"`
 	AirConditioner                  string `json:"air_conditioner"`
