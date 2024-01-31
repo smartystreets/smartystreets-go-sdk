@@ -42,7 +42,7 @@ func main() {
 		//httpError := &sdk.HTTPStatusError{}
 		//if errors.As(err, &httpError) && err.(*sdk.HTTPStatusError).StatusCode() == http.StatusNotModified {
 		if serr, ok := err.(*sdk.HTTPStatusError); ok && serr.StatusCode() == http.StatusNotModified {
-			log.Printf("Record was not modified since the last query")
+			log.Printf("Record has not been modified since the last request")
 			return
 		}
 		log.Fatal("Error sending lookup:", err)

@@ -140,8 +140,5 @@ func (f *FakeMultiSender) Send(request *http.Request) ([]byte, error) {
 	}
 	return []byte(fmt.Sprintf(multiSenderResponseFormat, f.callCount)), err
 }
-func (f *FakeMultiSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
-	return []byte{}, nil, f.err
-}
 
 const multiSenderResponseFormat = `[{"input_index": %d}]`

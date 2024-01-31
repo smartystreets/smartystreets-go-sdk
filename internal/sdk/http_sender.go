@@ -31,17 +31,8 @@ func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 	} else if content, err := readResponseBody(response); err != nil {
 		return content, err
 	} else {
+		request.Response = response // make headers available in the request
 		return interpret(response, content)
-	}
-}
-
-func (s *HTTPSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
-	if response, err := s.client.Do(request); err != nil {
-		return nil, nil, err
-	} else if content, err := readResponseBody(response); err != nil {
-		return content, nil, err
-	} else {
-		return interpretAndReturnHeaders(response, content, make(http.Header, 10))
 	}
 }
 

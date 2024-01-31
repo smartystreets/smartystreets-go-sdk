@@ -51,9 +51,14 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
 
-	response, headers, err := c.sender.SendAndReturnHeaders(request)
+	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
+	}
+
+	var headers http.Header
+	if request.Response != nil {
+		headers = request.Response.Header
 	}
 
 	return lookup.unmarshalResponse(response, headers)

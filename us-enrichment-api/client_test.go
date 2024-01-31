@@ -109,11 +109,6 @@ type FakeSender struct {
 func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
+	f.request.Response = &http.Response{Header: http.Header{"Etag": []string{"ABCDEFG"}}}
 	return []byte(f.response), f.err
-}
-
-func (f *FakeSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
-	f.callCount++
-	f.request = request
-	return []byte(f.response), http.Header{"Etag": []string{"ABCDEFG"}}, f.err
 }
