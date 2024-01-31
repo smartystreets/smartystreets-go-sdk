@@ -296,3 +296,7 @@ func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	}
 	return []byte(f.response), f.err
 }
+
+func (f *FakeSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
+	return []byte(f.response), nil, f.err
+}

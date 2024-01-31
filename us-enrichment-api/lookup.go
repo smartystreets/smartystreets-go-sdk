@@ -99,7 +99,19 @@ func (f *principalLookup) getResponse() interface{} {
 }
 
 func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	return json.Unmarshal(bytes, &p.Response)
+	if err := json.Unmarshal(bytes, &p.Response); err != nil {
+		return err
+	}
+
+	if headers != nil {
+		if etag, found := headers[lookupETagHeader]; found {
+			if len(etag) > 0 && len(p.Response) > 0 {
+				p.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
 }
 
 func (e *principalLookup) populate(query url.Values) {

@@ -55,6 +55,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 				VeteranTaxExemption:        "Veteran_Tax_Exemption",
 				WidowTaxExemption:          "Widow_Tax_Exemption",
 			},
+			Etag: "ABCDEFG",
 		},
 	})
 }
@@ -109,4 +110,10 @@ func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
 	return []byte(f.response), f.err
+}
+
+func (f *FakeSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
+	f.callCount++
+	f.request = request
+	return []byte(f.response), http.Header{"Etag": []string{"ABCDEFG"}}, f.err
 }
