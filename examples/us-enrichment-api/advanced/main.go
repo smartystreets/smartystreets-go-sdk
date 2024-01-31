@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
@@ -26,9 +29,22 @@ func main() {
 
 	smartyKey := "1682393594"
 
-	err, results := client.SendPropertyPrincipalLookup(smartyKey)
+	lookup := us_enrichment.Lookup{
+		SmartyKey: smartyKey,
+		Include:   "group_structural,sale_date",
+		Exclude:   "",
+		ETag:      "GU4TINZRHA4TQMY",
+	}
+
+	err, results := client.SendPropertyPrincipalWithLookup(&lookup)
 
 	if err != nil {
+		//httpError := &sdk.HTTPStatusError{}
+		//if errors.As(err, &httpError) && err.(*sdk.HTTPStatusError).StatusCode() == http.StatusNotModified {
+		if serr, ok := err.(*sdk.HTTPStatusError); ok && serr.StatusCode() == http.StatusNotModified {
+			log.Printf("Record was not modified since the last query")
+			return
+		}
 		log.Fatal("Error sending lookup:", err)
 	}
 

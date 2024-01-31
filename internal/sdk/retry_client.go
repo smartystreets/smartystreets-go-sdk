@@ -79,6 +79,9 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int
 	if response.StatusCode >= http.StatusBadRequest && response.StatusCode <= http.StatusUnprocessableEntity {
 		return false
 	}
+	if response.StatusCode == http.StatusNotModified {
+		return false
+	}
 	if response.StatusCode == http.StatusTooManyRequests {
 		r.sleeper(time.Second * time.Duration(r.random(backOffRateLimit)))
 		// Setting attempt to 1 will make 429s retry indefinitely; this is intended behavior.
