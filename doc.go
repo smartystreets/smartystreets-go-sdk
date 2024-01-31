@@ -5,4 +5,5 @@ import "net/http"
 
 type RequestSender interface {
 	Send(*http.Request) ([]byte, error)
+	SendAndReturnHeaders(*http.Request) ([]byte, http.Header, error)
 }

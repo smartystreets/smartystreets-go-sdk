@@ -51,13 +51,12 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
 
-	//TODO: Need to get the headers from the response for Etag
-	response, err := c.sender.Send(request)
+	response, headers, err := c.sender.SendAndReturnHeaders(request)
 	if err != nil {
 		return err
 	}
 
-	return lookup.unmarshalResponse(response)
+	return lookup.unmarshalResponse(response, headers)
 }
 
 func buildRequest(lookup enrichmentLookup) *http.Request {

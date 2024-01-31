@@ -2,6 +2,7 @@ package us_enrichment
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/url"
 )
 
@@ -18,7 +19,7 @@ type enrichmentLookup interface {
 	getDataSubset() string
 	getLookup() *Lookup
 	getResponse() interface{}
-	unmarshalResponse([]byte) error
+	unmarshalResponse([]byte, http.Header) error
 	populate(query url.Values)
 }
 
@@ -49,8 +50,20 @@ func (f *financialLookup) getResponse() interface{} {
 	return f.Response
 }
 
-func (f *financialLookup) unmarshalResponse(bytes []byte) error {
-	return json.Unmarshal(bytes, &f.Response)
+func (f *financialLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	if err := json.Unmarshal(bytes, &f.Response); err != nil {
+		return err
+	}
+
+	if headers != nil {
+		if etag, found := headers[lookupETagHeader]; found {
+			if len(etag) > 0 && len(f.Response) > 0 {
+				f.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
 }
 
 func (e *financialLookup) populate(query url.Values) {
@@ -85,7 +98,7 @@ func (f *principalLookup) getResponse() interface{} {
 	return f.Response
 }
 
-func (p *principalLookup) unmarshalResponse(bytes []byte) error {
+func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
 	return json.Unmarshal(bytes, &p.Response)
 }
 

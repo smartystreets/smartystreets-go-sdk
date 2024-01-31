@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"io"
+	"maps"
 	"net/http"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
@@ -24,7 +25,6 @@ func NewHTTPSender(client HTTPClient) *HTTPSender {
 	return &HTTPSender{client: client}
 }
 
-// TODO: Return headers
 func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 	if response, err := s.client.Do(request); err != nil {
 		return nil, err
@@ -32,6 +32,16 @@ func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 		return content, err
 	} else {
 		return interpret(response, content)
+	}
+}
+
+func (s *HTTPSender) SendAndReturnHeaders(request *http.Request) ([]byte, http.Header, error) {
+	if response, err := s.client.Do(request); err != nil {
+		return nil, nil, err
+	} else if content, err := readResponseBody(response); err != nil {
+		return content, nil, err
+	} else {
+		return interpretAndReturnHeaders(response, content, make(http.Header, 10))
 	}
 }
 
@@ -52,4 +62,12 @@ func interpret(response *http.Response, content []byte) ([]byte, error) {
 		return content, nil
 	}
 	return nil, sdk.NewHTTPStatusError(response.StatusCode, content)
+}
+
+func interpretAndReturnHeaders(response *http.Response, content []byte, headers http.Header) ([]byte, http.Header, error) {
+	if response.StatusCode == http.StatusOK {
+		maps.Copy(headers, response.Header)
+		return content, headers, nil
+	}
+	return nil, nil, sdk.NewHTTPStatusError(response.StatusCode, content)
 }
