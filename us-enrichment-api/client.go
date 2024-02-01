@@ -17,20 +17,20 @@ func NewClient(sender sdk.RequestSender) *Client {
 }
 
 func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
-	return c.SendPropertyFinancialWithLookup(&Lookup{SmartyKey: smartyKey})
+	return c.SendPropertyFinancial(&Lookup{SmartyKey: smartyKey})
 }
 
-func (c *Client) SendPropertyFinancialWithLookup(lookup *Lookup) (error, []*FinancialResponse) {
+func (c *Client) SendPropertyFinancial(lookup *Lookup) (error, []*FinancialResponse) {
 	propertyLookup := &financialLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
 	return err, propertyLookup.Response
 }
 
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
-	return c.SendPropertyPrincipalWithLookup(&Lookup{SmartyKey: smartyKey})
+	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
 }
 
-func (c *Client) SendPropertyPrincipalWithLookup(lookup *Lookup) (error, []*PrincipalResponse) {
+func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalResponse) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
 	return err, propertyLookup.Response
@@ -62,6 +62,13 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	}
 
 	return lookup.unmarshalResponse(response, headers)
+}
+
+func (c *Client) IsHTTPErrorCode(err error, code int) bool {
+	if serr, ok := err.(*sdk.HTTPStatusError); ok && serr.StatusCode() == code {
+		return true
+	}
+	return false
 }
 
 func buildRequest(lookup enrichmentLookup) *http.Request {

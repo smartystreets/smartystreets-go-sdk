@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
@@ -33,15 +32,13 @@ func main() {
 		SmartyKey: smartyKey,
 		Include:   "group_structural,sale_date",
 		Exclude:   "",
-		ETag:      "GU4TINZRHA4TQMY",
+		ETag:      "",
 	}
 
-	err, results := client.SendPropertyPrincipalWithLookup(&lookup)
+	err, results := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
-		//httpError := &sdk.HTTPStatusError{}
-		//if errors.As(err, &httpError) && err.(*sdk.HTTPStatusError).StatusCode() == http.StatusNotModified {
-		if serr, ok := err.(*sdk.HTTPStatusError); ok && serr.StatusCode() == http.StatusNotModified {
+		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
 			log.Printf("Record has not been modified since the last request")
 			return
 		}
