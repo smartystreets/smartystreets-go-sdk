@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
@@ -26,9 +28,21 @@ func main() {
 
 	smartyKey := "1682393594"
 
-	err, results := client.SendPropertyPrincipalLookup(smartyKey)
+	lookup := us_enrichment.Lookup{
+		SmartyKey: smartyKey,
+		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
+		Exclude:   "",                           // optional: exclude attributes from the returned data
+		ETag:      "",                           // optional: check if the record has been updated
+	}
+
+	err, results := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
+		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
+		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
+			log.Printf("Record has not been modified since the last request")
+			return
+		}
 		log.Fatal("Error sending lookup:", err)
 	}
 

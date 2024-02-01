@@ -16,22 +16,24 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
+// Deprecated: SendPropertyFinancialLookup is deprecated. Use SendPropertyFinancial
 func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
-	l := &financialLookup{
-		SmartyKey: smartyKey,
-	}
-	err := c.sendLookup(l)
-
-	return err, l.Response
+	return c.SendPropertyFinancial(&Lookup{SmartyKey: smartyKey})
+}
+func (c *Client) SendPropertyFinancial(lookup *Lookup) (error, []*FinancialResponse) {
+	propertyLookup := &financialLookup{Lookup: lookup}
+	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.Response
 }
 
+// Deprecated: SendPropertyFinancialLookup is deprecated. Use SendPropertyPrincipal
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
-	l := &principalLookup{
-		SmartyKey: smartyKey,
-	}
-	err := c.sendLookup(l)
-
-	return err, l.Response
+	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
+}
+func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalResponse) {
+	propertyLookup := &principalLookup{Lookup: lookup}
+	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.Response
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
@@ -39,10 +41,10 @@ func (c *Client) sendLookup(lookup enrichmentLookup) error {
 }
 
 func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
-	if lookup == nil {
+	if lookup == nil || lookup.getLookup() == nil {
 		return nil
 	}
-	if len(lookup.GetSmartyKey()) == 0 {
+	if len(lookup.getSmartyKey()) == 0 {
 		return nil
 	}
 
@@ -54,20 +56,34 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 		return err
 	}
 
-	return lookup.UnmarshalResponse(response)
+	var headers http.Header
+	if request.Response != nil {
+		headers = request.Response.Header
+	}
+
+	return lookup.unmarshalResponse(response, headers)
+}
+
+func (c *Client) IsHTTPErrorCode(err error, code int) bool {
+	if serr, ok := err.(*sdk.HTTPStatusError); ok && serr.StatusCode() == code {
+		return true
+	}
+	return false
 }
 
 func buildRequest(lookup enrichmentLookup) *http.Request {
 	request, _ := http.NewRequest("GET", buildLookupURL(lookup), nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
+	lookup.populate(query)
+	request.Header.Add(lookupETagHeader, lookup.getLookup().ETag)
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {
-	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.GetSmartyKey(), 1)
-	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.GetDataSet(), 1)
-	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.GetDataSubset(), 1)
+	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
+	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1)
 }
 
 const (
@@ -75,4 +91,5 @@ const (
 	lookupURLDataSet    = ":dataset"
 	lookupURLDataSubSet = ":datasubset"
 	lookupURL           = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
+	lookupETagHeader    = "Etag"
 )

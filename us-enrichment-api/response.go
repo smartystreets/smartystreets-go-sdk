@@ -5,6 +5,7 @@ type PrincipalResponse struct {
 	DataSetName    string              `json:"data_set_name"`
 	DataSubsetName string              `json:"data_subset_name"`
 	Attributes     PrincipalAttributes `json:"attributes"`
+	Etag           string
 }
 
 type PrincipalAttributes struct {
@@ -375,6 +376,7 @@ type FinancialResponse struct {
 	DataSetName    string              `json:"data_set_name"`
 	DataSubsetName string              `json:"data_subset_name"`
 	Attributes     FinancialAttributes `json:"attributes"`
+	Etag           string
 }
 
 type FinancialAttributes struct {

@@ -32,9 +32,7 @@ func (f *ClientFixture) Setup() {
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	smartyKey := "123"
 	f.sender.response = validFinancialResponse
-	f.input = &financialLookup{
-		SmartyKey: smartyKey,
-	}
+	f.input = &financialLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
@@ -42,7 +40,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.GetDataSet()+"/"+f.input.GetDataSubset())
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.getDataSet()+"/"+f.input.getDataSubset())
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	response := f.input.(*financialLookup).Response
@@ -57,6 +55,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 				VeteranTaxExemption:        "Veteran_Tax_Exemption",
 				WidowTaxExemption:          "Widow_Tax_Exemption",
 			},
+			Etag: "ABCDEFG",
 		},
 	})
 }
@@ -76,7 +75,7 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
 	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
-	f.input = &principalLookup{SmartyKey: "12345"}
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
@@ -86,7 +85,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input = &principalLookup{SmartyKey: "12345"}
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
@@ -110,5 +109,6 @@ type FakeSender struct {
 func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
+	f.request.Response = &http.Response{Header: http.Header{"Etag": []string{"ABCDEFG"}}}
 	return []byte(f.response), f.err
 }

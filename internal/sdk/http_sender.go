@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"io"
+	"maps"
 	"net/http"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
@@ -30,6 +31,7 @@ func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 	} else if content, err := readResponseBody(response); err != nil {
 		return content, err
 	} else {
+		request.Response = response // make headers available in the request
 		return interpret(response, content)
 	}
 }
@@ -51,4 +53,12 @@ func interpret(response *http.Response, content []byte) ([]byte, error) {
 		return content, nil
 	}
 	return nil, sdk.NewHTTPStatusError(response.StatusCode, content)
+}
+
+func interpretAndReturnHeaders(response *http.Response, content []byte, headers http.Header) ([]byte, http.Header, error) {
+	if response.StatusCode == http.StatusOK {
+		maps.Copy(headers, response.Header)
+		return content, headers, nil
+	}
+	return nil, nil, sdk.NewHTTPStatusError(response.StatusCode, content)
 }
