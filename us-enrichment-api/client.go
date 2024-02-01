@@ -16,20 +16,20 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
+// Deprecated: SendPropertyFinancialLookup is deprecated. Use SendPropertyFinancial
 func (c *Client) SendPropertyFinancialLookup(smartyKey string) (error, []*FinancialResponse) {
 	return c.SendPropertyFinancial(&Lookup{SmartyKey: smartyKey})
 }
-
 func (c *Client) SendPropertyFinancial(lookup *Lookup) (error, []*FinancialResponse) {
 	propertyLookup := &financialLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
 	return err, propertyLookup.Response
 }
 
+// Deprecated: SendPropertyFinancialLookup is deprecated. Use SendPropertyPrincipal
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
 	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
 }
-
 func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalResponse) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
