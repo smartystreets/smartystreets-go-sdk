@@ -23,6 +23,39 @@ type enrichmentLookup interface {
 	populate(query url.Values)
 }
 
+type genericLookup struct {
+	Lookup     *Lookup
+	DataSet    string
+	DataSubset string
+	Response   []map[string]interface{}
+}
+
+func (g *genericLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
+func (g *genericLookup) getDataSet() string       { return g.DataSet }
+func (g *genericLookup) getDataSubset() string    { return g.DataSubset }
+func (g *genericLookup) getLookup() *Lookup       { return g.Lookup }
+func (g *genericLookup) getResponse() interface{} { return g.Response }
+func (g *genericLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	if err := json.Unmarshal(bytes, &g.Response); err != nil {
+		return err
+	}
+
+	if headers != nil {
+		if etag, found := headers[lookupETagHeader]; found {
+			if len(etag) > 0 && len(g.Response) > 0 {
+				g.Response[0]["eTag"] = etag[0]
+			}
+		}
+	}
+
+	return nil
+
+}
+func (g *genericLookup) populate(query url.Values) {
+	g.Lookup.populateInclude(query)
+	g.Lookup.populateExclude(query)
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type financialLookup struct {

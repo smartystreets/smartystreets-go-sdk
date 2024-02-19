@@ -2,6 +2,7 @@ package us_enrichment
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -34,6 +35,18 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
 	return err, propertyLookup.Response
+}
+
+func (c *Client) SendGenericLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
+	propertyLookup := &genericLookup{
+		Lookup:     lookup,
+		DataSet:    dataSet,
+		DataSubset: dataSubset,
+	}
+
+	err := c.sendLookup(propertyLookup)
+	jsonData, _ := json.Marshal(propertyLookup.Response)
+	return err, jsonData
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
@@ -81,15 +94,22 @@ func buildRequest(lookup enrichmentLookup) *http.Request {
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {
-	newLookupURL := strings.Replace(lookupURL, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+	var newLookupURL string
+	if len(lookup.getDataSubset()) == 0 {
+		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+	} else {
+		newLookupURL = strings.Replace(lookupURLWithSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+	}
+
 	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
 	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1)
 }
 
 const (
-	lookupURLSmartyKey  = ":smartykey"
-	lookupURLDataSet    = ":dataset"
-	lookupURLDataSubSet = ":datasubset"
-	lookupURL           = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
-	lookupETagHeader    = "Etag"
+	lookupURLSmartyKey     = ":smartykey"
+	lookupURLDataSet       = ":dataset"
+	lookupURLDataSubSet    = ":datasubset"
+	lookupURLWithSubSet    = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
+	lookupURLWithoutSubSet = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet                             // Remaining parts will be completed later by the sdk.BaseURLClient.
+	lookupETagHeader       = "Etag"
 )
