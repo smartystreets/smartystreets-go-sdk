@@ -2,7 +2,6 @@ package us_enrichment
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -38,15 +37,14 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 }
 
 func (c *Client) SendGenericLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
-	propertyLookup := &genericLookup{
+	g := &genericLookup{
 		Lookup:     lookup,
 		DataSet:    dataSet,
 		DataSubset: dataSubset,
 	}
 
-	err := c.sendLookup(propertyLookup)
-	jsonData, _ := json.Marshal(propertyLookup.Response)
-	return err, jsonData
+	err := c.sendLookup(g)
+	return err, g.Response
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
