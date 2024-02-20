@@ -502,3 +502,34 @@ type FinancialAttributes struct {
 	VeteranTaxExemption            string `json:"veteran_tax_exemption"`
 	WidowTaxExemption              string `json:"widow_tax_exemption"`
 }
+type GeoReferenceResponse struct {
+	SmartyKey   string                 `json:"smarty_key"`
+	DataSetName string                 `json:"data_set_name"`
+	Attributes  GeoReferenceAttributes `json:"attributes"`
+	Etag        string
+}
+
+type GeoReferenceAttributes struct {
+	CensusBlock struct {
+		Accuracy string `json:"accuracy"`
+		Id       string `json:"id"`
+	} `json:"census_block"`
+
+	CensusCountyDivision struct {
+		Accuracy string `json:"accuracy"`
+		Id       string `json:"id"`
+		Name     string `json:"name"`
+	} `json:"census_county_division"`
+
+	CoreBasedStatArea struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"core_based_stat_area"`
+
+	Place struct {
+		Accuracy string `json:"accuracy"`
+		Id       string `json:"id"`
+		Name     string `json:"name"`
+		Type     string `json:"type"`
+	} `json:"place"`
+}

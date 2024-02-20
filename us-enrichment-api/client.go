@@ -36,6 +36,12 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 	return err, propertyLookup.Response
 }
 
+func (c *Client) SendPropertyGeoReference(lookup *Lookup) (error, []*GeoReferenceResponse) {
+	geoReferenceLookup := &geoReferenceLookup{Lookup: lookup}
+	err := c.sendLookup(geoReferenceLookup)
+	return err, geoReferenceLookup.Response
+}
+
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
 	return c.sendLookupWithContext(context.Background(), lookup)
 }
