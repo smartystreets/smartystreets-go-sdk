@@ -19,7 +19,7 @@ func main() {
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
 		// https://www.smarty.com/docs/cloud/licensing
-		wireup.WithLicenses("us-property-data-principal-cloud"),
+		//wireup.WithLicenses("us-property-data-principal-cloud"),
 		wireup.CustomBaseURL("https://us-enrichment.api.rivendell.smartyops.net"),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
@@ -36,6 +36,8 @@ func main() {
 		ETag:      "", // optional: check if the record has been updated
 	}
 
+	//For Financial
+	//err, results := client.SendPropertyFinancial(&lookup)
 	err, results := client.SendPropertyGeoReference(&lookup)
 
 	if err != nil {
