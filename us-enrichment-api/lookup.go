@@ -1,7 +1,7 @@
 package us_enrichment
 
 import (
-	"bytes"
+	bytesPackage "bytes"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -36,19 +36,19 @@ func (g *genericLookup) getDataSet() string       { return g.DataSet }
 func (g *genericLookup) getDataSubset() string    { return g.DataSubset }
 func (g *genericLookup) getLookup() *Lookup       { return g.Lookup }
 func (g *genericLookup) getResponse() interface{} { return g.Response }
-func (g *genericLookup) unmarshalResponse(bytesResponse []byte, headers http.Header) error {
-	g.Response = bytesResponse
+func (g *genericLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	g.Response = bytes
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found && len(etag) > 0 {
 
 			eTagAttribute := []byte(`"eTag": "` + etag[0] + `",`)
-			insertLocation := bytes.IndexByte(bytesResponse, '{') + 1
+			insertLocation := bytesPackage.IndexByte(bytes, '{') + 1
 
-			if insertLocation > 0 && insertLocation < len(bytesResponse) {
-				var modifiedResponse bytes.Buffer
-				modifiedResponse.Write(bytesResponse[:insertLocation])
+			if insertLocation > 0 && insertLocation < len(bytes) {
+				var modifiedResponse bytesPackage.Buffer
+				modifiedResponse.Write(bytes[:insertLocation])
 				modifiedResponse.Write(eTagAttribute)
-				modifiedResponse.Write(bytesResponse[insertLocation:])
+				modifiedResponse.Write(bytes[insertLocation:])
 				g.Response = modifiedResponse.Bytes()
 			}
 
