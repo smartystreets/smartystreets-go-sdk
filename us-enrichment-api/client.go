@@ -36,8 +36,8 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 	return err, propertyLookup.Response
 }
 
-func (c *Client) SendGenericLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
-	g := &genericLookup{
+func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
+	g := &universalLookup{
 		Lookup:     lookup,
 		DataSet:    dataSet,
 		DataSubset: dataSubset,

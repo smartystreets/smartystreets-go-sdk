@@ -24,19 +24,19 @@ type enrichmentLookup interface {
 	populate(query url.Values)
 }
 
-type genericLookup struct {
+type universalLookup struct {
 	Lookup     *Lookup
 	DataSet    string
 	DataSubset string
 	Response   []byte
 }
 
-func (g *genericLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
-func (g *genericLookup) getDataSet() string       { return g.DataSet }
-func (g *genericLookup) getDataSubset() string    { return g.DataSubset }
-func (g *genericLookup) getLookup() *Lookup       { return g.Lookup }
-func (g *genericLookup) getResponse() interface{} { return g.Response }
-func (g *genericLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
+func (g *universalLookup) getDataSet() string       { return g.DataSet }
+func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
+func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
+func (g *universalLookup) getResponse() interface{} { return g.Response }
+func (g *universalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
 	g.Response = bytes
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found && len(etag) > 0 {
@@ -58,7 +58,7 @@ func (g *genericLookup) unmarshalResponse(bytes []byte, headers http.Header) err
 	return nil
 
 }
-func (g *genericLookup) populate(query url.Values) {
+func (g *universalLookup) populate(query url.Values) {
 	g.Lookup.populateInclude(query)
 	g.Lookup.populateExclude(query)
 }
