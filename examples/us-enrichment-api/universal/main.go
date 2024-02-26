@@ -35,7 +35,7 @@ func main() {
 		ETag:      "",                           // optional: check if the record has been updated
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	err, results := client.SendUniversalLookup(&lookup, "property", "principal") //for datasets with no subsets, enter the empty string, "", for the dataSubset field
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -47,11 +47,7 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
-	for s, response := range results {
-		fmt.Printf("#%d: %+v\n", s, response)
-	}
-
-	//TODO: Add a test for the "genericLookup" feature
+	fmt.Println(string(results))
 
 	log.Println("OK")
 }
