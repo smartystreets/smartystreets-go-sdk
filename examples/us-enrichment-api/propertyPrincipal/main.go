@@ -16,12 +16,6 @@ func main() {
 	client := wireup.BuildUSEnrichmentAPIClient(
 		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		// The appropriate license values to be used for your subscriptions
-		// can be found on the Subscriptions page the account dashboard.
-		// https://www.smarty.com/docs/cloud/licensing
-		wireup.WithLicenses("us-property-data-principal-cloud"),
-		wireup.CustomBaseURL("https://us-enrichment.api.rivendell.smartyops.net"),
-		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
 	// Documentation for input fields can be found at:
