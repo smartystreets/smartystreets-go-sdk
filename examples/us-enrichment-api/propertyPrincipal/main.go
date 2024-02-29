@@ -31,13 +31,11 @@ func main() {
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
-		Include:   "", // optional: only include these attributes in the returned data
-		Exclude:   "", // optional: exclude attributes from the returned data
-		ETag:      "", // optional: check if the record has been updated
+		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
+		Exclude:   "",                           // optional: exclude attributes from the returned data
+		ETag:      "",                           // optional: check if the record has been updated
 	}
 
-	//For Financial
-	//err, results := client.SendPropertyFinancial(&lookup)
 	err, results := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {

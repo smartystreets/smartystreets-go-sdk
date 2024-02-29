@@ -19,7 +19,7 @@ func main() {
 		// The appropriate license values to be used for your subscriptions
 		// can be found on the Subscriptions page the account dashboard.
 		// https://www.smarty.com/docs/cloud/licensing
-		//wireup.WithLicenses("us-property-data-principal-cloud"),
+		wireup.WithLicenses("us-property-data-principal-cloud"),
 		wireup.CustomBaseURL("https://us-enrichment.api.rivendell.smartyops.net"),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
@@ -31,10 +31,12 @@ func main() {
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
-		ETag:      "", // optional: check if the record has been updated
+		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
+		Exclude:   "",                           // optional: exclude attributes from the returned data
+		ETag:      "",                           // optional: check if the record has been updated
 	}
 
-	err, results := client.SendPropertyGeoReference(&lookup)
+	err, results := client.SendPropertyFinancial(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
