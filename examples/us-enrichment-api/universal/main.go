@@ -26,8 +26,8 @@ func main() {
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
 		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
-		Exclude: "", // optional: exclude attributes from the returned data
-		ETag:    "", // optional: check if the record has been updated
+		Exclude:   "",                           // optional: exclude attributes from the returned data
+		ETag:      "",                           // optional: check if the record has been updated
 	}
 
 	// Universal lookup works with all datasets and optional subsets.

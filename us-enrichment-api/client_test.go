@@ -93,7 +93,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
 }
 
-func (f *ClientFixture) TestGenericLookupUnmarshallingWithEtag() {
+func (f *ClientFixture) TestUniversalLookupUnmarshallingWithEtag() {
 	lookup := universalLookup{
 		Response: []byte(validFinancialResponse),
 	}
@@ -104,7 +104,7 @@ func (f *ClientFixture) TestGenericLookupUnmarshallingWithEtag() {
 	f.So(lookup.Response, should.Equal, []byte(`[{"eTag": "ABCDEFG","smarty_key":"123","data_set_name":"property","data_subset_name":"financial","attributes":{"assessed_improvement_percent":"Assessed_Improvement_Percent","veteran_tax_exemption":"Veteran_Tax_Exemption","widow_tax_exemption":"Widow_Tax_Exemption"}}]`))
 }
 
-func (f *ClientFixture) TestGenericLookupUnmarshallingWithNoEtag() {
+func (f *ClientFixture) TestUniversalLookupUnmarshallingWithNoEtag() {
 	lookup := universalLookup{
 		Response: []byte(validPrincipalResponse),
 	}
