@@ -28,7 +28,7 @@ func main() {
 		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendPropertyGeoReference(&lookup)
+	err, results := client.SendGeoReference(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -43,6 +43,4 @@ func main() {
 	for s, response := range results {
 		fmt.Printf("#%d: %+v\n", s, response)
 	}
-
-	log.Println("OK")
 }

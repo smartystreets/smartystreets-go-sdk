@@ -502,6 +502,7 @@ type FinancialAttributes struct {
 	VeteranTaxExemption            string `json:"veteran_tax_exemption"`
 	WidowTaxExemption              string `json:"widow_tax_exemption"`
 }
+
 type GeoReferenceResponse struct {
 	SmartyKey   string                 `json:"smarty_key"`
 	DataSetName string                 `json:"data_set_name"`

@@ -120,7 +120,6 @@ func (e *principalLookup) populate(query url.Values) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 
 type geoReferenceLookup struct {
 	Lookup   *Lookup
@@ -128,7 +127,7 @@ type geoReferenceLookup struct {
 }
 
 func (g *geoReferenceLookup) getDataSubset() string {
-	return geoReferenceDataSubset
+	return emptyDataSubset
 }
 
 func (g *geoReferenceLookup) populate(query url.Values) {
@@ -171,11 +170,11 @@ func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header
 ////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	financialDataSubset    = "financial"
-	principalDataSubset    = "principal"
-	propertyDataSet        = "property"
-	geoReferenceDataSet    = "geo-reference"
-	geoReferenceDataSubset = ""
+	financialDataSubset = "financial"
+	principalDataSubset = "principal"
+	propertyDataSet     = "property"
+	geoReferenceDataSet = "geo-reference"
+	emptyDataSubset     = ""
 )
 
 func (l Lookup) populateInclude(query url.Values) {

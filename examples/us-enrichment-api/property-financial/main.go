@@ -45,6 +45,4 @@ func main() {
 	for s, response := range results {
 		fmt.Printf("#%d: %+v\n", s, response)
 	}
-
-	log.Println("OK")
 }
