@@ -224,7 +224,7 @@ func (l Lookup) populateInclude(query url.Values) {
 }
 
 func (l Lookup) populateExclude(query url.Values) {
-	if len(l.Include) > 0 {
+	if len(l.Exclude) > 0 {
 		query.Set("exclude", l.Exclude)
 	}
 }
