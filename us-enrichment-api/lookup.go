@@ -1,6 +1,7 @@
 package us_enrichment
 
 import (
+	bytesPackage "bytes"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -21,6 +22,45 @@ type enrichmentLookup interface {
 	getResponse() interface{}
 	unmarshalResponse([]byte, http.Header) error
 	populate(query url.Values)
+}
+
+type universalLookup struct {
+	Lookup     *Lookup
+	DataSet    string
+	DataSubset string
+	Response   []byte
+}
+
+func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
+func (g *universalLookup) getDataSet() string       { return g.DataSet }
+func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
+func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
+func (g *universalLookup) getResponse() interface{} { return g.Response }
+func (g *universalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	g.Response = bytes
+	if headers != nil {
+		if etag, found := headers[lookupETagHeader]; found && len(etag) > 0 {
+
+			eTagAttribute := []byte(`"eTag": "` + etag[0] + `",`)
+			insertLocation := bytesPackage.IndexByte(bytes, '{') + 1
+
+			if insertLocation > 0 && insertLocation < len(bytes) {
+				var modifiedResponse bytesPackage.Buffer
+				modifiedResponse.Write(bytes[:insertLocation])
+				modifiedResponse.Write(eTagAttribute)
+				modifiedResponse.Write(bytes[insertLocation:])
+				g.Response = modifiedResponse.Bytes()
+			}
+
+		}
+	}
+
+	return nil
+
+}
+func (g *universalLookup) populate(query url.Values) {
+	g.Lookup.populateInclude(query)
+	g.Lookup.populateExclude(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
