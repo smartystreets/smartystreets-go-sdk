@@ -18,22 +18,19 @@ func main() {
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 	)
 
-	// Documentation for input fields and available datasets can be found at:
-	// https://www.smarty.com/docs/cloud/us-address-enrichment-api
+	// Documentation for input fields can be found at:
+	// https://www.smarty.com/docs/cloud/us-address-enrichment-api#http-request-input-fields
 
 	smartyKey := "1682393594"
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
 		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
-		Exclude: "", // optional: exclude attributes from the returned data
-		ETag:    "", // optional: check if the record has been updated
+		Exclude:   "",                           // optional: exclude attributes from the returned data
+		ETag:      "",                           // optional: check if the record has been updated
 	}
 
-	// Universal lookup works with all datasets and optional subsets.
-	// Returns JSON bytes
-	// Note: The DataSubset field can be an empty string for datasets that have no subsets.
-	err, results := client.SendUniversalLookup(&lookup, "property", "principal")
+	err, results := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -45,5 +42,7 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
-	fmt.Println(string(results))
+	for s, response := range results {
+		fmt.Printf("#%d: %+v\n", s, response)
+	}
 }

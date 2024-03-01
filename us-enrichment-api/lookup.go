@@ -161,10 +161,60 @@ func (e *principalLookup) populate(query url.Values) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+type geoReferenceLookup struct {
+	Lookup   *Lookup
+	Response []*GeoReferenceResponse
+}
+
+func (g *geoReferenceLookup) getDataSubset() string {
+	return emptyDataSubset
+}
+
+func (g *geoReferenceLookup) populate(query url.Values) {
+	g.Lookup.populateInclude(query)
+	g.Lookup.populateExclude(query)
+}
+
+func (g *geoReferenceLookup) getSmartyKey() string {
+	return g.Lookup.SmartyKey
+}
+
+func (g *geoReferenceLookup) getDataSet() string {
+	return geoReferenceDataSet
+}
+
+func (g *geoReferenceLookup) getLookup() *Lookup {
+	return g.Lookup
+}
+
+func (g *geoReferenceLookup) getResponse() interface{} {
+	return g.Response
+}
+
+func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	if err := json.Unmarshal(bytes, &g.Response); err != nil {
+		return err
+	}
+
+	if headers != nil {
+		if etag, found := headers[lookupETagHeader]; found {
+			if len(etag) > 0 && len(g.Response) > 0 {
+				g.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 const (
 	financialDataSubset = "financial"
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
+	geoReferenceDataSet = "geo-reference"
+	emptyDataSubset     = ""
 )
 
 func (l Lookup) populateInclude(query url.Values) {

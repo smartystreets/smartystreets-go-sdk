@@ -36,6 +36,12 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 	return err, propertyLookup.Response
 }
 
+func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceResponse) {
+	geoRefLookup := &geoReferenceLookup{Lookup: lookup}
+	err := c.sendLookup(geoRefLookup)
+	return err, geoRefLookup.Response
+}
+
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
 	g := &universalLookup{
 		Lookup:     lookup,
@@ -100,7 +106,7 @@ func buildLookupURL(lookup enrichmentLookup) string {
 	}
 
 	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
-	return strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1)
+	return strings.TrimSuffix(strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1), "/")
 }
 
 const (

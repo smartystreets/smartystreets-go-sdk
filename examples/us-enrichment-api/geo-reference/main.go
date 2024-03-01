@@ -16,11 +16,6 @@ func main() {
 	client := wireup.BuildUSEnrichmentAPIClient(
 		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
 		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		// The appropriate license values to be used for your subscriptions
-		// can be found on the Subscriptions page the account dashboard.
-		// https://www.smarty.com/docs/cloud/licensing
-		wireup.WithLicenses("us-property-data-principal-cloud"),
-		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
 	// Documentation for input fields can be found at:
@@ -30,12 +25,10 @@ func main() {
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
-		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
-		Exclude:   "",                           // optional: exclude attributes from the returned data
-		ETag:      "",                           // optional: check if the record has been updated
+		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	err, results := client.SendGeoReference(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -50,8 +43,4 @@ func main() {
 	for s, response := range results {
 		fmt.Printf("#%d: %+v\n", s, response)
 	}
-
-	//TODO: Add a test for the "genericLookup" feature
-
-	log.Println("OK")
 }
