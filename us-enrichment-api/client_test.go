@@ -94,7 +94,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 }
 
 func (f *ClientFixture) TestGenericLookupUnmarshallingWithEtag() {
-	lookup := genericLookup{
+	lookup := universalLookup{
 		Response: []byte(validFinancialResponse),
 	}
 	httpHeaders := http.Header{"Etag": []string{"ABCDEFG"}}
@@ -105,7 +105,7 @@ func (f *ClientFixture) TestGenericLookupUnmarshallingWithEtag() {
 }
 
 func (f *ClientFixture) TestGenericLookupUnmarshallingWithNoEtag() {
-	lookup := genericLookup{
+	lookup := universalLookup{
 		Response: []byte(validPrincipalResponse),
 	}
 

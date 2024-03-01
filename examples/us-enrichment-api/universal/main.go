@@ -25,7 +25,7 @@ func main() {
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
-		//Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
+		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
 		Exclude: "", // optional: exclude attributes from the returned data
 		ETag:    "", // optional: check if the record has been updated
 	}
@@ -33,7 +33,7 @@ func main() {
 	// Universal lookup works with all datasets and optional subsets.
 	// Returns JSON bytes
 	// Note: The DataSubset field can be an empty string for datasets that have no subsets.
-	err, results := client.SendUniversalLookup(&lookup, "property", "financial")
+	err, results := client.SendUniversalLookup(&lookup, "property", "principal")
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
