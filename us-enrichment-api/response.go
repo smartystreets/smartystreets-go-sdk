@@ -12,7 +12,6 @@ type PrincipalAttributes struct {
 	FirstFloorSqft                  string `json:"1st_floor_sqft"`
 	SecondFloorSqft                 string `json:"2nd_floor_sqft"`
 	Acres                           string `json:"acres"`
-	AddressInfoPrivacy              string `json:"address_info_privacy"`
 	AirConditioner                  string `json:"air_conditioner"`
 	ArborPergola                    string `json:"arbor_pergola"`
 	AssessedImprovementPercent      string `json:"assessed_improvement_percent"`
@@ -85,7 +84,7 @@ type PrincipalAttributes struct {
 	CourtyardArea                   string `json:"courtyard_area"`
 	Deck                            string `json:"deck"`
 	DeckArea                        string `json:"deck_area"`
-	DeedDocumentPage                string `json:"deed_ document_page"`
+	DeedDocumentPage                string `json:"deed_document_page"`
 	DeedDocumentBook                string `json:"deed_document_book"`
 	DeedDocumentNumber              string `json:"deed_document_number"`
 	DeedOwnerFirstName              string `json:"deed_owner_first_name"`
@@ -113,6 +112,7 @@ type PrincipalAttributes struct {
 	DeedTransactionId               string `json:"deed_transaction_id"`
 	DepthLinearFootage              string `json:"depth_linear_footage"`
 	DisabledTaxExemption            string `json:"disabled_tax_exemption"`
+	DocumentTypeDescription         string `json:"document_type_description"`
 	DrivewaySqft                    string `json:"driveway_sqft"`
 	DrivewayType                    string `json:"driveway_type"`
 	EffectiveYearBuilt              string `json:"effective_year_built"`
@@ -432,6 +432,7 @@ type FinancialAttributes struct {
 	DisabledTaxExemption       string `json:"disabled_tax_exemption"`
 	FinancialHistory           []struct {
 		CodeTitleCompany         string `json:"code_title_company"`
+		DocumentTypeDescription  string `json:"document_type_description"`
 		InstrumentDate           string `json:"instrument_date"`
 		InterestRateType2        string `json:"interest_rate_type_2"`
 		LenderAddress            string `json:"lender_address"`
@@ -474,13 +475,29 @@ type FinancialAttributes struct {
 		RecordingDate            string `json:"recording_date"`
 		TransferAmount           string `json:"transfer_amount"`
 	} `json:"financial_history"`
+	FirstName                      string `json:"first_name"`
+	FirstName2                     string `json:"first_name_2"`
+	FirstName3                     string `json:"first_name_3"`
+	FirstName4                     string `json:"first_name_4"`
 	HomeownerTaxExemption          string `json:"homeowner_tax_exemption"`
+	LastName                       string `json:"last_name"`
+	LastName2                      string `json:"last_name_2"`
+	LastName3                      string `json:"last_name_3"`
+	LastName4                      string `json:"last_name_4"`
 	MarketImprovementPercent       string `json:"market_improvement_percent"`
 	MarketImprovementValue         string `json:"market_improvement_value"`
 	MarketLandValue                string `json:"market_land_value"`
 	MarketValueYear                string `json:"market_value_year"`
 	MatchType                      string `json:"match_type"`
+	MiddleName                     string `json:"middle_name"`
+	MiddleName2                    string `json:"middle_name_2"`
+	MiddleName3                    string `json:"middle_name_3"`
+	MiddleName4                    string `json:"middle_name_4"`
 	OtherTaxExemption              string `json:"other_tax_exemption"`
+	OwnerFullName                  string `json:"owner_full_name"`
+	OwnerFullName2                 string `json:"owner_full_name_2"`
+	OwnerFullName3                 string `json:"owner_full_name_3"`
+	OwnerFullName4                 string `json:"owner_full_name_4"`
 	OwnershipTransferDate          string `json:"ownership_transfer_date"`
 	OwnershipTransferDocNumber     string `json:"ownership_transfer_doc_number"`
 	OwnershipTransferTransactionId string `json:"ownership_transfer_transaction_id"`
@@ -492,6 +509,10 @@ type FinancialAttributes struct {
 	SaleAmount                     string `json:"sale_amount"`
 	SaleDate                       string `json:"sale_date"`
 	SeniorTaxExemption             string `json:"senior_tax_exemption"`
+	Suffix                         string `json:"suffix"`
+	Suffix2                        string `json:"suffix_2"`
+	Suffix3                        string `json:"suffix_3"`
+	Suffix4                        string `json:"suffix_4"`
 	TaxAssessYear                  string `json:"tax_assess_year"`
 	TaxBilledAmount                string `json:"tax_billed_amount"`
 	TaxDelinquentYear              string `json:"tax_delinquent_year"`
