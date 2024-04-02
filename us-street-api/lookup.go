@@ -60,7 +60,6 @@ type MatchStrategy string
 
 const (
 	MatchStrict   = MatchStrategy("strict")
-	MatchRange    = MatchStrategy("range") // Deprecated
 	MatchInvalid  = MatchStrategy("invalid")
 	MatchEnhanced = MatchStrategy("enhanced")
 )
