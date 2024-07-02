@@ -36,6 +36,8 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 				"street": "1",
 				"locality": "2",
 				"administrative_area": "3",
+				"administrative_area_short": "3.0",
+				"administrative_area_long": "3.1",
 				"postal_code": "4",
 				"country_iso3": "5"
 			},
@@ -43,6 +45,8 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 				"street": "6",
 				"locality": "7",
 				"administrative_area": "8",
+				"administrative_area_short": "8.0",
+				"administrative_area_long": "8.1",
 				"postal_code": "9",
 				"country_iso3": "10"
 			}
@@ -64,18 +68,22 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 
 	f.So(f.input.Result, should.Resemble, &Result{Candidates: []*Candidate{
 		{
-			Street:             "1",
-			Locality:           "2",
-			AdministrativeArea: "3",
-			PostalCode:         "4",
-			CountryIso3:        "5",
+			Street:                  "1",
+			Locality:                "2",
+			AdministrativeArea:      "3",
+			AdministrativeAreaShort: "3.0",
+			AdministrativeAreaLong:  "3.1",
+			PostalCode:              "4",
+			CountryIso3:             "5",
 		},
 		{
-			Street:             "6",
-			Locality:           "7",
-			AdministrativeArea: "8",
-			PostalCode:         "9",
-			CountryIso3:        "10",
+			Street:                  "6",
+			Locality:                "7",
+			AdministrativeArea:      "8",
+			AdministrativeAreaShort: "8.0",
+			AdministrativeAreaLong:  "8.1",
+			PostalCode:              "9",
+			CountryIso3:             "10",
 		},
 	}})
 }
