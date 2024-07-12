@@ -209,11 +209,107 @@ func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+type secondaryLookup struct {
+	*Lookup
+	Response []*SecondaryResponse
+}
+
+func (s *secondaryLookup) getSmartyKey() string {
+	return s.SmartyKey
+}
+
+func (s *secondaryLookup) getDataSet() string {
+	return secondaryData
+}
+
+func (s *secondaryLookup) getDataSubset() string {
+	return emptyDataSubset
+}
+
+func (s *secondaryLookup) getLookup() *Lookup {
+	return s.Lookup
+}
+
+func (s *secondaryLookup) getResponse() interface{} {
+	return s.Response
+}
+
+func (s *secondaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(s.Response) > 0 {
+				s.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *secondaryLookup) populate(query url.Values) {
+	s.Lookup.populateInclude(query)
+	s.Lookup.populateExclude(query)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+type secondaryCountLookup struct {
+	*Lookup
+	Response []*SecondaryCountResponse
+}
+
+func (s *secondaryCountLookup) getSmartyKey() string {
+	return s.SmartyKey
+}
+
+func (s *secondaryCountLookup) getDataSet() string {
+	return secondaryData
+}
+
+func (s *secondaryCountLookup) getDataSubset() string {
+	return secondaryDataCount
+}
+
+func (s *secondaryCountLookup) getLookup() *Lookup {
+	return s.Lookup
+}
+
+func (s *secondaryCountLookup) getResponse() interface{} {
+	return s.Response
+}
+
+func (s *secondaryCountLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(s.Response) > 0 {
+				s.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *secondaryCountLookup) populate(query url.Values) {
+	s.Lookup.populateInclude(query)
+	s.Lookup.populateExclude(query)
+}
+
 const (
 	financialDataSubset = "financial"
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
 	geoReferenceDataSet = "geo-reference"
+	secondaryData       = "secondary"
+	secondaryDataCount  = "count"
 	emptyDataSubset     = ""
 )
 

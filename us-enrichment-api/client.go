@@ -42,6 +42,18 @@ func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceRespons
 	return err, geoRefLookup.Response
 }
 
+func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
+	secondaryLookup := &secondaryLookup{Lookup: lookup}
+	err := c.sendLookup(secondaryLookup)
+	return err, secondaryLookup.Response
+}
+
+func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
+	secondaryCountLookup := &secondaryCountLookup{Lookup: lookup}
+	err := c.sendLookup(secondaryCountLookup)
+	return err, secondaryCountLookup.Response
+}
+
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
 	g := &universalLookup{
 		Lookup:     lookup,

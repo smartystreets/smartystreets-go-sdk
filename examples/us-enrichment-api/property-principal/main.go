@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,7 +22,7 @@ func main() {
 	// Documentation for input fields can be found at:
 	// https://www.smarty.com/docs/cloud/us-address-enrichment-api#http-request-input-fields
 
-	smartyKey := "1682393594"
+	smartyKey := "87844267"
 
 	lookup := us_enrichment.Lookup{
 		SmartyKey: smartyKey,
@@ -43,6 +44,26 @@ func main() {
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
 	for s, response := range results {
-		fmt.Printf("#%d: %+v\n", s, response)
+		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
+		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
+	}
+
+	client = wireup.BuildUSEnrichmentAPIClient(
+		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		// The appropriate license values to be used for your subscriptions
+		// can be found on the Subscriptions page the account dashboard.
+		// https://www.smarty.com/docs/cloud/licensing
+		wireup.WithLicenses("us-property-data-financial-cloud"),
+		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
+	)
+	err, financialResults := client.SendPropertyFinancialLookup(smartyKey)
+	if err != nil {
+		log.Fatal("Error sending lookup:", err)
+	}
+	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "financial")
+	for s, response := range financialResults {
+		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
+		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
 }
