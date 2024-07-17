@@ -556,40 +556,46 @@ type GeoReferenceAttributes struct {
 	} `json:"place"`
 }
 
+type RootAddress struct {
+	SecondaryCount      uint64 `json:"secondary_count"`
+	SmartyKey           string `json:"smarty_key"`
+	PrimaryNumber       string `json:"primary_number"`
+	StreetPredirection  string `json:"street_predirection"`
+	StreetName          string `json:"street_name"`
+	StreetSuffix        string `json:"street_suffix"`
+	StreetPostdirection string `json:"street_postdirection"`
+	CityName            string `json:"city_name"`
+	StateAbbreviation   string `json:"state_abbreviation"`
+	Zipcode             string `json:"zipcode"`
+	Plus4Code           string `json:"plus4_code"`
+}
+
+type Alias struct {
+	SmartyKey           string `json:"smarty_key"`
+	PrimaryNumber       string `json:"primary_number"`
+	StreetPredirection  string `json:"street_predirection"`
+	StreetName          string `json:"street_name"`
+	StreetSuffix        string `json:"street_suffix"`
+	StreetPostdirection string `json:"street_postdirection"`
+	CityName            string `json:"city_name"`
+	StateAbbreviation   string `json:"state_abbreviation"`
+	Zipcode             string `json:"zipcode"`
+	Plus4Code           string `json:"plus4_code"`
+}
+
+type Secondary struct {
+	SmartyKey           string `json:"smarty_key"`
+	SecondaryDesignator string `json:"secondary_designator"`
+	SecondaryNumber     string `json:"secondary_number"`
+	Plus4Code           string `json:"plus4_code"`
+}
+
 type SecondaryResponse struct {
 	SmartyKey   string `json:"smarty_key"`
 	Etag        string
-	RootAddress struct {
-		SecondaryCount      uint64 `json:"secondary_count"`
-		SmartyKey           string `json:"smarty_key"`
-		PrimaryNumber       string `json:"primary_number"`
-		StreetPredirection  string `json:"street_predirection"`
-		StreetName          string `json:"street_name"`
-		StreetSuffix        string `json:"street_suffix"`
-		StreetPostdirection string `json:"street_postdirection"`
-		CityName            string `json:"city_name"`
-		StateAbbreviation   string `json:"state_abbreviation"`
-		Zipcode             string `json:"zipcode"`
-		Plus4Code           string `json:"plus4_code"`
-	} `json:"root_address"`
-	Aliases []struct {
-		SmartyKey           string `json:"smarty_key"`
-		PrimaryNumber       string `json:"primary_number"`
-		StreetPredirection  string `json:"street_predirection"`
-		StreetName          string `json:"street_name"`
-		StreetSuffix        string `json:"street_suffix"`
-		StreetPostdirection string `json:"street_postdirection"`
-		CityName            string `json:"city_name"`
-		StateAbbreviation   string `json:"state_abbreviation"`
-		Zipcode             string `json:"zipcode"`
-		Plus4Code           string `json:"plus4_code"`
-	} `json:"aliases"`
-	Secondaries []struct {
-		SmartyKey           string `json:"smarty_key"`
-		SecondaryDesignator string `json:"secondary_designator"`
-		SecondaryNumber     string `json:"secondary_number"`
-		Plus4Code           string `json:"plus4_code"`
-	} `json:"secondaries"`
+	RootAddress RootAddress `json:"root_address"`
+	Aliases     []Alias     `json:"aliases"`
+	Secondaries []Secondary `json:"secondaries"`
 }
 
 type SecondaryCountResponse struct {

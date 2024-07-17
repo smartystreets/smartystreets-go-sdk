@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	usenrich "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
@@ -39,7 +40,11 @@ func main() {
 	}
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "secondary")
-	for s, response := range results {
-		fmt.Printf("#%d: %+v\n", s, response)
+	for i, response := range results {
+		prettyPrinted, err := json.MarshalIndent(response, "", "    ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Response %d: %s", i, prettyPrinted)
 	}
 }
