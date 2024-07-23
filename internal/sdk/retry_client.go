@@ -124,20 +124,6 @@ func (r *RetryClient) random(cap int) int {
 	return r.rand.Intn(cap)
 }
 
-func max(x, y int) int {
-	if x > y {
-		return x
-	}
-	return y
-}
-
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
-}
-
 const (
 	backOffRateLimit   = 5
 	maxBackOffDuration = 10
