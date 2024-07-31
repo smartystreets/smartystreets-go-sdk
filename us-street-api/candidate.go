@@ -18,6 +18,7 @@ type (
 		Components           Components `json:"components,omitempty"`
 		Metadata             Metadata   `json:"metadata,omitempty"`
 		Analysis             Analysis   `json:"analysis,omitempty"`
+		Match                Match      `json:"match,omitempty"`
 	}
 
 	// Components contains all output fields defined here:
@@ -82,5 +83,20 @@ type (
 		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`
 		EWSMatch          bool   `json:"ews_match,omitempty"`      // deprecated
 		EnhancedMatch     string `json:"enhanced_match,omitempty"` //v2 integration
+	}
+
+	Match struct {
+		PrimaryNumber MatchInfo `json:"primary_number,omitempty"`
+		Street        MatchInfo `json:"street,omitempty"`
+		Secondary     MatchInfo `json:"secondary,omitempty"`
+		City          MatchInfo `json:"city,omitempty"`
+		State         MatchInfo `json:"state,omitempty"`
+		ZIPCode       MatchInfo `json:"zipcode,omitempty"`
+		Urbanization  MatchInfo `json:"urbanization,omitempty"`
+	}
+
+	MatchInfo struct {
+		Validation string `json:"validation,omitempty"`
+		Change     string `json:"change,omitempty"`
 	}
 )
