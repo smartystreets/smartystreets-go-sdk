@@ -70,17 +70,40 @@ type (
 	// Analysis contains all output fields defined here:
 	// https://smartystreets.com/docs/us-street-api#analysis
 	Analysis struct {
-		DPVMatchCode      string `json:"dpv_match_code,omitempty"`
-		DPVFootnotes      string `json:"dpv_footnotes,omitempty"`
-		DPVCMRACode       string `json:"dpv_cmra,omitempty"`
-		DPVVacantCode     string `json:"dpv_vacant,omitempty"`
-		DPVNoStat         string `json:"dpv_no_stat,omitempty"`
-		Active            string `json:"active,omitempty"`
-		Footnotes         string `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
-		LACSLinkCode      string `json:"lacslink_code,omitempty"`
-		LACSLinkIndicator string `json:"lacslink_indicator,omitempty"`
-		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`
-		EWSMatch          bool   `json:"ews_match,omitempty"`      // deprecated
-		EnhancedMatch     string `json:"enhanced_match,omitempty"` //v2 integration
+		DPVMatchCode      string            `json:"dpv_match_code,omitempty"`
+		DPVFootnotes      string            `json:"dpv_footnotes,omitempty"`
+		DPVCMRACode       string            `json:"dpv_cmra,omitempty"`
+		DPVVacantCode     string            `json:"dpv_vacant,omitempty"`
+		DPVNoStat         string            `json:"dpv_no_stat,omitempty"`
+		Active            string            `json:"active,omitempty"`
+		Footnotes         string            `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
+		LACSLinkCode      string            `json:"lacslink_code,omitempty"`
+		LACSLinkIndicator string            `json:"lacslink_indicator,omitempty"`
+		SuiteLinkMatch    bool              `json:"suitelink_match,omitempty"`
+		EWSMatch          bool              `json:"ews_match,omitempty"`      // deprecated
+		EnhancedMatch     string            `json:"enhanced_match,omitempty"` //v2 integration
+		Components        ComponentAnalysis `json:"components,omitempty"`
+	}
+
+	ComponentAnalysis struct {
+		PrimaryNumber            MatchInfo `json:"primary_number,omitempty"`
+		StreetPredirection       MatchInfo `json:"street_predirection,omitempty"`
+		StreetName               MatchInfo `json:"street_name,omitempty"`
+		StreetPostdirection      MatchInfo `json:"street_postdirection,omitempty"`
+		StreetSuffix             MatchInfo `json:"street_suffix,omitempty"`
+		SecondaryNumber          MatchInfo `json:"secondary_number,omitempty"`
+		SecondaryDesignator      MatchInfo `json:"secondary_designator,omitempty"`
+		ExtraSecondaryNumber     MatchInfo `json:"extra_secondary_number,omitempty"`
+		ExtraSecondaryDesignator MatchInfo `json:"extra_secondary_designator,omitempty"`
+		CityName                 MatchInfo `json:"city_name,omitempty"`
+		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
+		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
+		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
+		Urbanization             MatchInfo `json:"urbanization,omitempty"`
+	}
+
+	MatchInfo struct {
+		Status string   `json:"status,omitempty"`
+		Change []string `json:"change,omitempty"`
 	}
 )
