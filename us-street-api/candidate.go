@@ -86,13 +86,25 @@ type (
 	}
 
 	Match struct {
-		PrimaryNumber MatchInfo `json:"primary_number,omitempty"`
-		Street        MatchInfo `json:"street,omitempty"`
-		Secondary     MatchInfo `json:"secondary,omitempty"`
-		City          MatchInfo `json:"city,omitempty"`
-		State         MatchInfo `json:"state,omitempty"`
-		ZIPCode       MatchInfo `json:"zipcode,omitempty"`
-		Urbanization  MatchInfo `json:"urbanization,omitempty"`
+		PrimaryNumber            MatchInfo `json:"primary_number,omitempty"`
+		StreetPredirection       MatchInfo `json:"street_predirection,omitempty"`
+		StreetName               MatchInfo `json:"street_name,omitempty"`
+		StreetPostdirection      MatchInfo `json:"street_postdirection,omitempty"`
+		StreetSuffix             MatchInfo `json:"street_suffix,omitempty"`
+		SecondaryNumber          MatchInfo `json:"secondary_number,omitempty"`
+		SecondaryDesignator      MatchInfo `json:"secondary_designator,omitempty"`
+		ExtraSecondaryNumber     MatchInfo `json:"extra_secondary_number,omitempty"`
+		ExtraSecondaryDesignator MatchInfo `json:"extra_secondary_designator,omitempty"`
+		PMBNumber                MatchInfo `json:"pmb_number,omitempty"`
+		PMBDesignator            MatchInfo `json:"pmb_designator,omitempty"`
+		CityName                 MatchInfo `json:"city_name,omitempty"`
+		DefaultCityName          MatchInfo `json:"default_city_name,omitempty"`
+		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
+		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
+		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
+		DeliveryPoint            MatchInfo `json:"delivery_point,omitempty"`
+		DeliveryPointCheckDigit  MatchInfo `json:"delivery_point_check_digit,omitempty"`
+		Urbanization             MatchInfo `json:"urbanization,omitempty"`
 	}
 
 	MatchInfo struct {
