@@ -98,7 +98,6 @@ type (
 		PMBNumber                MatchInfo `json:"pmb_number,omitempty"`
 		PMBDesignator            MatchInfo `json:"pmb_designator,omitempty"`
 		CityName                 MatchInfo `json:"city_name,omitempty"`
-		DefaultCityName          MatchInfo `json:"default_city_name,omitempty"`
 		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
 		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
 		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
