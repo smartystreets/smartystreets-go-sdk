@@ -99,8 +99,6 @@ type (
 		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
 		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
 		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
-		DeliveryPoint            MatchInfo `json:"delivery_point,omitempty"`
-		DeliveryPointCheckDigit  MatchInfo `json:"delivery_point_check_digit,omitempty"`
 		Urbanization             MatchInfo `json:"urbanization,omitempty"`
 	}
 
