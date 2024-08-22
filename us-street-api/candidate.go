@@ -95,8 +95,6 @@ type (
 		SecondaryDesignator      MatchInfo `json:"secondary_designator,omitempty"`
 		ExtraSecondaryNumber     MatchInfo `json:"extra_secondary_number,omitempty"`
 		ExtraSecondaryDesignator MatchInfo `json:"extra_secondary_designator,omitempty"`
-		PMBNumber                MatchInfo `json:"pmb_number,omitempty"`
-		PMBDesignator            MatchInfo `json:"pmb_designator,omitempty"`
 		CityName                 MatchInfo `json:"city_name,omitempty"`
 		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
 		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
