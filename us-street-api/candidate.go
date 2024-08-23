@@ -98,8 +98,8 @@ type (
 		CityName                 MatchInfo `json:"city_name,omitempty"`
 		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
 		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
-		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
-		Urbanization             MatchInfo `json:"urbanization,omitempty"`
+		//Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
+		Urbanization MatchInfo `json:"urbanization,omitempty"`
 	}
 
 	MatchInfo struct {
