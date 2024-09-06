@@ -11,6 +11,11 @@ type Lookup struct {
 	SmartyKey string
 	Include   string
 	Exclude   string
+	Freeform  string
+	Street    string
+	City      string
+	State     string
+	ZIPCode   string
 	ETag      string
 }
 
@@ -61,6 +66,12 @@ func (g *universalLookup) unmarshalResponse(bytes []byte, headers http.Header) e
 func (g *universalLookup) populate(query url.Values) {
 	g.Lookup.populateInclude(query)
 	g.Lookup.populateExclude(query)
+	g.Lookup.populateFreeform(query)
+	g.Lookup.populateStreet(query)
+	g.Lookup.populateCity(query)
+	g.Lookup.populateState(query)
+	g.Lookup.populateZIPCode(query)
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +120,11 @@ func (f *financialLookup) unmarshalResponse(bytes []byte, headers http.Header) e
 func (e *financialLookup) populate(query url.Values) {
 	e.Lookup.populateInclude(query)
 	e.Lookup.populateExclude(query)
+	e.Lookup.populateFreeform(query)
+	e.Lookup.populateStreet(query)
+	e.Lookup.populateCity(query)
+	e.Lookup.populateState(query)
+	e.Lookup.populateZIPCode(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -157,6 +173,11 @@ func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) e
 func (e *principalLookup) populate(query url.Values) {
 	e.Lookup.populateInclude(query)
 	e.Lookup.populateExclude(query)
+	e.Lookup.populateFreeform(query)
+	e.Lookup.populateStreet(query)
+	e.Lookup.populateCity(query)
+	e.Lookup.populateState(query)
+	e.Lookup.populateZIPCode(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +194,11 @@ func (g *geoReferenceLookup) getDataSubset() string {
 func (g *geoReferenceLookup) populate(query url.Values) {
 	g.Lookup.populateInclude(query)
 	g.Lookup.populateExclude(query)
+	g.Lookup.populateFreeform(query)
+	g.Lookup.populateStreet(query)
+	g.Lookup.populateCity(query)
+	g.Lookup.populateState(query)
+	g.Lookup.populateZIPCode(query)
 }
 
 func (g *geoReferenceLookup) getSmartyKey() string {
@@ -253,6 +279,11 @@ func (s *secondaryLookup) unmarshalResponse(bytes []byte, header http.Header) er
 func (s *secondaryLookup) populate(query url.Values) {
 	s.Lookup.populateInclude(query)
 	s.Lookup.populateExclude(query)
+	s.Lookup.populateFreeform(query)
+	s.Lookup.populateStreet(query)
+	s.Lookup.populateCity(query)
+	s.Lookup.populateState(query)
+	s.Lookup.populateZIPCode(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +332,11 @@ func (s *secondaryCountLookup) unmarshalResponse(bytes []byte, header http.Heade
 func (s *secondaryCountLookup) populate(query url.Values) {
 	s.Lookup.populateInclude(query)
 	s.Lookup.populateExclude(query)
+	s.Lookup.populateFreeform(query)
+	s.Lookup.populateStreet(query)
+	s.Lookup.populateCity(query)
+	s.Lookup.populateState(query)
+	s.Lookup.populateZIPCode(query)
 }
 
 const (
@@ -322,5 +358,35 @@ func (l Lookup) populateInclude(query url.Values) {
 func (l Lookup) populateExclude(query url.Values) {
 	if len(l.Exclude) > 0 {
 		query.Set("exclude", l.Exclude)
+	}
+}
+
+func (l Lookup) populateFreeform(query url.Values) {
+	if len(l.Freeform) > 0 {
+		query.Set("freeform", l.Freeform)
+	}
+}
+
+func (l Lookup) populateStreet(query url.Values) {
+	if len(l.Street) > 0 {
+		query.Set("street", l.Street)
+	}
+}
+
+func (l Lookup) populateCity(query url.Values) {
+	if len(l.City) > 0 {
+		query.Set("city", l.City)
+	}
+}
+
+func (l Lookup) populateState(query url.Values) {
+	if len(l.State) > 0 {
+		query.Set("state", l.State)
+	}
+}
+
+func (l Lookup) populateZIPCode(query url.Values) {
+	if len(l.ZIPCode) > 0 {
+		query.Set("zipcode", l.ZIPCode)
 	}
 }
