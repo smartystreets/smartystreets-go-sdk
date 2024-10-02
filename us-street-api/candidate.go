@@ -18,7 +18,6 @@ type (
 		Components           Components `json:"components,omitempty"`
 		Metadata             Metadata   `json:"metadata,omitempty"`
 		Analysis             Analysis   `json:"analysis,omitempty"`
-		Match                Match      `json:"match,omitempty"`
 	}
 
 	// Components contains all output fields defined here:
@@ -71,21 +70,22 @@ type (
 	// Analysis contains all output fields defined here:
 	// https://smartystreets.com/docs/us-street-api#analysis
 	Analysis struct {
-		DPVMatchCode      string `json:"dpv_match_code,omitempty"`
-		DPVFootnotes      string `json:"dpv_footnotes,omitempty"`
-		DPVCMRACode       string `json:"dpv_cmra,omitempty"`
-		DPVVacantCode     string `json:"dpv_vacant,omitempty"`
-		DPVNoStat         string `json:"dpv_no_stat,omitempty"`
-		Active            string `json:"active,omitempty"`
-		Footnotes         string `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
-		LACSLinkCode      string `json:"lacslink_code,omitempty"`
-		LACSLinkIndicator string `json:"lacslink_indicator,omitempty"`
-		SuiteLinkMatch    bool   `json:"suitelink_match,omitempty"`
-		EWSMatch          bool   `json:"ews_match,omitempty"`      // deprecated
-		EnhancedMatch     string `json:"enhanced_match,omitempty"` //v2 integration
+		DPVMatchCode      string            `json:"dpv_match_code,omitempty"`
+		DPVFootnotes      string            `json:"dpv_footnotes,omitempty"`
+		DPVCMRACode       string            `json:"dpv_cmra,omitempty"`
+		DPVVacantCode     string            `json:"dpv_vacant,omitempty"`
+		DPVNoStat         string            `json:"dpv_no_stat,omitempty"`
+		Active            string            `json:"active,omitempty"`
+		Footnotes         string            `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
+		LACSLinkCode      string            `json:"lacslink_code,omitempty"`
+		LACSLinkIndicator string            `json:"lacslink_indicator,omitempty"`
+		SuiteLinkMatch    bool              `json:"suitelink_match,omitempty"`
+		EWSMatch          bool              `json:"ews_match,omitempty"`      // deprecated
+		EnhancedMatch     string            `json:"enhanced_match,omitempty"` //v2 integration
+		ComponentAnalysis ComponentAnalysis `json:"component_analysis,omitempty"`
 	}
 
-	Match struct {
+	ComponentAnalysis struct {
 		PrimaryNumber            MatchInfo `json:"primary_number,omitempty"`
 		StreetPredirection       MatchInfo `json:"street_predirection,omitempty"`
 		StreetName               MatchInfo `json:"street_name,omitempty"`
@@ -98,12 +98,12 @@ type (
 		CityName                 MatchInfo `json:"city_name,omitempty"`
 		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
 		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
-		//Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
-		Urbanization MatchInfo `json:"urbanization,omitempty"`
+		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
+		Urbanization             MatchInfo `json:"urbanization,omitempty"`
 	}
 
 	MatchInfo struct {
-		Validation string `json:"validation,omitempty"`
-		Change     string `json:"change,omitempty"`
+		Status string `json:"status,omitempty"`
+		Change string `json:"change,omitempty"`
 	}
 )
