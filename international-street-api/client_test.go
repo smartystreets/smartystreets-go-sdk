@@ -225,7 +225,12 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "level_number": "blank",
 		  "post_box": "blank",
 		  "post_box_type": "blank",
-		  "post_box_number": "blank"
+		  "post_box_number": "blank",
+		  "additional_content":"blank",
+		  "delivery_installation_type":"blank",
+		  "delivery_installation_qualifier_name":"blank",
+		  "route_number":"blank",
+		  "route_type":"blank"
 		}
 	  }
 	}
@@ -358,6 +363,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.PostBox, should.Equal, "blank")
 	f.So(ccomponents.PostBoxType, should.Equal, "blank")
 	f.So(ccomponents.PostBoxNumber, should.Equal, "blank")
+	f.So(ccomponents.AdditionalContent, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationType, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
+	f.So(ccomponents.RouteType, should.Equal, "blank")
+	f.So(ccomponents.RouteNumber, should.Equal, "blank")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
