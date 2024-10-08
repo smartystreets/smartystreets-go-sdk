@@ -74,8 +74,10 @@ type (
 		PostBoxType                        string `json:"post_box_type,omitempty"`
 		PostBoxNumber                      string `json:"post_box_number,omitempty"`
 		AdditionalContent                  string `json:"additional_content,omitempty"`
+		DeliveryInstallation               string `json:"delivery_installation,omitempty"`
 		DeliveryInstallationType           string `json:"delivery_installation_type,omitempty"`
 		DeliveryInstallationQualifierName  string `json:"delivery_installation_qualifier_name,omitempty"`
+		Route                              string `json:"route,omitempty"`
 		RouteNumber                        string `json:"route_number,omitempty"`
 		RouteType                          string `json:"route_type,omitempty"`
 	}
