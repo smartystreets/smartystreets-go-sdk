@@ -32,6 +32,7 @@ type (
 	Components struct {
 		SuperAdministrativeArea            string `json:"super_administrative_area,omitempty"`
 		AdministrativeArea                 string `json:"administrative_area,omitempty"`
+		AdministrativeAreaISO2             string `json:"administrative_area_iso2,omitempty"`
 		AdministrativeAreaShort            string `json:"administrative_area_short,omitempty"`
 		AdministrativeAreaLong             string `json:"administrative_area_long,omitempty"`
 		SubAdministrativeArea              string `json:"sub_administrative_area,omitempty"`

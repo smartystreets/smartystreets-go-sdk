@@ -115,6 +115,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"components": {
 	  "super_administrative_area": "super_blah",
 	  "administrative_area": "SP",
+	  "administrative_area_iso2": "BR-SP",
 	  "administrative_area_short": "SP",
 	  "administrative_area_long": "São Paulo",
 	  "sub_administrative_area": "sub_blah",
@@ -185,6 +186,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"components": {
 	 	  "super_administrative_area": "blank",
 		  "administrative_area": "Verified-NoChange",
+		  "administrative_area_iso2": "Added",
 		  "administrative_area_short": "blank",
 		  "administrative_area_long": "blank",
 		  "sub_administrative_area": "blank",
@@ -262,6 +264,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.Address12, should.Equal, "here")
 	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
 	f.So(component.AdministrativeArea, should.Equal, "SP")
+	f.So(component.AdministrativeAreaISO2, should.Equal, "BR-SP")
 	f.So(component.AdministrativeAreaShort, should.Equal, "SP")
 	f.So(component.AdministrativeAreaLong, should.Equal, "São Paulo")
 	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
