@@ -28,7 +28,8 @@ func main() {
 		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendGeoReference(&lookup)
+	// supported census versions are: 2010, 2020, or leave empty for the latest census data available
+	err, results := client.SendGeoReference(&lookup, "")
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -39,7 +40,7 @@ func main() {
 		log.Fatal("Error sending lookup:", err)
 	}
 
-	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
+	fmt.Printf("Results for input: (%s)\n", smartyKey)
 	for s, response := range results {
 		fmt.Printf("#%d: %+v\n", s, response)
 	}
