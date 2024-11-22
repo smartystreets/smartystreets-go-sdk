@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// supported census versions are: 2010, 2020, or leave empty for the latest census data available
-	err, results := client.SendGeoReference(&lookup, "")
+	err, results := client.SendGeoReferenceWithVersion(&lookup, "")
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
