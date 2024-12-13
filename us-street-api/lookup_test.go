@@ -79,3 +79,11 @@ func (this *LookupFixture) TestQueryStringEncoding_OutputFormatSerialized() {
 		"format": {"project-usa"},
 	})
 }
+
+func (this *LookupFixture) TestQueryStringEncoding_CountySourceSerialized() {
+	this.So(this.encode(&Lookup{
+		CountySource: GeographicCounty,
+	}), should.Resemble, url.Values{
+		"county_source": {"geographic"},
+	})
+}
