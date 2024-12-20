@@ -38,7 +38,7 @@ type universalLookup struct {
 
 func (g *universalLookup) getSmartyKey() string {
 	if len(g.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return g.Lookup.SmartyKey
 }
@@ -88,7 +88,7 @@ type financialLookup struct {
 
 func (f *financialLookup) getSmartyKey() string {
 	if len(f.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return f.Lookup.SmartyKey
 }
@@ -144,7 +144,7 @@ type principalLookup struct {
 
 func (p *principalLookup) getSmartyKey() string {
 	if len(p.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return p.Lookup.SmartyKey
 }
@@ -214,7 +214,7 @@ func (g *geoReferenceLookup) populate(query url.Values) {
 
 func (g *geoReferenceLookup) getSmartyKey() string {
 	if len(g.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return g.Lookup.SmartyKey
 }
@@ -256,7 +256,7 @@ type secondaryLookup struct {
 
 func (s *secondaryLookup) getSmartyKey() string {
 	if len(s.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return s.SmartyKey
 }
@@ -312,7 +312,7 @@ type secondaryCountLookup struct {
 
 func (s *secondaryCountLookup) getSmartyKey() string {
 	if len(s.Lookup.SmartyKey) == 0 {
-		return smartyKeyBypass
+		return addressSearch
 	}
 	return s.SmartyKey
 }
@@ -367,7 +367,7 @@ const (
 	secondaryData       = "secondary"
 	secondaryDataCount  = "count"
 	emptyDataSubset     = ""
-	smartyKeyBypass     = "search"
+	addressSearch       = "search"
 )
 
 func (l Lookup) populateInclude(query url.Values) {
