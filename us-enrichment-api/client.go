@@ -73,9 +73,6 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	if lookup == nil || lookup.getLookup() == nil {
 		return nil
 	}
-	if len(lookup.getSmartyKey()) == 0 {
-		return nil
-	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
@@ -112,13 +109,21 @@ func buildRequest(lookup enrichmentLookup) *http.Request {
 func buildLookupURL(lookup enrichmentLookup) string {
 	var newLookupURL string
 	if len(lookup.getDataSubset()) == 0 {
-		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, getLookupURLSmartyKeyReplacement(lookup), 1)
 	} else {
-		newLookupURL = strings.Replace(lookupURLWithSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+		newLookupURL = strings.Replace(lookupURLWithSubSet, lookupURLSmartyKey, getLookupURLSmartyKeyReplacement(lookup), 1)
 	}
 
 	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
 	return strings.TrimSuffix(strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1), "/")
+}
+
+func getLookupURLSmartyKeyReplacement(lookup enrichmentLookup) string {
+	if len(lookup.getSmartyKey()) > 0 {
+		return lookup.getSmartyKey()
+	} else {
+		return addressSearch
+	}
 }
 
 const (
@@ -128,4 +133,5 @@ const (
 	lookupURLWithSubSet    = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
 	lookupURLWithoutSubSet = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet                             // Remaining parts will be completed later by the sdk.BaseURLClient.
 	lookupETagHeader       = "Etag"
+	addressSearch          = "search"
 )
