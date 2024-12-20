@@ -73,9 +73,6 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	if lookup == nil || lookup.getLookup() == nil {
 		return nil
 	}
-	if len(lookup.getSmartyKey()) == 0 {
-		return nil
-	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
