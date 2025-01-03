@@ -185,12 +185,13 @@ func (e *principalLookup) populate(query url.Values) {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type geoReferenceLookup struct {
-	Lookup   *Lookup
-	Response []*GeoReferenceResponse
+	Lookup        *Lookup
+	CensusVersion string
+	Response      []*GeoReferenceResponse
 }
 
 func (g *geoReferenceLookup) getDataSubset() string {
-	return emptyDataSubset
+	return g.CensusVersion
 }
 
 func (g *geoReferenceLookup) populate(query url.Values) {

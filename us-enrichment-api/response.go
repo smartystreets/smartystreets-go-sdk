@@ -536,6 +536,7 @@ type FinancialAttributes struct {
 type GeoReferenceResponse struct {
 	SmartyKey      string                 `json:"smarty_key"`
 	DataSetName    string                 `json:"data_set_name"`
+	DataSetVersion string                 `json:"data_set_version"`
 	MatchedAddress MatchedAddress         `json:"matched_address"`
 	Attributes     GeoReferenceAttributes `json:"attributes"`
 	Etag           string
@@ -544,23 +545,27 @@ type GeoReferenceResponse struct {
 type GeoReferenceAttributes struct {
 	CensusBlock struct {
 		Accuracy string `json:"accuracy"`
-		Id       string `json:"id"`
+		GeoId    string `json:"geoid"`
 	} `json:"census_block"`
 
 	CensusCountyDivision struct {
 		Accuracy string `json:"accuracy"`
-		Id       string `json:"id"`
+		Code     string `json:"code"`
 		Name     string `json:"name"`
 	} `json:"census_county_division"`
 
+	CensusTract struct {
+		Code string `json:"code"`
+	} `json:"census_tract"`
+
 	CoreBasedStatArea struct {
-		Id   string `json:"id"`
+		Code string `json:"code"`
 		Name string `json:"name"`
 	} `json:"core_based_stat_area"`
 
 	Place struct {
 		Accuracy string `json:"accuracy"`
-		Id       string `json:"id"`
+		Code     string `json:"code"`
 		Name     string `json:"name"`
 		Type     string `json:"type"`
 	} `json:"place"`

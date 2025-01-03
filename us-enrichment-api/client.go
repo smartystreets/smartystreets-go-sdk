@@ -42,6 +42,12 @@ func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceRespons
 	return err, geoRefLookup.Response
 }
 
+func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion string) (error, []*GeoReferenceResponse) {
+	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
+	err := c.sendLookup(geoRefLookup)
+	return err, geoRefLookup.Response
+}
+
 func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
 	secondaryLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookup(secondaryLookup)
