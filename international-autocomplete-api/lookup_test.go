@@ -30,7 +30,7 @@ func (f *LookupFixture) populate() {
 func (f *LookupFixture) TestDefaults() {
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query, should.HaveLength, 2)
 	f.So(f.query.Get("max_results"), should.Equal, "5")
 }
 func (f *LookupFixture) TestCountry() {
@@ -38,7 +38,7 @@ func (f *LookupFixture) TestCountry() {
 
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 2)
+	f.So(f.query, should.HaveLength, 3)
 	f.So(f.query.Get("country"), should.Equal, "Hello, World!")
 }
 func (f *LookupFixture) TestSearch() {
@@ -46,7 +46,7 @@ func (f *LookupFixture) TestSearch() {
 
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 2)
+	f.So(f.query, should.HaveLength, 3)
 	f.So(f.query.Get("search"), should.Equal, "Hello, World!")
 }
 func (f *LookupFixture) TestMaxResults() {
@@ -55,12 +55,26 @@ func (f *LookupFixture) TestMaxResults() {
 
 	f.So(f.query.Get("max_results"), should.Equal, "7")
 }
+func (f *LookupFixture) TestMaxGroupResults() {
+	f.lookup.MaxGroupResults = 7
+	f.populate()
+
+	f.So(f.query.Get("max_group_results"), should.Equal, "7")
+}
+func (f *LookupFixture) TestGeolocation() {
+	f.lookup.Geolocation = "locality"
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 3)
+	f.So(f.query.Get("geolocation"), should.Equal, "locality")
+}
 func (f *LookupFixture) TestLocality() {
 	f.lookup.Locality = "Hello, World!"
 
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 2)
+	f.So(f.query, should.HaveLength, 3)
 	f.So(f.query.Get("include_only_locality"), should.Equal, "Hello, World!")
 }
 func (f *LookupFixture) TestPostalCode() {
@@ -68,6 +82,6 @@ func (f *LookupFixture) TestPostalCode() {
 
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 2)
+	f.So(f.query, should.HaveLength, 3)
 	f.So(f.query.Get("include_only_postal_code"), should.Equal, "Hello, World!")
 }
