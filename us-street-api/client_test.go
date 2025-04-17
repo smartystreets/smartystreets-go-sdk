@@ -199,20 +199,20 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
       "lacslink_indicator": "lacslink_indicator",
       "suitelink_match": true,
       "enhanced_match": "enhanced_match",
-	  "component_analysis": {
+	  "components": {
         "primary_number": {
           "status": "confirmed"
         },
         "street_predirection": {
           "status": "confirmed",
-          "change": "added"
+          "change": ["added"]
         },
         "street_name": {
           "status": "confirmed"
         },
         "street_suffix": {
           "status": "confirmed",
-          "change": "added"
+          "change": ["added"]
         },
         "secondary_number": {
           "status": "unconfirmed"
@@ -231,7 +231,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
         },
         "plus4_code": {
           "status": "confirmed",
-          "change": "corrected"
+          "change": ["corrected"]
         }
       }
     }
@@ -306,62 +306,62 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 				SuiteLinkMatch:    true,
 				EWSMatch:          false,
 				EnhancedMatch:     "enhanced_match",
-				ComponentAnalysis: ComponentAnalysis{
+				Components: ComponentAnalysis{
 					PrimaryNumber: MatchInfo{
 						Status: "confirmed",
-						Change: "",
+						Change: nil,
 					},
 					StreetPredirection: MatchInfo{
 						Status: "confirmed",
-						Change: "added",
+						Change: []string{"added"},
 					},
 					StreetName: MatchInfo{
 						Status: "confirmed",
-						Change: "",
+						Change: nil,
 					},
 					StreetPostdirection: MatchInfo{
 						Status: "",
-						Change: "",
+						Change: nil,
 					},
 					StreetSuffix: MatchInfo{
 						Status: "confirmed",
-						Change: "added",
+						Change: []string{"added"},
 					},
 					SecondaryNumber: MatchInfo{
 						Status: "unconfirmed",
-						Change: "",
+						Change: nil,
 					},
 					SecondaryDesignator: MatchInfo{
 						Status: "unconfirmed",
-						Change: "",
+						Change: nil,
 					},
 					ExtraSecondaryNumber: MatchInfo{
 						Status: "",
-						Change: "",
+						Change: nil,
 					},
 					ExtraSecondaryDesignator: MatchInfo{
 						Status: "",
-						Change: "",
+						Change: nil,
 					},
 					CityName: MatchInfo{
 						Status: "confirmed",
-						Change: "",
+						Change: nil,
 					},
 					StateAbbreviation: MatchInfo{
 						Status: "confirmed",
-						Change: "",
+						Change: nil,
 					},
 					ZIPCode: MatchInfo{
 						Status: "confirmed",
-						Change: "",
+						Change: nil,
 					},
 					Plus4Code: MatchInfo{
 						Status: "confirmed",
-						Change: "corrected",
+						Change: []string{"corrected"},
 					},
 					Urbanization: MatchInfo{
 						Status: "",
-						Change: "",
+						Change: nil,
 					},
 				},
 			},

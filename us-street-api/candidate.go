@@ -82,7 +82,7 @@ type (
 		SuiteLinkMatch    bool              `json:"suitelink_match,omitempty"`
 		EWSMatch          bool              `json:"ews_match,omitempty"`      // deprecated
 		EnhancedMatch     string            `json:"enhanced_match,omitempty"` //v2 integration
-		ComponentAnalysis ComponentAnalysis `json:"component_analysis,omitempty"`
+		Components        ComponentAnalysis `json:"components,omitempty"`
 	}
 
 	ComponentAnalysis struct {
@@ -103,7 +103,7 @@ type (
 	}
 
 	MatchInfo struct {
-		Status string `json:"status,omitempty"`
-		Change string `json:"change,omitempty"`
+		Status string   `json:"status,omitempty"`
+		Change []string `json:"change,omitempty"`
 	}
 )
