@@ -21,6 +21,7 @@ type Lookup struct {
 	MaxCandidates int           `json:"candidates,omitempty"` // Default value: 1
 	MatchStrategy MatchStrategy `json:"match,omitempty"`
 	OutputFormat  OutputFormat  `json:"format,omitempty"`
+	CountySource  CountySource  `json:"county_source,omitempty"`
 
 	Results []*Candidate `json:"results,omitempty"`
 }
@@ -47,6 +48,9 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	if l.OutputFormat != FormatDefault {
 		encode(query, string(l.OutputFormat), "format")
 	}
+	if l.CountySource != PostalCounty {
+		encode(query, string(l.CountySource), "county_source")
+	}
 }
 func encode(query url.Values, source string, target string) {
 	if source != "" {
@@ -69,4 +73,11 @@ type OutputFormat string
 const (
 	FormatDefault    = OutputFormat("default")
 	FormatProjectUSA = OutputFormat("project-usa")
+)
+
+type CountySource string
+
+const (
+	PostalCounty     = CountySource("postal")
+	GeographicCounty = CountySource("geographic")
 )

@@ -115,6 +115,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"components": {
 	  "super_administrative_area": "super_blah",
 	  "administrative_area": "SP",
+	  "administrative_area_iso2": "BR-SP",
 	  "administrative_area_short": "SP",
 	  "administrative_area_long": "São Paulo",
 	  "sub_administrative_area": "sub_blah",
@@ -185,6 +186,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"components": {
 	 	  "super_administrative_area": "blank",
 		  "administrative_area": "Verified-NoChange",
+		  "administrative_area_iso2": "Added",
 		  "administrative_area_short": "blank",
 		  "administrative_area_long": "blank",
 		  "sub_administrative_area": "blank",
@@ -225,7 +227,12 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "level_number": "blank",
 		  "post_box": "blank",
 		  "post_box_type": "blank",
-		  "post_box_number": "blank"
+		  "post_box_number": "blank",
+		  "additional_content":"blank",
+		  "delivery_installation_type":"blank",
+		  "delivery_installation_qualifier_name":"blank",
+		  "route_number":"blank",
+		  "route_type":"blank"
 		}
 	  }
 	}
@@ -257,6 +264,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.Address12, should.Equal, "here")
 	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
 	f.So(component.AdministrativeArea, should.Equal, "SP")
+	f.So(component.AdministrativeAreaISO2, should.Equal, "BR-SP")
 	f.So(component.AdministrativeAreaShort, should.Equal, "SP")
 	f.So(component.AdministrativeAreaLong, should.Equal, "São Paulo")
 	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
@@ -358,6 +366,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.PostBox, should.Equal, "blank")
 	f.So(ccomponents.PostBoxType, should.Equal, "blank")
 	f.So(ccomponents.PostBoxNumber, should.Equal, "blank")
+	f.So(ccomponents.AdditionalContent, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationType, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
+	f.So(ccomponents.RouteType, should.Equal, "blank")
+	f.So(ccomponents.RouteNumber, should.Equal, "blank")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

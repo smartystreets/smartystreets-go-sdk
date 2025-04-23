@@ -32,6 +32,7 @@ type (
 	Components struct {
 		SuperAdministrativeArea            string `json:"super_administrative_area,omitempty"`
 		AdministrativeArea                 string `json:"administrative_area,omitempty"`
+		AdministrativeAreaISO2             string `json:"administrative_area_iso2,omitempty"`
 		AdministrativeAreaShort            string `json:"administrative_area_short,omitempty"`
 		AdministrativeAreaLong             string `json:"administrative_area_long,omitempty"`
 		SubAdministrativeArea              string `json:"sub_administrative_area,omitempty"`
@@ -73,6 +74,13 @@ type (
 		PostBox                            string `json:"post_box,omitempty"`
 		PostBoxType                        string `json:"post_box_type,omitempty"`
 		PostBoxNumber                      string `json:"post_box_number,omitempty"`
+		AdditionalContent                  string `json:"additional_content,omitempty"`
+		DeliveryInstallation               string `json:"delivery_installation,omitempty"`
+		DeliveryInstallationType           string `json:"delivery_installation_type,omitempty"`
+		DeliveryInstallationQualifierName  string `json:"delivery_installation_qualifier_name,omitempty"`
+		Route                              string `json:"route,omitempty"`
+		RouteNumber                        string `json:"route_number,omitempty"`
+		RouteType                          string `json:"route_type,omitempty"`
 	}
 
 	// Metadata contains all output fields defined here:

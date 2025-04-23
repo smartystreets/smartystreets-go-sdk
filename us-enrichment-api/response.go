@@ -4,8 +4,16 @@ type PrincipalResponse struct {
 	SmartyKey      string              `json:"smarty_key"`
 	DataSetName    string              `json:"data_set_name"`
 	DataSubsetName string              `json:"data_subset_name"`
+	MatchedAddress MatchedAddress      `json:"matched_address"`
 	Attributes     PrincipalAttributes `json:"attributes"`
 	Etag           string
+}
+
+type MatchedAddress struct {
+	Street  string `json:"street"`
+	City    string `json:"city"`
+	State   string `json:"state"`
+	ZIPCode string `json:"zipcode"`
 }
 
 type PrincipalAttributes struct {
@@ -375,6 +383,7 @@ type FinancialResponse struct {
 	SmartyKey      string              `json:"smarty_key"`
 	DataSetName    string              `json:"data_set_name"`
 	DataSubsetName string              `json:"data_subset_name"`
+	MatchedAddress MatchedAddress      `json:"matched_address"`
 	Attributes     FinancialAttributes `json:"attributes"`
 	Etag           string
 }
@@ -525,10 +534,11 @@ type FinancialAttributes struct {
 }
 
 type GeoReferenceResponse struct {
-	SmartyKey   string                 `json:"smarty_key"`
-	DataSetName string                 `json:"data_set_name"`
-	Attributes  GeoReferenceAttributes `json:"attributes"`
-	Etag        string
+	SmartyKey      string                 `json:"smarty_key"`
+	DataSetName    string                 `json:"data_set_name"`
+	MatchedAddress MatchedAddress         `json:"matched_address"`
+	Attributes     GeoReferenceAttributes `json:"attributes"`
+	Etag           string
 }
 
 type GeoReferenceAttributes struct {
@@ -584,10 +594,11 @@ type Alias struct {
 }
 
 type Secondary struct {
-	SmartyKey           string `json:"smarty_key"`
-	SecondaryDesignator string `json:"secondary_designator"`
-	SecondaryNumber     string `json:"secondary_number"`
-	Plus4Code           string `json:"plus4_code"`
+	SmartyKey           string         `json:"smarty_key"`
+	MatchedAddress      MatchedAddress `json:"matched_address"`
+	SecondaryDesignator string         `json:"secondary_designator"`
+	SecondaryNumber     string         `json:"secondary_number"`
+	Plus4Code           string         `json:"plus4_code"`
 }
 
 type SecondaryResponse struct {
