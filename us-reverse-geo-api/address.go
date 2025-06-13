@@ -26,4 +26,5 @@ type Address struct {
 	StateAbbreviation string `json:"state_abbreviation"`
 	ZIPCode           string `json:"zipcode"`
 	Source            string `json:"source"`
+	Smartykey         string `json:"smarty_key"`
 }
