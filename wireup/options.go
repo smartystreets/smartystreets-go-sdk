@@ -6,7 +6,6 @@ import (
 
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
@@ -23,11 +22,6 @@ func BuildUSStreetAPIClient(options ...Option) *street.Client {
 // BuildUSZIPCodeAPIClient builds a client for the US ZIP Code API using the provided options.
 func BuildUSZIPCodeAPIClient(options ...Option) *zipcode.Client {
 	return configure(options...).buildUSZIPCodeAPIClient()
-}
-
-// BuildUSAutocompleteAPIClient builds a client for the US Autocomplete API using the provided options.
-func BuildUSAutocompleteAPIClient(options ...Option) *autocomplete.Client {
-	return configure(options...).buildUSAutocompleteAPIClient()
 }
 
 // BuildUSAutocompleteProAPIClient builds a client for the US Autocomplete API using the provided options.
