@@ -31,7 +31,7 @@ func main() {
 		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendRiskLookup(&lookup)
+	err, results := client.SendRisk(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current

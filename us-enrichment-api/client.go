@@ -48,22 +48,32 @@ func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion strin
 	return err, geoRefLookup.Response
 }
 
-func (c *Client) SendRiskLookup(lookup *Lookup) (error, []*RiskResponse) {
+func (c *Client) SendRisk(lookup *Lookup) (error, []*RiskResponse) {
 	rLookup := &riskLookup{Lookup: lookup}
 	err := c.sendLookup(rLookup)
 	return err, rLookup.Response
 }
 
-func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
+func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookup(sLookup)
 	return err, sLookup.Response
 }
 
-func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
+// Deprecated: SendSecondaryLookup is deprecated. Use SendSecondary
+func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
+	return c.SendSecondary(lookup)
+}
+
+func (c *Client) SendSecondaryCount(lookup *Lookup) (error, []*SecondaryCountResponse) {
 	scLookup := &secondaryCountLookup{Lookup: lookup}
 	err := c.sendLookup(scLookup)
 	return err, scLookup.Response
+}
+
+// Deprecated: SendSecondaryCountLookup is deprecated. Use SendSecondaryCount
+func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
+	return c.SendSecondaryCount(lookup)
 }
 
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
