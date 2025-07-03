@@ -48,16 +48,22 @@ func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion strin
 	return err, geoRefLookup.Response
 }
 
+func (c *Client) SendRiskLookup(lookup *Lookup) (error, []*RiskResponse) {
+	rLookup := &riskLookup{Lookup: lookup}
+	err := c.sendLookup(rLookup)
+	return err, rLookup.Response
+}
+
 func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
-	secondaryLookup := &secondaryLookup{Lookup: lookup}
-	err := c.sendLookup(secondaryLookup)
-	return err, secondaryLookup.Response
+	sLookup := &secondaryLookup{Lookup: lookup}
+	err := c.sendLookup(sLookup)
+	return err, sLookup.Response
 }
 
 func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
-	secondaryCountLookup := &secondaryCountLookup{Lookup: lookup}
-	err := c.sendLookup(secondaryCountLookup)
-	return err, secondaryCountLookup.Response
+	scLookup := &secondaryCountLookup{Lookup: lookup}
+	err := c.sendLookup(scLookup)
+	return err, scLookup.Response
 }
 
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
