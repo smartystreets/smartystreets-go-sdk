@@ -81,6 +81,7 @@ type (
 		Route                              string `json:"route,omitempty"`
 		RouteNumber                        string `json:"route_number,omitempty"`
 		RouteType                          string `json:"route_type,omitempty"`
+		UseIndicator                       string `json:"use_indicator,omitempty"`
 	}
 
 	// Metadata contains all output fields defined here:

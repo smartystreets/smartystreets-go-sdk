@@ -232,7 +232,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "delivery_installation_type":"blank",
 		  "delivery_installation_qualifier_name":"blank",
 		  "route_number":"blank",
-		  "route_type":"blank"
+		  "route_type":"blank",
+			"use_indicator":"blank"
 		}
 	  }
 	}
@@ -371,6 +372,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
 	f.So(ccomponents.RouteType, should.Equal, "blank")
 	f.So(ccomponents.RouteNumber, should.Equal, "blank")
+	f.So(ccomponents.UseIndicator, should.Equal, "blank")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
