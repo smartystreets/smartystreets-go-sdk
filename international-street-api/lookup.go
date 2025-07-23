@@ -11,6 +11,7 @@ type Lookup struct {
 	Country            string
 	Geocode            bool
 	Language           Language
+	Features           string
 	Freeform           string
 	Address1           string
 	Address2           string
@@ -40,6 +41,7 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "country", l.Country)
 	populate(query, "geocode", boolString(l.Geocode))
 	populate(query, "language", string(l.Language))
+	populate(query, "features", l.Features)
 	populate(query, "freeform", l.Freeform)
 	populate(query, "address1", l.Address1)
 	populate(query, "address2", l.Address2)

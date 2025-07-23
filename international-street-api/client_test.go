@@ -163,7 +163,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	  "longitude": -46.659711,
 	  "geocode_precision": "Premise",
 	  "max_geocode_precision": "DeliveryPoint",
-	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code"
+	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code",
+	  "occupant_use": "commercial"
 	},
     "analysis": {
 	  "verification_status": "Verified",
@@ -232,8 +233,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "delivery_installation_type":"blank",
 		  "delivery_installation_qualifier_name":"blank",
 		  "route_number":"blank",
-		  "route_type":"blank",
-			"use_indicator":"blank"
+		  "route_type":"blank"
 		}
 	  }
 	}
@@ -312,6 +312,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(metadata.GeocodePrecision, should.Equal, "Premise")
 	f.So(metadata.MaxGeocodePrecision, should.Equal, "DeliveryPoint")
 	f.So(metadata.AddressFormat, should.Equal, "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code")
+	f.So(metadata.OccupantUse, should.Equal, "commercial")
 	f.So(analysis.VerificationStatus, should.Equal, "Verified")
 	f.So(analysis.AddressPrecision, should.Equal, "Premise")
 	f.So(analysis.MaxAddressPrecision, should.Equal, "DeliveryPoint")
@@ -372,7 +373,6 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
 	f.So(ccomponents.RouteType, should.Equal, "blank")
 	f.So(ccomponents.RouteNumber, should.Equal, "blank")
-	f.So(ccomponents.UseIndicator, should.Equal, "blank")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

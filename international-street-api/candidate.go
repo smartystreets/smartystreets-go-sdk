@@ -81,7 +81,6 @@ type (
 		Route                              string `json:"route,omitempty"`
 		RouteNumber                        string `json:"route_number,omitempty"`
 		RouteType                          string `json:"route_type,omitempty"`
-		UseIndicator                       string `json:"use_indicator,omitempty"`
 	}
 
 	// Metadata contains all output fields defined here:
@@ -92,6 +91,7 @@ type (
 		GeocodePrecision    string  `json:"geocode_precision,omitempty"`
 		MaxGeocodePrecision string  `json:"max_geocode_precision,omitempty"`
 		AddressFormat       string  `json:"address_format,omitempty"`
+		OccupantUse         string  `json:"occupant_use,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:
