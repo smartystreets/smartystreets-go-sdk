@@ -73,7 +73,6 @@ func (g *universalLookup) populate(query url.Values) {
 	g.Lookup.populateCity(query)
 	g.Lookup.populateState(query)
 	g.Lookup.populateZIPCode(query)
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -238,6 +237,59 @@ func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+type riskLookup struct {
+	*Lookup
+	Response []*RiskResponse
+}
+
+func (s *riskLookup) getSmartyKey() string {
+	return s.SmartyKey
+}
+
+func (s *riskLookup) getDataSet() string {
+	return riskDataSet
+}
+
+func (s *riskLookup) getDataSubset() string {
+	return emptyDataSubset
+}
+
+func (s *riskLookup) getLookup() *Lookup {
+	return s.Lookup
+}
+
+func (s *riskLookup) getResponse() interface{} {
+	return s.Response
+}
+
+func (s *riskLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(s.Response) > 0 {
+				s.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *riskLookup) populate(query url.Values) {
+	s.Lookup.populateInclude(query)
+	s.Lookup.populateExclude(query)
+	s.Lookup.populateFreeform(query)
+	s.Lookup.populateStreet(query)
+	s.Lookup.populateCity(query)
+	s.Lookup.populateState(query)
+	s.Lookup.populateZIPCode(query)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 type secondaryLookup struct {
 	*Lookup
 	Response []*SecondaryResponse
@@ -347,6 +399,7 @@ const (
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
 	geoReferenceDataSet = "geo-reference"
+	riskDataSet         = "risk"
 	secondaryData       = "secondary"
 	secondaryDataCount  = "count"
 	emptyDataSubset     = ""

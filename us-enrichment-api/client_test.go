@@ -139,6 +139,28 @@ func (f *ClientFixture) TestGeoReference() {
 	f.So(response, should.Resemble, geoRefResponse)
 }
 
+func (f *ClientFixture) TestRiskLookup() {
+	smartyKey := "123"
+	f.sender.response = validRiskResponse
+	f.input = &riskLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
+
+	ctx := context.WithValue(context.Background(), "key", "value")
+	err := f.client.sendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Method, should.Equal, "GET")
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.getDataSet())
+	f.So(f.sender.request.Context(), should.Resemble, ctx)
+
+	response := f.input.(*riskLookup).Response
+	var riskResponse []*RiskResponse
+	err = json.Unmarshal([]byte(validRiskResponse), &riskResponse)
+	riskResponse[0].Etag = "ABCDEFG"
+	f.So(err, should.BeNil)
+	f.So(response, should.Resemble, riskResponse)
+}
+
 func (f *ClientFixture) TestSecondaryLookup() {
 	smartyKey := "123"
 	f.sender.response = validSecondaryResponse
@@ -189,6 +211,7 @@ func (f *ClientFixture) TestSecondaryCount() {
 var validFinancialResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"financial","attributes":{"assessed_improvement_percent":"Assessed_Improvement_Percent","veteran_tax_exemption":"Veteran_Tax_Exemption","widow_tax_exemption":"Widow_Tax_Exemption"}}]`
 var validPrincipalResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft",lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-reference","data_set_version":"census-2020","attributes":{"census_block":{"accuracy":"block","geoid":"180759630002012"},"census_county_division":{"accuracy":"exact","code":"1807581764","name":"Wayne"},"census_tract":{"code":"9630.00"},"place":{"accuracy":"exact","code":"1861236","name":"Portland","type":"incorporated"}}}]`
+var validRiskResponse = `[{"smarty_key":"123","data_set_name":"risk","attributes":{"AGRIVALUE":"data","ALR_NPCTL":"data","ALR_VALA":"data","ALR_VALB":"data","ALR_VALP":"data","ALR_VRA_NPCTL":"data","AREA":"data","AVLN_AFREQ":"data","AVLN_ALRB":"data","AVLN_ALRP":"data","AVLN_ALR_NPCTL":"data","AVLN_EALB":"data","AVLN_EALP":"data","AVLN_EALPE":"data","AVLN_EALR":"data","AVLN_EALS":"data","AVLN_EALT":"data","AVLN_EVNTS":"data","AVLN_EXPB":"data","AVLN_EXPP":"data","AVLN_EXPPE":"data"}}]`
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`
 var validSecondaryCountResponse = `[{"smarty_key":"123","count":3}]`
 
