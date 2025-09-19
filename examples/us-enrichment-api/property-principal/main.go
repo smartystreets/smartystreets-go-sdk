@@ -25,10 +25,11 @@ func main() {
 	smartyKey := "87844267"
 
 	lookup := us_enrichment.Lookup{
-		SmartyKey: smartyKey,                    //smartyKey,
-		Include:   "group_structural,sale_date", // optional: only include these attributes in the returned data
-		Exclude:   "",                           // optional: exclude attributes from the returned data
-		ETag:      "",                           // optional: check if the record has been updated
+		SmartyKey: smartyKey, //smartyKey,
+		Include:   "",        // optional: only include these attributes in the returned data. e.g. "group_structural,sale_date"
+		Exclude:   "",        // optional: exclude attributes from the returned data
+		ETag:      "",        // optional: check if the record has been updated
+		Features:  "financial",
 	}
 
 	err, results := client.SendPropertyPrincipal(&lookup)
