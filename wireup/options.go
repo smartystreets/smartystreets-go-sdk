@@ -5,6 +5,7 @@ import (
 	"time"
 
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
@@ -42,6 +43,11 @@ func BuildUSExtractAPIClient(options ...Option) *extract.Client {
 // BuildInternationalStreetAPIClient builds a client for the International Street API using the provided options.
 func BuildInternationalStreetAPIClient(options ...Option) *international_street.Client {
 	return configure(options...).buildInternationalStreetAPIClient()
+}
+
+// BuildInternationalPostalCodeAPIClient builds a client for the International Postal Code API using the provided options.
+func BuildInternationalPostalCodeAPIClient(options ...Option) *international_postal_code.Client {
+	return configure(options...).buildInternationalPostalCodeAPIClient()
 }
 
 // BuildInternationalAutocompleteAPIClient builds a client for the International Autocomplete API using the provided options.

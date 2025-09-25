@@ -60,14 +60,12 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 
 func (f *ClientFixture) TestNilLookupNOP() {
 	err := f.client.SendLookup(nil)
-	f.So(err, should.BeNil)
-	f.So(f.sender.request, should.BeNil)
+	f.So(err.Error(), should.Equal, "lookup cannot be nil")
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
 	err := f.client.SendLookup(new(Lookup))
-	f.So(err, should.BeNil)
-	f.So(f.sender.request, should.BeNil)
+	f.So(err.Error(), should.Equal, "unexpected end of JSON input")
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {

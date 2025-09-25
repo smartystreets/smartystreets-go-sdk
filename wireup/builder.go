@@ -12,6 +12,7 @@ import (
 	"github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
@@ -158,6 +159,11 @@ func (b *clientBuilder) buildInternationalStreetAPIClient() *international_stree
 	return international_street.NewClient(b.buildHTTPSender())
 }
 
+func (b *clientBuilder) buildInternationalPostalCodeAPIClient() *international_postal_code.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_InternationalPostalCodeAPI)
+	return international_postal_code.NewClient(b.buildHTTPSender())
+}
+
 func (b *clientBuilder) buildInternationalAutocompleteAPIClient() *international_autocomplete.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_InternationalAutocompleteAPI)
 	return international_autocomplete.NewClient(b.buildHTTPSender())
@@ -223,6 +229,7 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 
 var (
 	defaultBaseURL_InternationalStreetAPI       = &url.URL{Scheme: "https", Host: "international-street.api.smarty.com"}
+	defaultBaseURL_InternationalPostalCodeAPI   = &url.URL{Scheme: "https", Host: "international-postal-code.api.smarty.com"}
 	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smarty.com"}
 	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smarty.com"}
 	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smarty.com"}

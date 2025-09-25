@@ -1,4 +1,4 @@
-package street
+package international_postal_code
 
 import (
 	"context"
@@ -49,11 +49,11 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 }
 
 func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", verifyURL, nil) // We control the method and the URL. This is safe.
+	request, _ := http.NewRequest("GET", lookupUrl, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
-const verifyURL = "/verify" // Remaining parts will be completed later by the sdk.BaseURLClient.
+const lookupUrl = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
