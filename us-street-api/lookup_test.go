@@ -87,3 +87,11 @@ func (this *LookupFixture) TestQueryStringEncoding_CountySourceSerialized() {
 		"county_source": {"geographic"},
 	})
 }
+
+func (this *LookupFixture) TestQueryStringEncoding_CustomParameters() {
+	lookup := &Lookup{}
+	lookup.AddCustomParameter("test_parameter", "hello")
+	this.So(this.encode(lookup), should.Resemble, url.Values{
+		"test_parameter": {"hello"},
+	})
+}
