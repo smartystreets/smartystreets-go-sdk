@@ -37,14 +37,16 @@ type clientBuilder struct {
 	http2Disabled bool
 	client        *http.Client
 	licenses      []string
+	customQueries url.Values
 }
 
 func newClientBuilder() *clientBuilder {
 	return &clientBuilder{
-		credential: &internal.NopCredential{},
-		retries:    4,
-		timeout:    time.Second * 10,
-		headers:    initializeHeadersWithUserAgent(),
+		credential:    &internal.NopCredential{},
+		retries:       4,
+		timeout:       time.Second * 10,
+		headers:       initializeHeadersWithUserAgent(),
+		customQueries: url.Values{},
 	}
 }
 
@@ -190,6 +192,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	wrapped = internal.NewLicenseClient(wrapped, b.licenses...)
+	wrapped = internal.NewCustomQueryClient(wrapped, b.customQueries)
 	// outer-most
 	return wrapped
 }
