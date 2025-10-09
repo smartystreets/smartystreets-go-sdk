@@ -17,6 +17,7 @@ type Lookup struct {
 	State     string
 	ZIPCode   string
 	ETag      string
+	Features  string
 }
 
 type enrichmentLookup interface {
@@ -36,7 +37,9 @@ type universalLookup struct {
 	Response   []byte
 }
 
-func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
+func (g *universalLookup) getSmartyKey() string {
+	return g.Lookup.SmartyKey
+}
 func (g *universalLookup) getDataSet() string       { return g.DataSet }
 func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
 func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
@@ -71,7 +74,7 @@ func (g *universalLookup) populate(query url.Values) {
 	g.Lookup.populateCity(query)
 	g.Lookup.populateState(query)
 	g.Lookup.populateZIPCode(query)
-
+	g.Lookup.populateFeatures(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +128,7 @@ func (e *financialLookup) populate(query url.Values) {
 	e.Lookup.populateCity(query)
 	e.Lookup.populateState(query)
 	e.Lookup.populateZIPCode(query)
+	e.Lookup.populateFeatures(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -178,17 +182,19 @@ func (e *principalLookup) populate(query url.Values) {
 	e.Lookup.populateCity(query)
 	e.Lookup.populateState(query)
 	e.Lookup.populateZIPCode(query)
+	e.Lookup.populateFeatures(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type geoReferenceLookup struct {
-	Lookup   *Lookup
-	Response []*GeoReferenceResponse
+	Lookup        *Lookup
+	CensusVersion string
+	Response      []*GeoReferenceResponse
 }
 
 func (g *geoReferenceLookup) getDataSubset() string {
-	return emptyDataSubset
+	return g.CensusVersion
 }
 
 func (g *geoReferenceLookup) populate(query url.Values) {
@@ -199,6 +205,7 @@ func (g *geoReferenceLookup) populate(query url.Values) {
 	g.Lookup.populateCity(query)
 	g.Lookup.populateState(query)
 	g.Lookup.populateZIPCode(query)
+	g.Lookup.populateFeatures(query)
 }
 
 func (g *geoReferenceLookup) getSmartyKey() string {
@@ -231,6 +238,60 @@ func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header
 	}
 
 	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+type riskLookup struct {
+	*Lookup
+	Response []*RiskResponse
+}
+
+func (s *riskLookup) getSmartyKey() string {
+	return s.SmartyKey
+}
+
+func (s *riskLookup) getDataSet() string {
+	return riskDataSet
+}
+
+func (s *riskLookup) getDataSubset() string {
+	return emptyDataSubset
+}
+
+func (s *riskLookup) getLookup() *Lookup {
+	return s.Lookup
+}
+
+func (s *riskLookup) getResponse() interface{} {
+	return s.Response
+}
+
+func (s *riskLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(s.Response) > 0 {
+				s.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *riskLookup) populate(query url.Values) {
+	s.Lookup.populateInclude(query)
+	s.Lookup.populateExclude(query)
+	s.Lookup.populateFreeform(query)
+	s.Lookup.populateStreet(query)
+	s.Lookup.populateCity(query)
+	s.Lookup.populateState(query)
+	s.Lookup.populateZIPCode(query)
+	s.Lookup.populateFeatures(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -284,6 +345,7 @@ func (s *secondaryLookup) populate(query url.Values) {
 	s.Lookup.populateCity(query)
 	s.Lookup.populateState(query)
 	s.Lookup.populateZIPCode(query)
+	s.Lookup.populateFeatures(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -337,6 +399,7 @@ func (s *secondaryCountLookup) populate(query url.Values) {
 	s.Lookup.populateCity(query)
 	s.Lookup.populateState(query)
 	s.Lookup.populateZIPCode(query)
+	s.Lookup.populateFeatures(query)
 }
 
 const (
@@ -344,6 +407,7 @@ const (
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
 	geoReferenceDataSet = "geo-reference"
+	riskDataSet         = "risk"
 	secondaryData       = "secondary"
 	secondaryDataCount  = "count"
 	emptyDataSubset     = ""
@@ -388,5 +452,11 @@ func (l Lookup) populateState(query url.Values) {
 func (l Lookup) populateZIPCode(query url.Values) {
 	if len(l.ZIPCode) > 0 {
 		query.Set("zipcode", l.ZIPCode)
+	}
+}
+
+func (l Lookup) populateFeatures(query url.Values) {
+	if len(l.Features) > 0 {
+		query.Set("features", l.Features)
 	}
 }

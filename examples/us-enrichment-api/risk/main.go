@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
+	usenrich "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
@@ -22,17 +22,16 @@ func main() {
 	// Documentation for input fields can be found at:
 	// https://www.smarty.com/docs/cloud/us-address-enrichment-api#http-request-input-fields
 
-	smartyKey := "87844267"
+	//smartyKey := "1270119982"
+	smartyKey := "search" // SmartyKey to use when performing an address search
 
-	lookup := us_enrichment.Lookup{
-		SmartyKey: smartyKey, //smartyKey,
-		Include:   "",        // optional: only include these attributes in the returned data. e.g. "group_structural,sale_date"
-		Exclude:   "",        // optional: exclude attributes from the returned data
-		ETag:      "",        // optional: check if the record has been updated
-		Features:  "financial",
+	lookup := usenrich.Lookup{
+		SmartyKey: smartyKey,
+		Freeform:  "1 E Main Carnegie OK",
+		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	err, results := client.SendRisk(&lookup)
 
 	if err != nil {
 		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
@@ -43,9 +42,12 @@ func main() {
 		log.Fatal("Error sending lookup:", err)
 	}
 
-	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
-	for s, response := range results {
-		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
-		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
+	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "risk")
+	for i, response := range results {
+		prettyPrinted, err := json.MarshalIndent(response, "", "    ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Response %d: %s", i, prettyPrinted)
 	}
 }

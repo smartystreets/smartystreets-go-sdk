@@ -6,7 +6,6 @@ import (
 
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
@@ -23,11 +22,6 @@ func BuildUSStreetAPIClient(options ...Option) *street.Client {
 // BuildUSZIPCodeAPIClient builds a client for the US ZIP Code API using the provided options.
 func BuildUSZIPCodeAPIClient(options ...Option) *zipcode.Client {
 	return configure(options...).buildUSZIPCodeAPIClient()
-}
-
-// BuildUSAutocompleteAPIClient builds a client for the US Autocomplete API using the provided options.
-func BuildUSAutocompleteAPIClient(options ...Option) *autocomplete.Client {
-	return configure(options...).buildUSAutocompleteAPIClient()
 }
 
 // BuildUSAutocompleteProAPIClient builds a client for the US Autocomplete API using the provided options.
@@ -187,4 +181,30 @@ func WithLicenses(licenses ...string) Option {
 	return func(builder *clientBuilder) {
 		builder.licenses = append(builder.licenses, licenses...)
 	}
+}
+
+// WithCustomQuery allows the caller to specify key and value pair that is added to the request query.
+func WithCustomQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		builder.customQueries.Set(key, value)
+	}
+}
+
+// WithCustomCommaSeparatedQuery allows the caller to specify key and value pair and appends the value to the current
+// value associated with the key, separated by a comma.
+func WithCustomCommaSeparatedQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		v := builder.customQueries.Get(key)
+		if v == "" {
+			v = value
+		} else {
+			v += "," + value
+		}
+		builder.customQueries.Set(key, value)
+	}
+}
+
+// WithFeatureComponentAnalysis adds to the request query to use the component analysis feature.
+func WithFeatureComponentAnalysis() Option {
+	return WithCustomCommaSeparatedQuery("features", "component-analysis")
 }

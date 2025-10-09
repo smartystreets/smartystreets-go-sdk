@@ -16,10 +16,6 @@ func main() {
 	client := wireup.BuildInternationalStreetAPIClient(
 		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
 		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		// The appropriate license values to be used for your subscriptions
-		// can be found on the Subscriptions page the account dashboard.
-		// https://www.smartystreets.com/docs/cloud/licensing
-		wireup.WithLicenses("international-global-plus-cloud"),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 

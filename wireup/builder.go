@@ -13,7 +13,6 @@ import (
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
@@ -38,14 +37,16 @@ type clientBuilder struct {
 	http2Disabled bool
 	client        *http.Client
 	licenses      []string
+	customQueries url.Values
 }
 
 func newClientBuilder() *clientBuilder {
 	return &clientBuilder{
-		credential: &internal.NopCredential{},
-		retries:    4,
-		timeout:    time.Second * 10,
-		headers:    initializeHeadersWithUserAgent(),
+		credential:    &internal.NopCredential{},
+		retries:       4,
+		timeout:       time.Second * 10,
+		headers:       initializeHeadersWithUserAgent(),
+		customQueries: url.Values{},
 	}
 }
 
@@ -139,11 +140,6 @@ func (b *clientBuilder) buildUSZIPCodeAPIClient() *zipcode.Client {
 	return zipcode.NewClient(b.buildHTTPSender())
 }
 
-func (b *clientBuilder) buildUSAutocompleteAPIClient() *autocomplete.Client {
-	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteAPI)
-	return autocomplete.NewClient(b.buildHTTPSender())
-}
-
 func (b *clientBuilder) buildUSAutocompleteProAPIClient() *autocomplete_pro.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteProAPI)
 	return autocomplete_pro.NewClient(b.buildHTTPSender())
@@ -196,6 +192,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	wrapped = internal.NewLicenseClient(wrapped, b.licenses...)
+	wrapped = internal.NewCustomQueryClient(wrapped, b.customQueries)
 	// outer-most
 	return wrapped
 }
@@ -232,7 +229,6 @@ var (
 	defaultBaseURL_InternationalAutocompleteAPI = &url.URL{Scheme: "https", Host: "international-autocomplete.api.smarty.com"}
 	defaultBaseURL_USStreetAPI                  = &url.URL{Scheme: "https", Host: "us-street.api.smarty.com"}
 	defaultBaseURL_USZIPCodeAPI                 = &url.URL{Scheme: "https", Host: "us-zipcode.api.smarty.com"}
-	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smarty.com"}
 	defaultBaseURL_USEnrichmentAPI              = &url.URL{Scheme: "https", Host: "us-enrichment.api.smarty.com"}
 	defaultBaseURL_USExtractAPI                 = &url.URL{Scheme: "https", Host: "us-extract.api.smarty.com"}
 	defaultBaseURL_USReverseGeocodingAPI        = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smarty.com"}

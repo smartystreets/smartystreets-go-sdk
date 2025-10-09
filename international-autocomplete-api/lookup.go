@@ -6,24 +6,29 @@ import (
 )
 
 const (
-	maxResultsDefault = 5
-	distanceDefault   = 5
+	maxResultsDefault      = 5
+	maxGroupResultsDefault = 100
+	distanceDefault        = 5
 )
 
 type Lookup struct {
-	Country    string
-	Search     string
-	AddressID  string
-	MaxResults int
-	Locality   string
-	PostalCode string
-	Result     *Result
+	Country         string
+	Search          string
+	AddressID       string
+	MaxResults      int
+	MaxGroupResults int
+	Geolocation     string
+	Locality        string
+	PostalCode      string
+	Result          *Result
 }
 
 func (l Lookup) populate(query url.Values) {
 	l.populateCountry(query)
 	l.populateSearch(query)
 	l.populateMaxResults(query)
+	l.populateMaxGroupResults(query)
+	l.populateGeolocation(query)
 	l.populateLocality(query)
 	l.populatePostalCode(query)
 }
@@ -43,6 +48,18 @@ func (l Lookup) populateMaxResults(query url.Values) {
 		maxResults = maxResultsDefault
 	}
 	query.Set("max_results", strconv.Itoa(maxResults))
+}
+func (l Lookup) populateMaxGroupResults(query url.Values) {
+	maxGroupResults := l.MaxGroupResults
+	if maxGroupResults < 1 {
+		maxGroupResults = maxGroupResultsDefault
+	}
+	query.Set("max_group_results", strconv.Itoa(maxGroupResults))
+}
+func (l Lookup) populateGeolocation(query url.Values) {
+	if len(l.Geolocation) > 0 {
+		query.Set("geolocation", l.Geolocation)
+	}
 }
 func (l Lookup) populateLocality(query url.Values) {
 	if len(l.Locality) > 0 {

@@ -42,16 +42,38 @@ func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceRespons
 	return err, geoRefLookup.Response
 }
 
-func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
-	secondaryLookup := &secondaryLookup{Lookup: lookup}
-	err := c.sendLookup(secondaryLookup)
-	return err, secondaryLookup.Response
+func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion string) (error, []*GeoReferenceResponse) {
+	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
+	err := c.sendLookup(geoRefLookup)
+	return err, geoRefLookup.Response
 }
 
+func (c *Client) SendRisk(lookup *Lookup) (error, []*RiskResponse) {
+	rLookup := &riskLookup{Lookup: lookup}
+	err := c.sendLookup(rLookup)
+	return err, rLookup.Response
+}
+
+func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
+	sLookup := &secondaryLookup{Lookup: lookup}
+	err := c.sendLookup(sLookup)
+	return err, sLookup.Response
+}
+
+// Deprecated: SendSecondaryLookup is deprecated. Use SendSecondary
+func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
+	return c.SendSecondary(lookup)
+}
+
+func (c *Client) SendSecondaryCount(lookup *Lookup) (error, []*SecondaryCountResponse) {
+	scLookup := &secondaryCountLookup{Lookup: lookup}
+	err := c.sendLookup(scLookup)
+	return err, scLookup.Response
+}
+
+// Deprecated: SendSecondaryCountLookup is deprecated. Use SendSecondaryCount
 func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
-	secondaryCountLookup := &secondaryCountLookup{Lookup: lookup}
-	err := c.sendLookup(secondaryCountLookup)
-	return err, secondaryCountLookup.Response
+	return c.SendSecondaryCount(lookup)
 }
 
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
@@ -71,9 +93,6 @@ func (c *Client) sendLookup(lookup enrichmentLookup) error {
 
 func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
 	if lookup == nil || lookup.getLookup() == nil {
-		return nil
-	}
-	if len(lookup.getSmartyKey()) == 0 {
 		return nil
 	}
 
@@ -112,13 +131,21 @@ func buildRequest(lookup enrichmentLookup) *http.Request {
 func buildLookupURL(lookup enrichmentLookup) string {
 	var newLookupURL string
 	if len(lookup.getDataSubset()) == 0 {
-		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, getLookupURLSmartyKeyReplacement(lookup), 1)
 	} else {
-		newLookupURL = strings.Replace(lookupURLWithSubSet, lookupURLSmartyKey, lookup.getSmartyKey(), 1)
+		newLookupURL = strings.Replace(lookupURLWithSubSet, lookupURLSmartyKey, getLookupURLSmartyKeyReplacement(lookup), 1)
 	}
 
 	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
 	return strings.TrimSuffix(strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1), "/")
+}
+
+func getLookupURLSmartyKeyReplacement(lookup enrichmentLookup) string {
+	if len(lookup.getSmartyKey()) > 0 {
+		return lookup.getSmartyKey()
+	} else {
+		return addressSearch
+	}
 }
 
 const (
@@ -128,4 +155,5 @@ const (
 	lookupURLWithSubSet    = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet + "/" + lookupURLDataSubSet // Remaining parts will be completed later by the sdk.BaseURLClient.
 	lookupURLWithoutSubSet = "/lookup/" + lookupURLSmartyKey + "/" + lookupURLDataSet                             // Remaining parts will be completed later by the sdk.BaseURLClient.
 	lookupETagHeader       = "Etag"
+	addressSearch          = "search"
 )
