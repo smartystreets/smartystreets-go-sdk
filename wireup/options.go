@@ -182,3 +182,29 @@ func WithLicenses(licenses ...string) Option {
 		builder.licenses = append(builder.licenses, licenses...)
 	}
 }
+
+// WithCustomQuery allows the caller to specify key and value pair that is added to the request query.
+func WithCustomQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		builder.customQueries.Set(key, value)
+	}
+}
+
+// WithCustomCommaSeparatedQuery allows the caller to specify key and value pair and appends the value to the current
+// value associated with the key, separated by a comma.
+func WithCustomCommaSeparatedQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		v := builder.customQueries.Get(key)
+		if v == "" {
+			v = value
+		} else {
+			v += "," + value
+		}
+		builder.customQueries.Set(key, value)
+	}
+}
+
+// WithFeatureComponentAnalysis adds to the request query to use the component analysis feature.
+func WithFeatureComponentAnalysis() Option {
+	return WithCustomCommaSeparatedQuery("features", "component-analysis")
+}
