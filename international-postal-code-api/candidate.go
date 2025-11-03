@@ -13,8 +13,7 @@ type (
 		DependentLocality       string `json:"dependent_locality,omitempty"`
 		DependentLocalityName   string `json:"dependent_locality_name,omitempty"`
 		DoubleDependentLocality string `json:"double_dependent_locality,omitempty"`
-		//PostalCode              string `json:"postal_code,omitempty"`
-		PostalCodeShort string `json:"postal_code,omitempty"`
-		PostalCodeExtra string `json:"postal_code_extra,omitempty"`
+		PostalCode              string `json:"postal_code,omitempty"`
+		PostalCodeExtra         string `json:"postal_code_extra,omitempty"`
 	}
 )
