@@ -47,7 +47,7 @@ func main() {
 		display(candidate.SubAdministrativeArea)
 		display(candidate.AdministrativeArea)
 		display(candidate.SuperAdministrativeArea)
-		display(candidate.PostalCodeShort)
+		display(candidate.PostalCode)
 		fmt.Println()
 	}
 

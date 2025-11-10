@@ -52,7 +52,7 @@ func (f *ClientFixture) TestLookupSerializedAndSent__ResponseSuggestionsIncorpor
 		{InputID: "1"},
 		{AdministrativeArea: "2"},
 		{Locality: "3"},
-		{PostalCodeShort: "4"},
+		{PostalCode: "4"},
 	})
 }
 
@@ -115,7 +115,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.AdministrativeArea, should.Equal, "4")
 	f.So(candidate.SubAdministrativeArea, should.Equal, "5")
 	f.So(candidate.SuperAdministrativeArea, should.Equal, "6")
-	f.So(candidate.PostalCodeShort, should.Equal, "7")
+	f.So(candidate.PostalCode, should.Equal, "7")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
