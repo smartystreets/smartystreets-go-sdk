@@ -200,7 +200,7 @@ func WithCustomCommaSeparatedQuery(key, value string) Option {
 		} else {
 			v += "," + value
 		}
-		builder.customQueries.Set(key, value)
+		builder.customQueries.Set(key, v)
 	}
 }
 
