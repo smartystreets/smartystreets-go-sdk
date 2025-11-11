@@ -161,6 +161,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"metadata": {
 	  "latitude": -23.509659,
 	  "longitude": -46.659711,
+	  "geocode_classification": "multiple-point-average",
 	  "geocode_precision": "Premise",
 	  "max_geocode_precision": "DeliveryPoint",
 	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code",
@@ -309,6 +310,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(component.PostBoxNumber, should.Equal, "blank")
 	f.So(metadata.Latitude, should.Equal, -23.509659)
 	f.So(metadata.Longitude, should.Equal, -46.659711)
+	f.So(metadata.GeocodeClassification, should.Equal, "multiple-point-average")
 	f.So(metadata.GeocodePrecision, should.Equal, "Premise")
 	f.So(metadata.MaxGeocodePrecision, should.Equal, "DeliveryPoint")
 	f.So(metadata.AddressFormat, should.Equal, "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code")

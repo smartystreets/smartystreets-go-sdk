@@ -86,12 +86,13 @@ type (
 	// Metadata contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#metadata
 	Metadata struct {
-		Latitude            float64 `json:"latitude,omitempty"`
-		Longitude           float64 `json:"longitude,omitempty"`
-		GeocodePrecision    string  `json:"geocode_precision,omitempty"`
-		MaxGeocodePrecision string  `json:"max_geocode_precision,omitempty"`
-		AddressFormat       string  `json:"address_format,omitempty"`
-		OccupantUse         string  `json:"occupant_use,omitempty"`
+		Latitude              float64 `json:"latitude,omitempty"`
+		Longitude             float64 `json:"longitude,omitempty"`
+		GeocodePrecision      string  `json:"geocode_precision,omitempty"`
+		GeocodeClassification string  `json:"geocode_classification,omitempty"`
+		MaxGeocodePrecision   string  `json:"max_geocode_precision,omitempty"`
+		AddressFormat         string  `json:"address_format,omitempty"`
+		OccupantUse           string  `json:"occupant_use,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:
