@@ -79,60 +79,6 @@ func (g *universalLookup) populate(query url.Values) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-type financialLookup struct {
-	Lookup   *Lookup
-	Response []*FinancialResponse
-}
-
-func (f *financialLookup) getSmartyKey() string {
-	return f.Lookup.SmartyKey
-}
-
-func (f *financialLookup) getDataSet() string {
-	return propertyDataSet
-}
-
-func (f *financialLookup) getDataSubset() string {
-	return financialDataSubset
-}
-
-func (f *financialLookup) getLookup() *Lookup {
-	return f.Lookup
-}
-
-func (f *financialLookup) getResponse() interface{} {
-	return f.Response
-}
-
-func (f *financialLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	if err := json.Unmarshal(bytes, &f.Response); err != nil {
-		return err
-	}
-
-	if headers != nil {
-		if etag, found := headers[lookupETagHeader]; found {
-			if len(etag) > 0 && len(f.Response) > 0 {
-				f.Response[0].Etag = etag[0]
-			}
-		}
-	}
-
-	return nil
-}
-
-func (e *financialLookup) populate(query url.Values) {
-	e.Lookup.populateInclude(query)
-	e.Lookup.populateExclude(query)
-	e.Lookup.populateFreeform(query)
-	e.Lookup.populateStreet(query)
-	e.Lookup.populateCity(query)
-	e.Lookup.populateState(query)
-	e.Lookup.populateZIPCode(query)
-	e.Lookup.populateFeatures(query)
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-
 type principalLookup struct {
 	Lookup   *Lookup
 	Response []*PrincipalResponse
@@ -403,7 +349,6 @@ func (s *secondaryCountLookup) populate(query url.Values) {
 }
 
 const (
-	financialDataSubset = "financial"
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
 	geoReferenceDataSet = "geo-reference"
