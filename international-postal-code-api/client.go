@@ -38,6 +38,23 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	return deserializeResponse(response, lookup)
 }
 
+func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
+	if lookup == nil {
+		return errors.New("lookup cannot be nil")
+	}
+
+	request := buildRequest(lookup)
+	request = request.WithContext(ctx)
+	if len(authID) > 0 && len(authToken) > 0 {
+		sdk.SignRequest(request, authID, authToken)
+	}
+	response, err := c.sender.Send(request)
+	if err != nil {
+		return err
+	}
+	return deserializeResponse(response, lookup)
+}
+
 func deserializeResponse(response []byte, lookup *Lookup) error {
 	var candidates []*Candidate
 	err := json.Unmarshal(response, &candidates)

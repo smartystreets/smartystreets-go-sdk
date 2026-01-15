@@ -3,18 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 	"log"
 	"os"
+
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
+	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildInternationalAutocompleteAPIClient(
-		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
-		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		wireup.HeaderCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 	)
 
 	// Documentation for input fields can be found at:

@@ -20,22 +20,28 @@ func NewClient(sender sdk.RequestSender) *Client {
 
 // SendBatch sends the batch of inputs, populating the output for each input if the batch was successful.
 func (c *Client) SendLookup(lookup *Lookup) error {
-	return c.SendLookupWithContext(context.Background(), lookup)
+	return c.SendLookupWithContextAndAuth(context.Background(), lookup, "", "")
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
+	return c.SendLookupWithContextAndAuth(ctx, lookup, "", "")
+}
+
+func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
 	if lookup == nil || len(lookup.Text) == 0 {
 		return nil
 	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
+	if len(authID) > 0 && len(authToken) > 0 {
+		sdk.SignRequest(request, authID, authToken)
+	}
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
-	} else {
-		return deserializeResponse(response, lookup)
 	}
+	return deserializeResponse(response, lookup)
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {

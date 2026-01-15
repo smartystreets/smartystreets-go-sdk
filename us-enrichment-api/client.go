@@ -20,9 +20,16 @@ func NewClient(sender sdk.RequestSender) *Client {
 func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
 	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
 }
+
 func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalResponse) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
+	return err, propertyLookup.Response
+}
+
+func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*PrincipalResponse) {
+	propertyLookup := &principalLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, propertyLookup, authID, authToken)
 	return err, propertyLookup.Response
 }
 
@@ -32,9 +39,21 @@ func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceRespons
 	return err, geoRefLookup.Response
 }
 
+func (c *Client) SendGeoReferenceWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*GeoReferenceResponse) {
+	geoRefLookup := &geoReferenceLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, authID, authToken)
+	return err, geoRefLookup.Response
+}
+
 func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion string) (error, []*GeoReferenceResponse) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
 	err := c.sendLookup(geoRefLookup)
+	return err, geoRefLookup.Response
+}
+
+func (c *Client) SendGeoReferenceWithVersionContextAndAuth(ctx context.Context, lookup *Lookup, censusVersion, authID, authToken string) (error, []*GeoReferenceResponse) {
+	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
+	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, authID, authToken)
 	return err, geoRefLookup.Response
 }
 
@@ -44,9 +63,21 @@ func (c *Client) SendRisk(lookup *Lookup) (error, []*RiskResponse) {
 	return err, rLookup.Response
 }
 
+func (c *Client) SendRiskWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*RiskResponse) {
+	rLookup := &riskLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, rLookup, authID, authToken)
+	return err, rLookup.Response
+}
+
 func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookup(sLookup)
+	return err, sLookup.Response
+}
+
+func (c *Client) SendSecondaryWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*SecondaryResponse) {
+	sLookup := &secondaryLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, sLookup, authID, authToken)
 	return err, sLookup.Response
 }
 
@@ -61,34 +92,57 @@ func (c *Client) SendSecondaryCount(lookup *Lookup) (error, []*SecondaryCountRes
 	return err, scLookup.Response
 }
 
+func (c *Client) SendSecondaryCountWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*SecondaryCountResponse) {
+	scLookup := &secondaryCountLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, scLookup, authID, authToken)
+	return err, scLookup.Response
+}
+
 // Deprecated: SendSecondaryCountLookup is deprecated. Use SendSecondaryCount
 func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
 	return c.SendSecondaryCount(lookup)
 }
 
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
-	g := &universalLookup{
+	u := &universalLookup{
 		Lookup:     lookup,
 		DataSet:    dataSet,
 		DataSubset: dataSubset,
 	}
 
-	err := c.sendLookup(g)
-	return err, g.Response
+	err := c.sendLookup(u)
+	return err, u.Response
+}
+
+func (c *Client) SendUniversalLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, dataSet, dataSubset, authID, authToken string) (error, []byte) {
+	u := &universalLookup{
+		Lookup:     lookup,
+		DataSet:    dataSet,
+		DataSubset: dataSubset,
+	}
+
+	err := c.sendLookupWithContextAndAuth(ctx, u, authID, authToken)
+	return err, u.Response
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
-	return c.sendLookupWithContext(context.Background(), lookup)
+	return c.sendLookupWithContextAndAuth(context.Background(), lookup, "", "")
 }
 
 func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLookup) error {
+	return c.sendLookupWithContextAndAuth(ctx, lookup, "", "")
+}
+
+func (c *Client) sendLookupWithContextAndAuth(ctx context.Context, lookup enrichmentLookup, authID, authToken string) error {
 	if lookup == nil || lookup.getLookup() == nil {
 		return nil
 	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
-
+	if len(authID) > 0 && len(authToken) > 0 {
+		sdk.SignRequest(request, authID, authToken)
+	}
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err

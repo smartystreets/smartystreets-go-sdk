@@ -80,8 +80,16 @@ func SecretKeyCredential(authID, authToken string) Option {
 	}
 }
 
+// HeaderCredential sets the authID and authToken for use with the client.
+// The authID and authToken are sent base64encoded in the Authorization header
+func HeaderCredential(authID, authToken string) Option {
+	return func(builder *clientBuilder) {
+		builder.withSecretKeyCredential(authID, authToken)
+	}
+}
+
 // WebsiteKeyCredential sets the key and hostnameOrIP for use with the client.
-// This kind of authentication is generally only used for client-side applications but it
+// This kind of authentication is generally only used for client-side applications, it is
 // included here for completeness.
 func WebsiteKeyCredential(key, hostnameOrIP string) Option {
 	return func(builder *clientBuilder) {
