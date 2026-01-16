@@ -84,7 +84,7 @@ func SecretKeyCredential(authID, authToken string) Option {
 // The authID and authToken are sent base64encoded in the Authorization header
 func HeaderCredential(authID, authToken string) Option {
 	return func(builder *clientBuilder) {
-		builder.withSecretKeyCredential(authID, authToken)
+		builder.withHeaderCredential(authID, authToken)
 	}
 }
 
