@@ -8,48 +8,48 @@ import (
 	"github.com/smarty/gunit"
 )
 
-func TestHeaderCredentialFixture(t *testing.T) {
-	gunit.Run(new(HeaderCredentialFixture), t)
+func TestBasicAuthCredentialFixture(t *testing.T) {
+	gunit.Run(new(BasicAuthCredentialFixture), t)
 }
 
-type HeaderCredentialFixture struct {
+type BasicAuthCredentialFixture struct {
 	*gunit.Fixture
 }
 
-func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithValidCredentials() {
-	cred := NewHeaderCredential("testID", "testToken")
+func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithValidCredentials() {
+	cred := NewBasicAuthCredential("testID", "testToken")
 
 	this.So(cred, should.NotBeNil)
 	this.So(cred.authID, should.Equal, "testID")
 	this.So(cred.authToken, should.Equal, "testToken")
 }
 
-func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithEmptyAuthID() {
-	cred := NewHeaderCredential("", "testToken")
+func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithEmptyAuthID() {
+	cred := NewBasicAuthCredential("", "testToken")
 
 	this.So(cred, should.NotBeNil)
 	this.So(cred.authID, should.Equal, "")
 	this.So(cred.authToken, should.Equal, "testToken")
 }
 
-func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithEmptyAuthToken() {
-	cred := NewHeaderCredential("testID", "")
+func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithEmptyAuthToken() {
+	cred := NewBasicAuthCredential("testID", "")
 
 	this.So(cred, should.NotBeNil)
 	this.So(cred.authID, should.Equal, "testID")
 	this.So(cred.authToken, should.Equal, "")
 }
 
-func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithBothEmpty() {
-	cred := NewHeaderCredential("", "")
+func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithBothEmpty() {
+	cred := NewBasicAuthCredential("", "")
 
 	this.So(cred, should.NotBeNil)
 	this.So(cred.authID, should.Equal, "")
 	this.So(cred.authToken, should.Equal, "")
 }
 
-func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithSpecialCharacters() {
-	cred := NewHeaderCredential("test@id#123", "token!@#$%^&*()")
+func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithSpecialCharacters() {
+	cred := NewBasicAuthCredential("test@id#123", "token!@#$%^&*()")
 
 	this.So(cred, should.NotBeNil)
 	this.So(cred.authID, should.Equal, "test@id#123")
@@ -65,7 +65,7 @@ type SignMethodFixture struct {
 }
 
 func (this *SignMethodFixture) TestSignWithValidCredentials() {
-	cred := NewHeaderCredential("myID", "myToken")
+	cred := NewBasicAuthCredential("myID", "myToken")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
@@ -80,7 +80,7 @@ func (this *SignMethodFixture) TestSignWithValidCredentials() {
 }
 
 func (this *SignMethodFixture) TestSignWithEmptyCredentials() {
-	cred := NewHeaderCredential("", "")
+	cred := NewBasicAuthCredential("", "")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
@@ -95,7 +95,7 @@ func (this *SignMethodFixture) TestSignWithEmptyCredentials() {
 
 func (this *SignMethodFixture) TestSignWithPasswordContainingColon() {
 	// Note: Per RFC 2617, userid must NOT contain colons, but password can
-	cred := NewHeaderCredential("validUserID", "password:with:colons")
+	cred := NewBasicAuthCredential("validUserID", "password:with:colons")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
@@ -109,7 +109,7 @@ func (this *SignMethodFixture) TestSignWithPasswordContainingColon() {
 }
 
 func (this *SignMethodFixture) TestSignWithSpecialCharacters() {
-	cred := NewHeaderCredential("user@domain.com", "p@ssw0rd!")
+	cred := NewBasicAuthCredential("user@domain.com", "p@ssw0rd!")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)

@@ -4,19 +4,19 @@ import (
 	"net/http"
 )
 
-type headerCredential struct {
+type basicAuthCredential struct {
 	authID    string
 	authToken string
 }
 
-func NewHeaderCredential(authID, authToken string) *headerCredential {
-	return &headerCredential{
+func NewBasicAuthCredential(authID, authToken string) *basicAuthCredential {
+	return &basicAuthCredential{
 		authID:    authID,
 		authToken: authToken,
 	}
 }
 
-func (c headerCredential) Sign(request *http.Request) error {
+func (c basicAuthCredential) Sign(request *http.Request) error {
 	SignRequest(request, c.authID, c.authToken)
 	return nil
 }
