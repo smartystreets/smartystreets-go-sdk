@@ -15,8 +15,8 @@ func main() {
 
 	// You don't have to store your keys in environment variables, but we recommend it.
 	client := wireup.BuildUSStreetAPIClient(
-		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
-		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		wireup.HeaderCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// wireup.ViaProxy("https://my-proxy.my-company.com"), // uncomment this line to point to the specified proxy.
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 		// ...or maybe you want to supply your own http client:

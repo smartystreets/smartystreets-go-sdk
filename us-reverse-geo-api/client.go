@@ -18,10 +18,14 @@ func NewClient(sender sdk.RequestSender) *Client {
 }
 
 func (c *Client) SendLookup(lookup *Lookup) error {
-	return c.SendLookupWithContext(context.Background(), lookup)
+	return c.SendLookupWithContextAndAuth(context.Background(), lookup, "", "")
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
+	return c.SendLookupWithContextAndAuth(ctx, lookup, "", "")
+}
+
+func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
 	if lookup == nil {
 		return nil
 	}
@@ -31,6 +35,9 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
+	if len(authID) > 0 && len(authToken) > 0 {
+		sdk.SignRequest(request, authID, authToken)
+	}
 
 	response, err := c.sender.Send(request)
 	if err != nil {
