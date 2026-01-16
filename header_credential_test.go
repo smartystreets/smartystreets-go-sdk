@@ -1,8 +1,6 @@
 package sdk
 
 import (
-	"encoding/base64"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -18,48 +16,110 @@ type HeaderCredentialFixture struct {
 	*gunit.Fixture
 }
 
-func (this *HeaderCredentialFixture) TestSignWithValidCredentials() {
+func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithValidCredentials() {
+	cred := NewHeaderCredential("testID", "testToken")
+
+	this.So(cred, should.NotBeNil)
+	this.So(cred.authID, should.Equal, "testID")
+	this.So(cred.authToken, should.Equal, "testToken")
+}
+
+func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithEmptyAuthID() {
+	cred := NewHeaderCredential("", "testToken")
+
+	this.So(cred, should.NotBeNil)
+	this.So(cred.authID, should.Equal, "")
+	this.So(cred.authToken, should.Equal, "testToken")
+}
+
+func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithEmptyAuthToken() {
+	cred := NewHeaderCredential("testID", "")
+
+	this.So(cred, should.NotBeNil)
+	this.So(cred.authID, should.Equal, "testID")
+	this.So(cred.authToken, should.Equal, "")
+}
+
+func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithBothEmpty() {
+	cred := NewHeaderCredential("", "")
+
+	this.So(cred, should.NotBeNil)
+	this.So(cred.authID, should.Equal, "")
+	this.So(cred.authToken, should.Equal, "")
+}
+
+func (this *HeaderCredentialFixture) TestNewHeaderCredentialWithSpecialCharacters() {
+	cred := NewHeaderCredential("test@id#123", "token!@#$%^&*()")
+
+	this.So(cred, should.NotBeNil)
+	this.So(cred.authID, should.Equal, "test@id#123")
+	this.So(cred.authToken, should.Equal, "token!@#$%^&*()")
+}
+
+func TestSignMethodFixture(t *testing.T) {
+	gunit.Run(new(SignMethodFixture), t)
+}
+
+type SignMethodFixture struct {
+	*gunit.Fixture
+}
+
+func (this *SignMethodFixture) TestSignWithValidCredentials() {
 	cred := NewHeaderCredential("myID", "myToken")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
 
 	this.So(err, should.BeNil)
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("myID:myToken")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+
+	// Verify the Authorization header is set
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "myID")
+	this.So(password, should.Equal, "myToken")
 }
 
-func (this *HeaderCredentialFixture) TestSignWithEmptyCredentials() {
+func (this *SignMethodFixture) TestSignWithEmptyCredentials() {
 	cred := NewHeaderCredential("", "")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
 
 	this.So(err, should.BeNil)
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte(":")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "")
+	this.So(password, should.Equal, "")
 }
 
-func (this *HeaderCredentialFixture) TestSignWithCredentialsContainingColon() {
-	cred := NewHeaderCredential("id:with:colons", "token:also")
+func (this *SignMethodFixture) TestSignWithPasswordContainingColon() {
+	// Note: Per RFC 2617, userid must NOT contain colons, but password can
+	cred := NewHeaderCredential("validUserID", "password:with:colons")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
 
 	this.So(err, should.BeNil)
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("id:with:colons:token:also")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "validUserID")
+	this.So(password, should.Equal, "password:with:colons")
 }
 
-func (this *HeaderCredentialFixture) TestSignWithSpecialCharacters() {
+func (this *SignMethodFixture) TestSignWithSpecialCharacters() {
 	cred := NewHeaderCredential("user@domain.com", "p@ssw0rd!")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	err := cred.Sign(req)
 
 	this.So(err, should.BeNil)
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("user@domain.com:p@ssw0rd!")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "user@domain.com")
+	this.So(password, should.Equal, "p@ssw0rd!")
 }
 
 func TestSignRequestFixture(t *testing.T) {
@@ -75,8 +135,10 @@ func (this *SignRequestFixture) TestSignRequestWithBasicCredentials() {
 
 	SignRequest(req, "testUser", "testPass")
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("testUser:testPass")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "testUser")
+	this.So(password, should.Equal, "testPass")
 }
 
 func (this *SignRequestFixture) TestSignRequestWithEmptyAuthID() {
@@ -84,8 +146,10 @@ func (this *SignRequestFixture) TestSignRequestWithEmptyAuthID() {
 
 	SignRequest(req, "", "password")
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte(":password")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "")
+	this.So(password, should.Equal, "password")
 }
 
 func (this *SignRequestFixture) TestSignRequestWithEmptyAuthToken() {
@@ -93,8 +157,10 @@ func (this *SignRequestFixture) TestSignRequestWithEmptyAuthToken() {
 
 	SignRequest(req, "username", "")
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("username:")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "username")
+	this.So(password, should.Equal, "")
 }
 
 func (this *SignRequestFixture) TestSignRequestWithUnicodeCharacters() {
@@ -102,8 +168,10 @@ func (this *SignRequestFixture) TestSignRequestWithUnicodeCharacters() {
 
 	SignRequest(req, "用户", "密码")
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("用户:密码")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "用户")
+	this.So(password, should.Equal, "密码")
 }
 
 func (this *SignRequestFixture) TestSignRequestWithLongCredentials() {
@@ -113,8 +181,10 @@ func (this *SignRequestFixture) TestSignRequestWithLongCredentials() {
 	authToken := "verylongpasswordthatexceedsnormallength"
 	SignRequest(req, authID, authToken)
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte(authID+":"+authToken)))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, authID)
+	this.So(password, should.Equal, authToken)
 }
 
 func (this *SignRequestFixture) TestSignRequestOverwritesExistingHeader() {
@@ -123,8 +193,10 @@ func (this *SignRequestFixture) TestSignRequestOverwritesExistingHeader() {
 
 	SignRequest(req, "newID", "newToken")
 
-	expectedAuth := fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte("newID:newToken")))
-	this.So(req.Header.Get("Authorization"), should.Equal, expectedAuth)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "newID")
+	this.So(password, should.Equal, "newToken")
 
 	// Ensure old header was replaced, not appended
 	authHeaders := req.Header.Values("Authorization")

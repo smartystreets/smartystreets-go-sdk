@@ -1,8 +1,6 @@
 package sdk
 
 import (
-	"encoding/base64"
-	"fmt"
 	"net/http"
 )
 
@@ -24,5 +22,5 @@ func (c headerCredential) Sign(request *http.Request) error {
 }
 
 func SignRequest(request *http.Request, authID string, authToken string) {
-	request.Header.Set("Authorization", fmt.Sprintf("Basic %s", base64.URLEncoding.EncodeToString([]byte(authID+":"+authToken))))
+	request.SetBasicAuth(authID, authToken)
 }
