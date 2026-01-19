@@ -25,27 +25,15 @@ func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithValidCrede
 }
 
 func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithEmptyAuthID() {
-	cred := NewBasicAuthCredential("", "testToken")
-
-	this.So(cred, should.NotBeNil)
-	this.So(cred.authID, should.Equal, "")
-	this.So(cred.authToken, should.Equal, "testToken")
+	this.So(func() { NewBasicAuthCredential("", "testToken") }, should.PanicWith, ErrCredentialsRequired)
 }
 
 func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithEmptyAuthToken() {
-	cred := NewBasicAuthCredential("testID", "")
-
-	this.So(cred, should.NotBeNil)
-	this.So(cred.authID, should.Equal, "testID")
-	this.So(cred.authToken, should.Equal, "")
+	this.So(func() { NewBasicAuthCredential("testID", "") }, should.PanicWith, ErrCredentialsRequired)
 }
 
 func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithBothEmpty() {
-	cred := NewBasicAuthCredential("", "")
-
-	this.So(cred, should.NotBeNil)
-	this.So(cred.authID, should.Equal, "")
-	this.So(cred.authToken, should.Equal, "")
+	this.So(func() { NewBasicAuthCredential("", "") }, should.PanicWith, ErrCredentialsRequired)
 }
 
 func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithSpecialCharacters() {
@@ -56,15 +44,7 @@ func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithSpecialCha
 	this.So(cred.authToken, should.Equal, "token!@#$%^&*()")
 }
 
-func TestSignMethodFixture(t *testing.T) {
-	gunit.Run(new(SignMethodFixture), t)
-}
-
-type SignMethodFixture struct {
-	*gunit.Fixture
-}
-
-func (this *SignMethodFixture) TestSignWithValidCredentials() {
+func (this *BasicAuthCredentialFixture) TestSignWithValidCredentials() {
 	cred := NewBasicAuthCredential("myID", "myToken")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
@@ -79,21 +59,7 @@ func (this *SignMethodFixture) TestSignWithValidCredentials() {
 	this.So(password, should.Equal, "myToken")
 }
 
-func (this *SignMethodFixture) TestSignWithEmptyCredentials() {
-	cred := NewBasicAuthCredential("", "")
-	req, _ := http.NewRequest("GET", "http://example.com", nil)
-
-	err := cred.Sign(req)
-
-	this.So(err, should.BeNil)
-
-	username, password, ok := req.BasicAuth()
-	this.So(ok, should.BeTrue)
-	this.So(username, should.Equal, "")
-	this.So(password, should.Equal, "")
-}
-
-func (this *SignMethodFixture) TestSignWithPasswordContainingColon() {
+func (this *BasicAuthCredentialFixture) TestSignWithPasswordContainingColon() {
 	// Note: Per RFC 2617, userid must NOT contain colons, but password can
 	cred := NewBasicAuthCredential("validUserID", "password:with:colons")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
@@ -108,7 +74,7 @@ func (this *SignMethodFixture) TestSignWithPasswordContainingColon() {
 	this.So(password, should.Equal, "password:with:colons")
 }
 
-func (this *SignMethodFixture) TestSignWithSpecialCharacters() {
+func (this *BasicAuthCredentialFixture) TestSignWithSpecialCharacters() {
 	cred := NewBasicAuthCredential("user@domain.com", "p@ssw0rd!")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
@@ -122,7 +88,7 @@ func (this *SignMethodFixture) TestSignWithSpecialCharacters() {
 	this.So(password, should.Equal, "p@ssw0rd!")
 }
 
-func (this *SignMethodFixture) TestSignWithUnicodeCharacters() {
+func (this *BasicAuthCredentialFixture) TestSignWithUnicodeCharacters() {
 	cred := NewBasicAuthCredential("用户", "密码")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
@@ -136,7 +102,7 @@ func (this *SignMethodFixture) TestSignWithUnicodeCharacters() {
 	this.So(password, should.Equal, "密码")
 }
 
-func (this *SignMethodFixture) TestSignOverwritesExistingHeader() {
+func (this *BasicAuthCredentialFixture) TestSignOverwritesExistingHeader() {
 	cred := NewBasicAuthCredential("newID", "newToken")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 	req.Header.Set("Authorization", "Bearer oldtoken")

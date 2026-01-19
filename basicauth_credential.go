@@ -1,8 +1,11 @@
 package sdk
 
 import (
+	"errors"
 	"net/http"
 )
+
+var ErrCredentialsRequired = errors.New("credentials (auth id, auth token) required")
 
 type basicAuthCredential struct {
 	authID    string
@@ -10,6 +13,9 @@ type basicAuthCredential struct {
 }
 
 func NewBasicAuthCredential(authID, authToken string) *basicAuthCredential {
+	if len(authID) == 0 || len(authToken) == 0 {
+		panic(ErrCredentialsRequired)
+	}
 	return &basicAuthCredential{
 		authID:    authID,
 		authToken: authToken,
