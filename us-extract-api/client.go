@@ -35,7 +35,7 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
 	if len(authID) > 0 && len(authToken) > 0 {
-		sdk.SignRequest(request, authID, authToken)
+		request.SetBasicAuth(authID, authToken)
 	}
 	response, err := c.sender.Send(request)
 	if err != nil {

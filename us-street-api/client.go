@@ -33,7 +33,7 @@ func (c *Client) SendBatchWithContextAndAuth(ctx context.Context, batch *Batch, 
 	request := batch.buildRequest()
 	request = request.WithContext(ctx)
 	if len(authID) > 0 && len(authToken) > 0 {
-		sdk.SignRequest(request, authID, authToken)
+		request.SetBasicAuth(authID, authToken)
 	}
 	response, err := c.sender.Send(request)
 	if err != nil {

@@ -122,51 +122,13 @@ func (this *SignMethodFixture) TestSignWithSpecialCharacters() {
 	this.So(password, should.Equal, "p@ssw0rd!")
 }
 
-func TestSignRequestFixture(t *testing.T) {
-	gunit.Run(new(SignRequestFixture), t)
-}
+func (this *SignMethodFixture) TestSignWithUnicodeCharacters() {
+	cred := NewBasicAuthCredential("用户", "密码")
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-type SignRequestFixture struct {
-	*gunit.Fixture
-}
+	err := cred.Sign(req)
 
-func (this *SignRequestFixture) TestSignRequestWithBasicCredentials() {
-	req, _ := http.NewRequest("POST", "http://api.example.com/endpoint", nil)
-
-	SignRequest(req, "testUser", "testPass")
-
-	username, password, ok := req.BasicAuth()
-	this.So(ok, should.BeTrue)
-	this.So(username, should.Equal, "testUser")
-	this.So(password, should.Equal, "testPass")
-}
-
-func (this *SignRequestFixture) TestSignRequestWithEmptyAuthID() {
-	req, _ := http.NewRequest("POST", "http://api.example.com/endpoint", nil)
-
-	SignRequest(req, "", "password")
-
-	username, password, ok := req.BasicAuth()
-	this.So(ok, should.BeTrue)
-	this.So(username, should.Equal, "")
-	this.So(password, should.Equal, "password")
-}
-
-func (this *SignRequestFixture) TestSignRequestWithEmptyAuthToken() {
-	req, _ := http.NewRequest("POST", "http://api.example.com/endpoint", nil)
-
-	SignRequest(req, "username", "")
-
-	username, password, ok := req.BasicAuth()
-	this.So(ok, should.BeTrue)
-	this.So(username, should.Equal, "username")
-	this.So(password, should.Equal, "")
-}
-
-func (this *SignRequestFixture) TestSignRequestWithUnicodeCharacters() {
-	req, _ := http.NewRequest("POST", "http://api.example.com/endpoint", nil)
-
-	SignRequest(req, "用户", "密码")
+	this.So(err, should.BeNil)
 
 	username, password, ok := req.BasicAuth()
 	this.So(ok, should.BeTrue)
@@ -174,24 +136,14 @@ func (this *SignRequestFixture) TestSignRequestWithUnicodeCharacters() {
 	this.So(password, should.Equal, "密码")
 }
 
-func (this *SignRequestFixture) TestSignRequestWithLongCredentials() {
-	req, _ := http.NewRequest("POST", "http://api.example.com/endpoint", nil)
-
-	authID := "verylongusernamethatexceedsnormallength"
-	authToken := "verylongpasswordthatexceedsnormallength"
-	SignRequest(req, authID, authToken)
-
-	username, password, ok := req.BasicAuth()
-	this.So(ok, should.BeTrue)
-	this.So(username, should.Equal, authID)
-	this.So(password, should.Equal, authToken)
-}
-
-func (this *SignRequestFixture) TestSignRequestOverwritesExistingHeader() {
+func (this *SignMethodFixture) TestSignOverwritesExistingHeader() {
+	cred := NewBasicAuthCredential("newID", "newToken")
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 	req.Header.Set("Authorization", "Bearer oldtoken")
 
-	SignRequest(req, "newID", "newToken")
+	err := cred.Sign(req)
+
+	this.So(err, should.BeNil)
 
 	username, password, ok := req.BasicAuth()
 	this.So(ok, should.BeTrue)
@@ -201,24 +153,4 @@ func (this *SignRequestFixture) TestSignRequestOverwritesExistingHeader() {
 	// Ensure old header was replaced, not appended
 	authHeaders := req.Header.Values("Authorization")
 	this.So(len(authHeaders), should.Equal, 1)
-}
-
-func (this *SignRequestFixture) TestSignRequestPreservesOtherHeaders() {
-	req, _ := http.NewRequest("GET", "http://example.com", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Custom-Header", "custom-value")
-
-	SignRequest(req, "id", "token")
-
-	this.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
-	this.So(req.Header.Get("X-Custom-Header"), should.Equal, "custom-value")
-}
-
-func (this *SignRequestFixture) TestSignRequestWithNilRequestPanics() {
-	defer func() {
-		r := recover()
-		this.So(r, should.NotBeNil)
-	}()
-
-	SignRequest(nil, "id", "token")
 }
