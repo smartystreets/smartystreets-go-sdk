@@ -15,7 +15,7 @@ func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildUSStreetAPIClient(
-		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		wireup.WithFeatureComponentAnalysis(), // To add component analysis feature you need to specify when you
 		// create the client.
 	)

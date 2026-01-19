@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	usenrich "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 	"log"
 	"net/http"
 	"os"
+
+	usenrich "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/wireup"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 
 	client := wireup.BuildUSEnrichmentAPIClient(
 		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
-		wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
+		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 	)
 
 	// Documentation for input fields can be found at:
