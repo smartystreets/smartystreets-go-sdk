@@ -67,7 +67,7 @@ func (b *clientBuilder) withWebsiteKeyCredential(key, hostnameOrIP string) *clie
 	return b
 }
 
-func (b *clientBuilder) withHeaderCredential(authId, authToken string) *clientBuilder {
+func (b *clientBuilder) withBasicAuthCredential(authId, authToken string) *clientBuilder {
 	b.credential = sdk.NewBasicAuthCredential(authId, authToken)
 	return b
 }

@@ -80,11 +80,11 @@ func SecretKeyCredential(authID, authToken string) Option {
 	}
 }
 
-// HeaderCredential sets the authID and authToken for use with the client.
+// BasicAuthCredential sets the authID and authToken for use with the client.
 // The authID and authToken are sent base64encoded in the Authorization header
-func HeaderCredential(authID, authToken string) Option {
+func BasicAuthCredential(authID, authToken string) Option {
 	return func(builder *clientBuilder) {
-		builder.withHeaderCredential(authID, authToken)
+		builder.withBasicAuthCredential(authID, authToken)
 	}
 }
 
