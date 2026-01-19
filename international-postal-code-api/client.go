@@ -38,6 +38,9 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	return deserializeResponse(response, lookup)
 }
 
+// SendLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
 	if lookup == nil {
 		return errors.New("lookup cannot be nil")

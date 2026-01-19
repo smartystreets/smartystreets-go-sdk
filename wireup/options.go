@@ -81,7 +81,7 @@ func SecretKeyCredential(authID, authToken string) Option {
 }
 
 // BasicAuthCredential sets the authID and authToken for use with the client.
-// The authID and authToken are sent base64encoded in the Authorization header
+// Uses HTTP Basic Authentication (RFC 7617) to send credentials in the Authorization header.
 func BasicAuthCredential(authID, authToken string) Option {
 	return func(builder *clientBuilder) {
 		builder.withBasicAuthCredential(authID, authToken)

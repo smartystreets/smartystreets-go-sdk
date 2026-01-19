@@ -27,6 +27,9 @@ func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalRespo
 	return err, propertyLookup.Response
 }
 
+// SendPropertyPrincipalWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*PrincipalResponse) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, propertyLookup, authID, authToken)
@@ -39,6 +42,9 @@ func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceRespons
 	return err, geoRefLookup.Response
 }
 
+// SendGeoReferenceWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendGeoReferenceWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*GeoReferenceResponse) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, authID, authToken)
@@ -51,6 +57,9 @@ func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion strin
 	return err, geoRefLookup.Response
 }
 
+// SendGeoReferenceWithVersionContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendGeoReferenceWithVersionContextAndAuth(ctx context.Context, lookup *Lookup, censusVersion, authID, authToken string) (error, []*GeoReferenceResponse) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
 	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, authID, authToken)
@@ -63,6 +72,9 @@ func (c *Client) SendRisk(lookup *Lookup) (error, []*RiskResponse) {
 	return err, rLookup.Response
 }
 
+// SendRiskWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendRiskWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*RiskResponse) {
 	rLookup := &riskLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, rLookup, authID, authToken)
@@ -75,6 +87,9 @@ func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
 	return err, sLookup.Response
 }
 
+// SendSecondaryWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendSecondaryWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*SecondaryResponse) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, sLookup, authID, authToken)
@@ -92,6 +107,9 @@ func (c *Client) SendSecondaryCount(lookup *Lookup) (error, []*SecondaryCountRes
 	return err, scLookup.Response
 }
 
+// SendSecondaryCountWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendSecondaryCountWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*SecondaryCountResponse) {
 	scLookup := &secondaryCountLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, scLookup, authID, authToken)
@@ -114,6 +132,9 @@ func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string)
 	return err, u.Response
 }
 
+// SendUniversalLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendUniversalLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, dataSet, dataSubset, authID, authToken string) (error, []byte) {
 	u := &universalLookup{
 		Lookup:     lookup,
@@ -133,6 +154,9 @@ func (c *Client) sendLookupWithContext(ctx context.Context, lookup enrichmentLoo
 	return c.sendLookupWithContextAndAuth(ctx, lookup, "", "")
 }
 
+// sendLookupWithContextAndAuth sends an enrichmentLookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) sendLookupWithContextAndAuth(ctx context.Context, lookup enrichmentLookup, authID, authToken string) error {
 	if lookup == nil || lookup.getLookup() == nil {
 		return nil

@@ -26,6 +26,9 @@ func (c *Client) SendBatchWithContext(ctx context.Context, batch *Batch) error {
 	return c.SendBatchWithContextAndAuth(ctx, batch, "", "")
 }
 
+// SendBatchWithContextAndAuth sends a batch of lookups with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendBatchWithContextAndAuth(ctx context.Context, batch *Batch, authID, authToken string) error {
 	if batch == nil || batch.Length() == 0 {
 		return nil
