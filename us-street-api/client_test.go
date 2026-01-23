@@ -46,7 +46,7 @@ func (f *ClientFixture) TestSingleAddressBatchWithContext_SentInQueryStringAsGET
 	f.So(f.sender.requestBody, should.BeNil)
 	f.So(f.sender.request.ContentLength, should.Equal, 0)
 	f.So(f.sender.request.URL.String(), should.StartWith, verifyURL)
-	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}})
+	f.So(f.sender.request.URL.Query(), should.Resemble, url.Values{"input_id": {"42"}, "match": {"enhanced"}, "candidates": {"5"}})
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 }
 

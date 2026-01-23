@@ -45,13 +45,17 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	encode(query, l.Addressee, "addressee")
 	encode(query, l.Urbanization, "urbanization")
 	encode(query, l.InputID, "input_id")
+	matchStrategy := l.MatchStrategy
+	if matchStrategy == "" {
+		matchStrategy = MatchEnhanced
+	}
 	if l.MaxCandidates > 0 {
 		encode(query, strconv.Itoa(l.MaxCandidates), "candidates")
-	} else if l.MatchStrategy == MatchEnhanced {
+	} else if matchStrategy == MatchEnhanced {
 		encode(query, "5", "candidates")
 	}
-	if l.MatchStrategy != MatchStrict {
-		encode(query, string(l.MatchStrategy), "match")
+	if matchStrategy != MatchStrict {
+		encode(query, string(matchStrategy), "match")
 	}
 	if l.OutputFormat != FormatDefault {
 		encode(query, string(l.OutputFormat), "format")
