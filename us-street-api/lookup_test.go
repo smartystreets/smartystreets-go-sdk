@@ -101,3 +101,20 @@ func (this *LookupFixture) TestQueryStringEncoding_CustomParameters() {
 		"candidates":     {"5"},
 	})
 }
+
+func (this *LookupFixture) TestQueryStringEncoding_DefaultMatchStrategyIsEnhanced() {
+	this.So(this.encode(&Lookup{}), should.Resemble, url.Values{
+		"match":      {"enhanced"},
+		"candidates": {"5"},
+	})
+}
+
+func (this *LookupFixture) TestQueryStringEncoding_ExplicitMatchStrict() {
+	this.So(this.encode(&Lookup{MatchStrategy: MatchStrict}), should.Resemble, url.Values{})
+}
+
+func (this *LookupFixture) TestQueryStringEncoding_ExplicitMatchStrictWithCandidates() {
+	this.So(this.encode(&Lookup{MatchStrategy: MatchStrict, MaxCandidates: 3}), should.Resemble, url.Values{
+		"candidates": {"3"},
+	})
+}
