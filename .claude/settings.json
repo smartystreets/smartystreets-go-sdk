@@ -8,5 +8,9 @@
       "Bash(make *)",
       "Bash(cargo *)"
     ]
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
   }
 }
