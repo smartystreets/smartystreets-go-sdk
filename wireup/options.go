@@ -5,9 +5,10 @@ import (
 	"time"
 
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
 	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
@@ -24,14 +25,14 @@ func BuildUSZIPCodeAPIClient(options ...Option) *zipcode.Client {
 	return configure(options...).buildUSZIPCodeAPIClient()
 }
 
-// BuildUSAutocompleteAPIClient builds a client for the US Autocomplete API using the provided options.
-func BuildUSAutocompleteAPIClient(options ...Option) *autocomplete.Client {
-	return configure(options...).buildUSAutocompleteAPIClient()
-}
-
 // BuildUSAutocompleteProAPIClient builds a client for the US Autocomplete API using the provided options.
 func BuildUSAutocompleteProAPIClient(options ...Option) *autocomplete_pro.Client {
 	return configure(options...).buildUSAutocompleteProAPIClient()
+}
+
+// BuildUSEnrichmentAPIClient builds a client for the US Enrichment API using the provided options.
+func BuildUSEnrichmentAPIClient(options ...Option) *us_enrichment.Client {
+	return configure(options...).buildUSEnrichmentAPIClient()
 }
 
 // BuildUSExtractAPIClient builds a client for the US Extract API using the provided options.
@@ -42,6 +43,11 @@ func BuildUSExtractAPIClient(options ...Option) *extract.Client {
 // BuildInternationalStreetAPIClient builds a client for the International Street API using the provided options.
 func BuildInternationalStreetAPIClient(options ...Option) *international_street.Client {
 	return configure(options...).buildInternationalStreetAPIClient()
+}
+
+// BuildInternationalPostalCodeAPIClient builds a client for the International Postal Code API using the provided options.
+func BuildInternationalPostalCodeAPIClient(options ...Option) *international_postal_code.Client {
+	return configure(options...).buildInternationalPostalCodeAPIClient()
 }
 
 // BuildInternationalAutocompleteAPIClient builds a client for the International Autocomplete API using the provided options.
@@ -74,8 +80,16 @@ func SecretKeyCredential(authID, authToken string) Option {
 	}
 }
 
+// BasicAuthCredential sets the authID and authToken for use with the client.
+// Uses HTTP Basic Authentication (RFC 7617) to send credentials in the Authorization header.
+func BasicAuthCredential(authID, authToken string) Option {
+	return func(builder *clientBuilder) {
+		builder.withBasicAuthCredential(authID, authToken)
+	}
+}
+
 // WebsiteKeyCredential sets the key and hostnameOrIP for use with the client.
-// This kind of authentication is generally only used for client-side applications but it
+// This kind of authentication is generally only used for client-side applications, it is
 // included here for completeness.
 func WebsiteKeyCredential(key, hostnameOrIP string) Option {
 	return func(builder *clientBuilder) {
@@ -181,4 +195,30 @@ func WithLicenses(licenses ...string) Option {
 	return func(builder *clientBuilder) {
 		builder.licenses = append(builder.licenses, licenses...)
 	}
+}
+
+// WithCustomQuery allows the caller to specify key and value pair that is added to the request query.
+func WithCustomQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		builder.customQueries.Set(key, value)
+	}
+}
+
+// WithCustomCommaSeparatedQuery allows the caller to specify key and value pair and appends the value to the current
+// value associated with the key, separated by a comma.
+func WithCustomCommaSeparatedQuery(key, value string) Option {
+	return func(builder *clientBuilder) {
+		v := builder.customQueries.Get(key)
+		if v == "" {
+			v = value
+		} else {
+			v += "," + value
+		}
+		builder.customQueries.Set(key, v)
+	}
+}
+
+// WithFeatureComponentAnalysis adds to the request query to use the component analysis feature.
+func WithFeatureComponentAnalysis() Option {
+	return WithCustomCommaSeparatedQuery("features", "component-analysis")
 }

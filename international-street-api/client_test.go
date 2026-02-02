@@ -60,14 +60,12 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 
 func (f *ClientFixture) TestNilLookupNOP() {
 	err := f.client.SendLookup(nil)
-	f.So(err, should.BeNil)
-	f.So(f.sender.request, should.BeNil)
+	f.So(err.Error(), should.Equal, "lookup cannot be nil")
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
 	err := f.client.SendLookup(new(Lookup))
-	f.So(err, should.BeNil)
-	f.So(f.sender.request, should.BeNil)
+	f.So(err.Error(), should.Equal, "unexpected end of JSON input")
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
@@ -115,6 +113,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"components": {
 	  "super_administrative_area": "super_blah",
 	  "administrative_area": "SP",
+	  "administrative_area_iso2": "BR-SP",
 	  "administrative_area_short": "SP",
 	  "administrative_area_long": "São Paulo",
 	  "sub_administrative_area": "sub_blah",
@@ -160,9 +159,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"metadata": {
 	  "latitude": -23.509659,
 	  "longitude": -46.659711,
+	  "geocode_classification": "multiple-point-average",
 	  "geocode_precision": "Premise",
 	  "max_geocode_precision": "DeliveryPoint",
-	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code"
+	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code",
+	  "occupant_use": "commercial"
 	},
     "analysis": {
 	  "verification_status": "Verified",
@@ -185,6 +186,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"components": {
 	 	  "super_administrative_area": "blank",
 		  "administrative_area": "Verified-NoChange",
+		  "administrative_area_iso2": "Added",
 		  "administrative_area_short": "blank",
 		  "administrative_area_long": "blank",
 		  "sub_administrative_area": "blank",
@@ -225,7 +227,12 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "level_number": "blank",
 		  "post_box": "blank",
 		  "post_box_type": "blank",
-		  "post_box_number": "blank"
+		  "post_box_number": "blank",
+		  "additional_content":"blank",
+		  "delivery_installation_type":"blank",
+		  "delivery_installation_qualifier_name":"blank",
+		  "route_number":"blank",
+		  "route_type":"blank"
 		}
 	  }
 	}
@@ -257,6 +264,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.Address12, should.Equal, "here")
 	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
 	f.So(component.AdministrativeArea, should.Equal, "SP")
+	f.So(component.AdministrativeAreaISO2, should.Equal, "BR-SP")
 	f.So(component.AdministrativeAreaShort, should.Equal, "SP")
 	f.So(component.AdministrativeAreaLong, should.Equal, "São Paulo")
 	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
@@ -300,9 +308,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(component.PostBoxNumber, should.Equal, "blank")
 	f.So(metadata.Latitude, should.Equal, -23.509659)
 	f.So(metadata.Longitude, should.Equal, -46.659711)
+	f.So(metadata.GeocodeClassification, should.Equal, "multiple-point-average")
 	f.So(metadata.GeocodePrecision, should.Equal, "Premise")
 	f.So(metadata.MaxGeocodePrecision, should.Equal, "DeliveryPoint")
 	f.So(metadata.AddressFormat, should.Equal, "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code")
+	f.So(metadata.OccupantUse, should.Equal, "commercial")
 	f.So(analysis.VerificationStatus, should.Equal, "Verified")
 	f.So(analysis.AddressPrecision, should.Equal, "Premise")
 	f.So(analysis.MaxAddressPrecision, should.Equal, "DeliveryPoint")
@@ -358,6 +368,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.PostBox, should.Equal, "blank")
 	f.So(ccomponents.PostBoxType, should.Equal, "blank")
 	f.So(ccomponents.PostBoxNumber, should.Equal, "blank")
+	f.So(ccomponents.AdditionalContent, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationType, should.Equal, "blank")
+	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
+	f.So(ccomponents.RouteType, should.Equal, "blank")
+	f.So(ccomponents.RouteNumber, should.Equal, "blank")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

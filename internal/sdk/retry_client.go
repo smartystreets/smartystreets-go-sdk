@@ -76,6 +76,9 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int
 	if response.StatusCode >= http.StatusBadRequest && response.StatusCode <= http.StatusUnprocessableEntity {
 		return false
 	}
+	if response.StatusCode == http.StatusNotModified {
+		return false
+	}
 	if response.StatusCode == http.StatusTooManyRequests {
 		if response.Header != nil {
 			if i, err := strconv.Atoi(response.Header.Get("Retry-After")); err == nil {

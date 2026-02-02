@@ -8,20 +8,30 @@ import (
 // Lookup contains all input fields defined here:
 // https://smartystreets.com/docs/us-street-api#input-fields
 type Lookup struct {
-	Street        string        `json:"street,omitempty"`
-	Street2       string        `json:"street2,omitempty"`
-	Secondary     string        `json:"secondary,omitempty"`
-	City          string        `json:"city,omitempty"`
-	State         string        `json:"state,omitempty"`
-	ZIPCode       string        `json:"zipcode,omitempty"`
-	LastLine      string        `json:"lastline,omitempty"`
-	Addressee     string        `json:"addressee,omitempty"`
-	Urbanization  string        `json:"urbanization,omitempty"`
-	InputID       string        `json:"input_id,omitempty"`
-	MaxCandidates int           `json:"candidates,omitempty"` // Default value: 1
-	MatchStrategy MatchStrategy `json:"match,omitempty"`
+	Street           string            `json:"street,omitempty"`
+	Street2          string            `json:"street2,omitempty"`
+	Secondary        string            `json:"secondary,omitempty"`
+	City             string            `json:"city,omitempty"`
+	State            string            `json:"state,omitempty"`
+	ZIPCode          string            `json:"zipcode,omitempty"`
+	LastLine         string            `json:"lastline,omitempty"`
+	Addressee        string            `json:"addressee,omitempty"`
+	Urbanization     string            `json:"urbanization,omitempty"`
+	InputID          string            `json:"input_id,omitempty"`
+	MaxCandidates    int               `json:"candidates,omitempty"` // Default value: 1
+	MatchStrategy    MatchStrategy     `json:"match,omitempty"`
+	OutputFormat     OutputFormat      `json:"format,omitempty"`
+	CountySource     CountySource      `json:"county_source,omitempty"`
+	CustomParameters map[string]string `json:"custom_parameters,omitempty"`
 
 	Results []*Candidate `json:"results,omitempty"`
+}
+
+func (l *Lookup) AddCustomParameter(name, value string) {
+	if l.CustomParameters == nil {
+		l.CustomParameters = make(map[string]string)
+	}
+	l.CustomParameters[name] = value
 }
 
 func (l *Lookup) encodeQueryString(query url.Values) {
@@ -35,15 +45,31 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	encode(query, l.Addressee, "addressee")
 	encode(query, l.Urbanization, "urbanization")
 	encode(query, l.InputID, "input_id")
+	matchStrategy := l.MatchStrategy
+	if matchStrategy == "" {
+		matchStrategy = MatchEnhanced
+	}
 	if l.MaxCandidates > 0 {
 		encode(query, strconv.Itoa(l.MaxCandidates), "candidates")
-	} else if l.MatchStrategy == MatchEnhanced {
+	} else if matchStrategy == MatchEnhanced {
 		encode(query, "5", "candidates")
 	}
-	if l.MatchStrategy != MatchStrict {
-		encode(query, string(l.MatchStrategy), "match")
+	if matchStrategy != MatchStrict {
+		encode(query, string(matchStrategy), "match")
+	}
+	if l.OutputFormat != FormatDefault {
+		encode(query, string(l.OutputFormat), "format")
+	}
+	if l.CountySource != PostalCounty {
+		encode(query, string(l.CountySource), "county_source")
+	}
+	if len(l.CustomParameters) > 0 {
+		for k, v := range l.CustomParameters {
+			encode(query, v, k)
+		}
 	}
 }
+
 func encode(query url.Values, source string, target string) {
 	if source != "" {
 		query.Set(target, source)
@@ -56,7 +82,20 @@ type MatchStrategy string
 
 const (
 	MatchStrict   = MatchStrategy("strict")
-	MatchRange    = MatchStrategy("range") // Deprecated
 	MatchInvalid  = MatchStrategy("invalid")
 	MatchEnhanced = MatchStrategy("enhanced")
+)
+
+type OutputFormat string
+
+const (
+	FormatDefault    = OutputFormat("default")
+	FormatProjectUSA = OutputFormat("project-usa")
+)
+
+type CountySource string
+
+const (
+	PostalCounty     = CountySource("postal")
+	GeographicCounty = CountySource("geographic")
 )

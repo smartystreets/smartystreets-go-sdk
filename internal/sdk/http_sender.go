@@ -30,6 +30,7 @@ func (s *HTTPSender) Send(request *http.Request) ([]byte, error) {
 	} else if content, err := readResponseBody(response); err != nil {
 		return content, err
 	} else {
+		request.Response = response // make headers available in the request
 		return interpret(response, content)
 	}
 }

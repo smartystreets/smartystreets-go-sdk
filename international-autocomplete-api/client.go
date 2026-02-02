@@ -22,7 +22,7 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
-	if lookup == nil || len(lookup.Search) == 0 {
+	if lookup == nil || len(lookup.Country) == 0 || (len(lookup.Search) == 0 && len(lookup.AddressID) == 0) {
 		return nil
 	}
 
@@ -45,11 +45,15 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 }
 
 func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", suggestURL, nil) // We control the method and the URL. This is safe.
+	var addressID = ""
+	if len(lookup.AddressID) > 0 {
+		addressID = "/" + lookup.AddressID
+	}
+	request, _ := http.NewRequest("GET", suggestURL+addressID, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
 	return request
 }
 
-const suggestURL = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.
+const suggestURL = "/v2/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.

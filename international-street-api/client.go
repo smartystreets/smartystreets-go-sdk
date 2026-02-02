@@ -3,6 +3,7 @@ package street
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
@@ -24,12 +25,22 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
-	if lookup == nil || (len(lookup.Address1) == 0 && len(lookup.Freeform) == 0) {
-		return nil
+	return c.SendLookupWithContextAndAuth(ctx, lookup, "", "")
+}
+
+// SendLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// This is useful for multi-tenant scenarios where different requests require different credentials.
+func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
+	if lookup == nil {
+		return errors.New("lookup cannot be nil")
 	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
+	if len(authID) > 0 && len(authToken) > 0 {
+		request.SetBasicAuth(authID, authToken)
+	}
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err

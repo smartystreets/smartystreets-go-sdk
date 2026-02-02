@@ -65,6 +65,15 @@ func (f *LookupSerializationFixture) TestGeocodeTrue() {
 	f.So(f.query.Get("geocode"), should.Equal, "true")
 }
 
+func (f *LookupSerializationFixture) TestFeatures() {
+	f.lookup.Features = "f1,f2,f3"
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("features"), should.Equal, "f1,f2,f3")
+}
+
 func (f *LookupSerializationFixture) TestLanguageBlank() {
 	f.lookup.Language = Language("")
 	f.populate()

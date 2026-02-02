@@ -14,12 +14,8 @@ func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildUSAutocompleteProAPIClient(
-		wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
-		//wireup.SecretKeyCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
-		// The appropriate license values to be used for your subscriptions
-		// can be found on the Subscriptions page the account dashboard.
-		// https://www.smartystreets.com/docs/cloud/licensing
-		wireup.WithLicenses("us-autocomplete-pro-cloud"),
+		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
 
@@ -27,13 +23,11 @@ func main() {
 	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
 
 	lookup := &autocomplete_pro.Lookup{
-		Search:      "1042 W Center",
+		Search:      "104",
 		MaxResults:  5,
-		CityFilter:  []string{"Denver", "Orem"},
-		StateFilter: []string{"CO", "UT"},
+		CityFilter:  []string{"Denver,Aurora,CO", "Provo,UT"},
 		PreferState: []string{"CO"},
 		PreferRatio: 3,
-		Geolocation: autocomplete_pro.GeolocateCity,
 		Source:      "all",
 	}
 
