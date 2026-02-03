@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"errors"
 	"io"
 	"math/rand"
@@ -36,7 +37,7 @@ func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
 }
-func (f *RetryClientFixture) sleep(duration time.Duration) {
+func (f *RetryClientFixture) sleep(_ context.Context, duration time.Duration) {
 	f.naps = append(f.naps, duration)
 }
 func (f *RetryClientFixture) assertReadErrorReturnedAndRequestNotSent() {
@@ -180,4 +181,146 @@ func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, err
 	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
+}
+
+/**************************************************************************/
+
+func (f *RetryClientFixture) TestContextAlreadyCancelledReturnsImmediately() {
+	f.inner = NewFailingHTTPClient(500, 500, 500, 500, 500)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Cancel immediately
+
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(f.inner.call, should.Equal, 0) // No requests should be made
+}
+
+func (f *RetryClientFixture) TestContextAlreadyCancelledReturnsImmediatelyForPost() {
+	f.inner = NewFailingHTTPClient(500, 500, 500, 500, 500)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Cancel immediately
+
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(f.inner.call, should.Equal, 0) // No requests should be made
+}
+
+func (f *RetryClientFixture) TestContextCancelledDuringBackoffStopsRetryingGet() {
+	f.inner = NewFailingHTTPClient(500, 500, 500)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	sleepCount := 0
+	cancellingSleeper := func(_ context.Context, d time.Duration) {
+		sleepCount++
+		if sleepCount == 2 {
+			cancel()
+		}
+	}
+
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), cancellingSleeper).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(f.inner.call, should.Equal, 2)
+}
+
+func (f *RetryClientFixture) TestContextCancelledDuringBackoffStopsRetryingPost() {
+	f.inner = NewFailingHTTPClient(500, 500, 500)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	sleepCount := 0
+	cancellingSleeper := func(_ context.Context, d time.Duration) {
+		sleepCount++
+		if sleepCount == 2 {
+			cancel()
+		}
+	}
+
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), cancellingSleeper).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(f.inner.call, should.Equal, 2)
+}
+
+func (f *RetryClientFixture) TestContextCancelledDuringRateLimitBackoffStopsRetrying() {
+	f.inner = NewFailingHTTPClient(429, 429, 429)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	sleepCount := 0
+	cancellingSleeper := func(_ context.Context, d time.Duration) {
+		sleepCount++
+		if sleepCount == 2 {
+			cancel()
+		}
+	}
+
+	// 429 handling: request made, then sleep in handleHttpStatusCode (count=1),
+	// then backOff sleep (count=2, cancels), then ctx.Err() check exits.
+	client := NewRetryClient(f.inner, 10, rand.New(rand.NewSource(0)), cancellingSleeper).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(f.inner.call, should.Equal, 1)
+}
+
+/**************************************************************************/
+
+func TestContextSleep(t *testing.T) {
+	gunit.Run(new(ContextSleepFixture), t)
+}
+
+type ContextSleepFixture struct {
+	*gunit.Fixture
+}
+
+func (f *ContextSleepFixture) TestSleepsForFullDurationWhenContextNotCancelled() {
+	ctx := context.Background()
+	start := time.Now()
+
+	ContextSleep(ctx, 50*time.Millisecond)
+
+	elapsed := time.Since(start)
+	f.So(elapsed, should.BeGreaterThanOrEqualTo, 50*time.Millisecond)
+}
+
+func (f *ContextSleepFixture) TestReturnsImmediatelyWhenContextAlreadyCancelled() {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	start := time.Now()
+
+	ContextSleep(ctx, 1*time.Second)
+
+	elapsed := time.Since(start)
+	f.So(elapsed, should.BeLessThan, 100*time.Millisecond)
+}
+
+func (f *ContextSleepFixture) TestReturnsEarlyWhenContextCancelledDuringSleep() {
+	ctx, cancel := context.WithCancel(context.Background())
+	start := time.Now()
+
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		cancel()
+	}()
+
+	ContextSleep(ctx, 1*time.Second)
+
+	elapsed := time.Since(start)
+	f.So(elapsed, should.BeGreaterThanOrEqualTo, 50*time.Millisecond)
+	f.So(elapsed, should.BeLessThan, 200*time.Millisecond)
 }
