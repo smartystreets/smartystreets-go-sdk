@@ -3,6 +3,7 @@ package wireup
 import (
 	"crypto/tls"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -196,7 +197,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = b.buildClient()
 	wrapped = internal.NewTracingClient(wrapped, b.trace)
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
-	wrapped = internal.NewRetryClient(wrapped, b.retries, time.Sleep)
+	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewSource(time.Now().UnixNano())), internal.ContextSleep)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)

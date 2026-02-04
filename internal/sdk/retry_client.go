@@ -2,9 +2,12 @@ package sdk
 
 import (
 	"bytes"
+	"context"
 	"io"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -12,11 +15,12 @@ import (
 type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
-	sleeper    func(time.Duration)
-	rateLimit  int
+	sleeper    func(context.Context, time.Duration)
+	lock       *sync.Mutex
+	rand       *rand.Rand
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int, sleeper func(time.Duration)) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper func(context.Context, time.Duration)) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
@@ -24,7 +28,8 @@ func NewRetryClient(inner HTTPClient, maxRetries int, sleeper func(time.Duration
 		inner:      inner,
 		maxRetries: maxRetries,
 		sleeper:    sleeper,
-		rateLimit:  -1,
+		lock:       &sync.Mutex{},
+		rand:       rand,
 	}
 }
 
@@ -36,13 +41,17 @@ func (r *RetryClient) Do(request *http.Request) (*http.Response, error) {
 }
 
 func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err error) {
-	for attempt := 0; r.backOff(attempt); attempt++ {
+	ctx := request.Context()
+	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			if r.readBody(response) {
 				break
 			}
 		}
-		if !r.handleHttpStatusCode(response, &attempt) {
+		if !r.handleHttpStatusCode(ctx, response, &attempt) {
 			break
 		}
 	}
@@ -55,21 +64,25 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 		return nil, err
 	}
 
-	for attempt := 0; r.backOff(attempt); attempt++ {
+	ctx := request.Context()
+	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
 		request.Body = io.NopCloser(bytes.NewReader(body))
 		if response, err = r.inner.Do(request); err == nil && response.StatusCode == http.StatusOK {
 			if r.readBody(response) {
 				break
 			}
 		}
-		if !r.handleHttpStatusCode(response, &attempt) {
+		if !r.handleHttpStatusCode(ctx, response, &attempt) {
 			break
 		}
 	}
 	return response, err
 }
 
-func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int) bool {
+func (r *RetryClient) handleHttpStatusCode(ctx context.Context, response *http.Response, attempt *int) bool {
 	if response == nil {
 		return true
 	}
@@ -80,21 +93,24 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response, attempt *int
 		return false
 	}
 	if response.StatusCode == http.StatusTooManyRequests {
-		if response.Header != nil {
-			if i, err := strconv.Atoi(response.Header.Get("Retry-After")); err == nil {
-				r.rateLimit = i
-				*attempt = 0
-				return true
-			}
+		sleepDuration := r.rateLimitSleepDuration(response)
+		r.sleeper(ctx, sleepDuration)
+		if ctx.Err() != nil {
+			return false
 		}
-		if *attempt == 0 {
-			r.rateLimit = 1
-		} else {
-			r.rateLimit += 1
-		}
-		*attempt = 0
+		// Setting attempt to 1 will make 429s retry indefinitely; this is intended behavior.
+		*attempt = 1
 	}
 	return true
+}
+
+func (r *RetryClient) rateLimitSleepDuration(response *http.Response) time.Duration {
+	if response.Header != nil {
+		if retryAfter, err := strconv.Atoi(response.Header.Get("Retry-After")); err == nil && retryAfter > 0 {
+			return time.Second * time.Duration(retryAfter)
+		}
+	}
+	return time.Second * time.Duration(r.random(backOffRateLimit))
 }
 
 func (r *RetryClient) readBody(response *http.Response) bool {
@@ -112,37 +128,43 @@ func (r *RetryClient) readBody(response *http.Response) bool {
 	return false
 }
 
-func (r *RetryClient) backOff(attempt int) bool {
+func (r *RetryClient) backOff(ctx context.Context, attempt int) bool {
+	if attempt == 0 {
+		return true
+	}
 	if attempt > r.maxRetries {
 		return false
 	}
-	backOffCap := 0
-	if r.rateLimit != -1 {
-		backOffCap = r.rateLimit
-	} else {
-		backOffCap = max(0, min(maxBackOffDuration, attempt))
-	}
-	backOff := time.Second * time.Duration(backOffCap)
-	r.sleeper(backOff)
+	backOffCap := max(0, min(maxBackOffDuration, attempt))
+	backOff := time.Second * time.Duration(r.random(backOffCap))
+	r.sleeper(ctx, backOff)
 	return true
 }
 
-// TODO: delete in favor of built-in function after upgrading to Go 1.21
-func max(x, y int) int {
-	if x > y {
-		return x
+// ContextSleep is a context-aware sleep function suitable for production use.
+// It returns immediately if the context is cancelled.
+func ContextSleep(ctx context.Context, duration time.Duration) {
+	select {
+	case <-ctx.Done():
+		return
+	default:
 	}
-	return y
+
+	timer := time.NewTimer(duration)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+	case <-timer.C:
+	}
 }
 
-// TODO: delete in favor of built-in function after upgrading to Go 1.21
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
+func (r *RetryClient) random(cap int) int {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	return r.rand.Intn(cap)
 }
 
 const (
 	maxBackOffDuration = 10
+	backOffRateLimit   = 10
 )
