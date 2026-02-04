@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -26,9 +27,9 @@ func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper f
 	return &RetryClient{
 		inner:      inner,
 		maxRetries: maxRetries,
-		lock:       new(sync.Mutex),
-		rand:       rand,
 		sleeper:    sleeper,
+		lock:       &sync.Mutex{},
+		rand:       rand,
 	}
 }
 
@@ -92,7 +93,8 @@ func (r *RetryClient) handleHttpStatusCode(ctx context.Context, response *http.R
 		return false
 	}
 	if response.StatusCode == http.StatusTooManyRequests {
-		r.sleeper(ctx, time.Second*time.Duration(r.random(backOffRateLimit)))
+		sleepDuration := r.rateLimitSleepDuration(response)
+		r.sleeper(ctx, sleepDuration)
 		if ctx.Err() != nil {
 			return false
 		}
@@ -100,6 +102,15 @@ func (r *RetryClient) handleHttpStatusCode(ctx context.Context, response *http.R
 		*attempt = 1
 	}
 	return true
+}
+
+func (r *RetryClient) rateLimitSleepDuration(response *http.Response) time.Duration {
+	if response.Header != nil {
+		if retryAfter, err := strconv.Atoi(response.Header.Get("Retry-After")); err == nil && retryAfter > 0 {
+			return time.Second * time.Duration(retryAfter)
+		}
+	}
+	return time.Second * time.Duration(r.random(backOffRateLimit))
 }
 
 func (r *RetryClient) readBody(response *http.Response) bool {
@@ -154,6 +165,6 @@ func (r *RetryClient) random(cap int) int {
 }
 
 const (
-	backOffRateLimit   = 5
 	maxBackOffDuration = 10
+	backOffRateLimit   = 10
 )

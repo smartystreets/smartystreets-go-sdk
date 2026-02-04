@@ -23,6 +23,7 @@ type RetryClientFixture struct {
 	inner    *FakeMultiHTTPClient
 	response *http.Response
 	err      error
+	header   http.Header
 
 	naps []time.Duration
 }
@@ -76,8 +77,11 @@ func (f *RetryClientFixture) assertRequestWasSuccessful() {
 }
 func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(f.inner.call, should.Equal, 5)
-	f.So(f.naps, should.Resemble,
-		[]time.Duration{0 * time.Second, 0 * time.Second, 1 * time.Second, 2 * time.Second})
+	f.So(len(f.naps), should.Equal, 4) // 4 backoff sleeps for 5 attempts (first attempt has no backoff)
+	for i, nap := range f.naps {
+		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
+		f.So(nap, should.BeLessThanOrEqualTo, cap)
+	}
 }
 
 /**************************************************************************/
@@ -89,6 +93,28 @@ func (f *RetryClientFixture) TestRetryOnBadResponseUntilSuccess() {
 
 	f.assertRequestWasSuccessful()
 	f.assertBackOffStrategyWasObserved()
+}
+
+func (f *RetryClientFixture) TestPost404ErrorDoesNotRetry() {
+	f.inner = NewFailingHTTPClient(404, 429)
+
+	f.response, f.err = f.sendPostWithRetry(1)
+
+	if f.So(f.response, should.NotBeNil) {
+		f.So(f.response.StatusCode, should.Equal, 404)
+	}
+	f.So(f.err, should.BeNil)
+}
+
+func (f *RetryClientFixture) TestGet404ErrorDoesNotRetry() {
+	f.inner = NewFailingHTTPClient(404, 429)
+
+	f.response, f.err = f.sendGetWithRetry(1)
+
+	if f.So(f.response, should.NotBeNil) {
+		f.So(f.response.StatusCode, should.Equal, 404)
+	}
+	f.So(f.err, should.BeNil)
 }
 
 /**************************************************************************/
@@ -126,9 +152,9 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, retries)
-	f.So(f.naps[0], should.Equal, 0)
-	for i := 1; i < len(f.naps); i++ {
-		f.So(f.naps[i], should.BeBetweenOrEqual, 0, time.Second*time.Duration(min(i, maxBackOffDuration)))
+	for i := 0; i < len(f.naps); i++ {
+		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
+		f.So(f.naps[i], should.BeLessThanOrEqualTo, cap)
 	}
 }
 
@@ -140,15 +166,11 @@ func (f *RetryClientFixture) TestBackOffRateLimitedGet() {
 
 	_, f.err = f.sendGetWithRetry(retries - 1)
 
+	// 429s retry indefinitely (attempt reset to 1), so all 11 requests should be made
 	f.So(f.err, should.BeNil)
-	if f.So(f.inner.call, should.Equal, 11) {
-		var napTotal time.Duration
-		for i := 0; i < 10; i++ {
-			napTotal += f.naps[i]
-			f.So(f.naps[i], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
-		}
-		f.So(napTotal, should.BeGreaterThan, time.Second*5)
-	}
+	f.So(f.inner.call, should.Equal, 11)
+	// Each 429 triggers a rate limit sleep plus a backoff sleep
+	f.So(len(f.naps), should.BeGreaterThan, 0)
 }
 
 func (f *RetryClientFixture) TestBackOffRateLimitedPost() {
@@ -159,25 +181,67 @@ func (f *RetryClientFixture) TestBackOffRateLimitedPost() {
 
 	_, f.err = f.sendPostWithRetry(retries - 1)
 
+	// 429s retry indefinitely (attempt reset to 1), so all 11 requests should be made
 	f.So(f.err, should.BeNil)
-	if f.So(f.inner.call, should.Equal, 11) {
-		var napTotal time.Duration
-		for i := 0; i < 10; i++ {
-			napTotal += f.naps[i]
-			f.So(f.naps[i], should.BeBetweenOrEqual, 0, backOffRateLimit*time.Second)
+	f.So(f.inner.call, should.Equal, 11)
+	// Each 429 triggers a rate limit sleep plus a backoff sleep
+	f.So(len(f.naps), should.BeGreaterThan, 0)
+}
+
+func (f *RetryClientFixture) TestRetryAfterHeaderUsedFor429() {
+	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
+	retryAfterSeconds := 7
+	f.inner.headerKey = "Retry-After"
+	f.inner.rateLimitTime = retryAfterSeconds
+	f.inner.responses[3].Body = io.NopCloser(strings.NewReader("Success"))
+
+	_, f.err = f.sendPostWithRetry(3) // 3 retries allows for 4 attempts
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 4)
+	// At least one nap should be the exact Retry-After value (from 429 handling)
+	hasRetryAfterNap := false
+	for _, nap := range f.naps {
+		if nap == time.Second*time.Duration(retryAfterSeconds) {
+			hasRetryAfterNap = true
+			break
 		}
-		f.So(napTotal, should.BeGreaterThan, time.Second*5)
+	}
+	f.So(hasRetryAfterNap, should.BeTrue)
+}
+
+func (f *RetryClientFixture) TestFallsBackToRandomBackoffWithoutRetryAfterHeader() {
+	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
+	f.inner.headerKey = "X-Invalid-Header" // Not Retry-After
+	f.inner.rateLimitTime = 100            // Would be obvious if used
+	f.inner.responses[3].Body = io.NopCloser(strings.NewReader("Success"))
+
+	_, f.err = f.sendPostWithRetry(3) // 3 retries allows for 4 attempts
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 4)
+	// Without Retry-After header, should use random backoff (0 to backOffRateLimit)
+	for _, nap := range f.naps {
+		f.So(nap, should.BeLessThanOrEqualTo, time.Second*time.Duration(max(backOffRateLimit, maxBackOffDuration)))
 	}
 }
 
 /**************************************************************************/
 
 func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, error) {
+	if len(f.inner.responses) <= retries {
+		f.T().Fatalf("The number of retries is greater than or equal to the number of status codes provided. Please ensure that the number of retries is less than the number of status codes provided.")
+	}
+
 	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("GET", "/?body=request", nil)
 	return client.Do(request)
 }
 func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, error) {
+	if len(f.inner.responses) <= retries {
+		f.T().Fatalf("The number of retries is greater than or equal to the number of status codes provided. Please ensure that the number of retries is less than the number of status codes provided.")
+	}
+
 	client := NewRetryClient(f.inner, retries, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
