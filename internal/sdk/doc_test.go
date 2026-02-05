@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"strconv"
@@ -71,4 +72,21 @@ func NewErringHTTPClient(errors ...error) *FakeMultiHTTPClient {
 		client.errors = append(client.errors, err)
 	}
 	return client
+}
+
+/*////////////////////////////////////////////////////////////////////////*/
+
+// ContextCancellingHTTPClient cancels the context on a specific call number,
+// simulating context cancellation during an in-flight HTTP request.
+type ContextCancellingHTTPClient struct {
+	cancelOnCall int
+	cancel       context.CancelFunc
+	inner        *FakeMultiHTTPClient
+}
+
+func (c *ContextCancellingHTTPClient) Do(request *http.Request) (*http.Response, error) {
+	if c.inner.call+1 == c.cancelOnCall {
+		c.cancel()
+	}
+	return c.inner.Do(request)
 }

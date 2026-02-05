@@ -51,9 +51,15 @@ func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err
 				break
 			}
 		}
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		if !r.handleHttpStatusCode(ctx, response, &attempt) {
 			break
 		}
+	}
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 	return response, err
 }
@@ -75,9 +81,15 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 				break
 			}
 		}
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		if !r.handleHttpStatusCode(ctx, response, &attempt) {
 			break
 		}
+	}
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 	return response, err
 }
@@ -138,7 +150,7 @@ func (r *RetryClient) backOff(ctx context.Context, attempt int) bool {
 	backOffCap := max(0, min(maxBackOffDuration, attempt))
 	backOff := time.Second * time.Duration(r.random(backOffCap))
 	r.sleeper(ctx, backOff)
-	return true
+	return ctx.Err() == nil
 }
 
 // ContextSleep is a context-aware sleep function suitable for production use.

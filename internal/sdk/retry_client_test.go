@@ -319,6 +319,42 @@ func (f *RetryClientFixture) TestContextCancelledDuringBackoffStopsRetryingPost(
 	f.So(f.inner.call, should.Equal, 2)
 }
 
+func (f *RetryClientFixture) TestContextCancelledDuringRequestStopsRetryingGet() {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	cancellingClient := &ContextCancellingHTTPClient{
+		cancelOnCall: 2,
+		cancel:       cancel,
+		inner:        NewFailingHTTPClient(500, 500, 500, 500, 500),
+	}
+
+	client := NewRetryClient(cancellingClient, 10, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(cancellingClient.inner.call, should.Equal, 2) // Should not retry after cancellation
+}
+
+func (f *RetryClientFixture) TestContextCancelledDuringRequestStopsRetryingPost() {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	cancellingClient := &ContextCancellingHTTPClient{
+		cancelOnCall: 2,
+		cancel:       cancel,
+		inner:        NewFailingHTTPClient(500, 500, 500, 500, 500),
+	}
+
+	client := NewRetryClient(cancellingClient, 10, rand.New(rand.NewSource(0)), f.sleep).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
+	response, err := client.Do(request)
+
+	f.So(response, should.BeNil)
+	f.So(err, should.Equal, context.Canceled)
+	f.So(cancellingClient.inner.call, should.Equal, 2) // Should not retry after cancellation
+}
+
 func (f *RetryClientFixture) TestContextCancelledDuringRateLimitBackoffStopsRetrying() {
 	f.inner = NewFailingHTTPClient(429, 429, 429)
 	ctx, cancel := context.WithCancel(context.Background())
