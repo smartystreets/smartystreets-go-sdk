@@ -122,14 +122,12 @@ func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCo
 }
 
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
-	u := &universalLookup{
-		Lookup:     lookup,
-		DataSet:    dataSet,
-		DataSubset: dataSubset,
-	}
+	return c.SendUniversalLookupWithContext(context.Background(), lookup, dataSet, dataSubset)
+}
 
-	err := c.sendLookup(u)
-	return err, u.Response
+// SendUniversalLookupWithContext sends a lookup with the provided context.
+func (c *Client) SendUniversalLookupWithContext(ctx context.Context, lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
+	return c.SendUniversalLookupWithContextAndAuth(ctx, lookup, dataSet, dataSubset, "", "")
 }
 
 // SendUniversalLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
