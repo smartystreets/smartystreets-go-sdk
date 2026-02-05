@@ -48,4 +48,6 @@ func main() {
 		}
 		fmt.Printf("Response %d: %s", i, prettyPrinted)
 	}
+
+	log.Println("OK")
 }

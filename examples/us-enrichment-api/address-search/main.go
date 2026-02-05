@@ -52,4 +52,6 @@ func main() {
 		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
+
+	log.Println("OK")
 }

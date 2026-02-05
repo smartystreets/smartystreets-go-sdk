@@ -46,4 +46,6 @@ func main() {
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
 	fmt.Println(string(results))
+
+	log.Println("OK")
 }
