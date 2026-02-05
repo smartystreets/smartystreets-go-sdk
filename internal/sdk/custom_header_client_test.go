@@ -33,7 +33,7 @@ func (this *CustomHeadersClientFixture) Setup() {
 		response: this.response,
 	}
 	this.headers = make(http.Header)
-	this.client = NewCustomHeadersClient(this.inner, this.headers)
+	this.client = NewCustomHeadersClient(this.inner, this.headers, nil)
 }
 
 func (this *CustomHeadersClientFixture) TestAllCustomHeadersAreAddedToTheRequestBeforeItIsSentToTheInnerHandler() {
@@ -51,4 +51,17 @@ func (this *CustomHeadersClientFixture) TestAllCustomHeadersAreAddedToTheRequest
 	this.So(this.request.Header.Get("A"), should.Equal, "1")
 	this.So(this.request.Header.Get("B"), should.Equal, "1")
 	this.So(this.request.Host, should.Equal, "some-domain.com")
+}
+
+func (this *CustomHeadersClientFixture) TestAppendedHeadersAreJoinedWithSeparator() {
+	this.headers.Add("User-Agent", "base-value")
+	this.headers.Add("User-Agent", "custom-value")
+	this.client = NewCustomHeadersClient(this.inner, this.headers, map[string]string{"User-Agent": " "})
+
+	response, err := this.client.Do(this.request)
+
+	this.So(err, should.Equal, this.inner.err)
+	this.So(response, should.Equal, this.inner.response)
+	this.So(this.request.Header, should.HaveLength, 1)
+	this.So(this.request.Header.Get("User-Agent"), should.Equal, "base-value custom-value")
 }

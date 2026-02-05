@@ -34,6 +34,7 @@ type clientBuilder struct {
 	close         bool
 	trace         bool
 	headers       http.Header
+	appendHeaders map[string]string
 	idleConns     int
 	http2Disabled bool
 	client        *http.Client
@@ -47,6 +48,7 @@ func newClientBuilder() *clientBuilder {
 		retries:       4,
 		timeout:       time.Second * 10,
 		headers:       initializeHeadersWithUserAgent(),
+		appendHeaders: make(map[string]string),
 		customQueries: url.Values{},
 	}
 }
@@ -108,6 +110,12 @@ func (b *clientBuilder) withHTTPRequestTracing() *clientBuilder {
 }
 
 func (b *clientBuilder) withCustomHeader(key, value string) *clientBuilder {
+	b.headers.Add(key, value)
+	return b
+}
+
+func (b *clientBuilder) withAppendedHeader(key, value, separator string) *clientBuilder {
+	b.appendHeaders[key] = separator
 	b.headers.Add(key, value)
 	return b
 }
@@ -199,7 +207,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
 	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewSource(time.Now().UnixNano())), internal.ContextSleep)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
-	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers)
+	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers, b.appendHeaders)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
 	wrapped = internal.NewKeepAliveCloseClient(wrapped, b.close)
 	wrapped = internal.NewLicenseClient(wrapped, b.licenses...)

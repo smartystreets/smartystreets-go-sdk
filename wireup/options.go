@@ -143,6 +143,14 @@ func CustomHeader(key, value string) Option {
 	}
 }
 
+// AppendedHeader appends the provided value to the existing header value using the specified separator,
+// rather than adding a separate header value. This is useful for single-value headers like User-Agent.
+func AppendedHeader(key, value, separator string) Option {
+	return func(builder *clientBuilder) {
+		builder.withAppendedHeader(key, value, separator)
+	}
+}
+
 // DisableKeepAlive disables keep-alive for API requests.
 // This is helpful if your environment limits the number of open files.
 func DisableKeepAlive() Option {

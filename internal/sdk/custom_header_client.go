@@ -1,16 +1,21 @@
 package sdk
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 type CustomHeadersClient struct {
-	inner   HTTPClient
-	headers http.Header
+	inner         HTTPClient
+	headers       http.Header
+	appendHeaders map[string]string
 }
 
-func NewCustomHeadersClient(inner HTTPClient, headers http.Header) *CustomHeadersClient {
+func NewCustomHeadersClient(inner HTTPClient, headers http.Header, appendHeaders map[string]string) *CustomHeadersClient {
 	return &CustomHeadersClient{
-		inner:   inner,
-		headers: headers,
+		inner:         inner,
+		headers:       headers,
+		appendHeaders: appendHeaders,
 	}
 }
 
@@ -23,11 +28,15 @@ func (this *CustomHeadersClient) addHeaders(request *http.Request) {
 	headers := request.Header
 
 	for key, values := range this.headers {
-		for _, value := range values {
-			if key == "Host" {
-				request.Host = value
-			} else {
-				headers.Add(key, value)
+		if separator, ok := this.appendHeaders[key]; ok {
+			headers.Set(key, strings.Join(values, separator))
+		} else {
+			for _, value := range values {
+				if key == "Host" {
+					request.Host = value
+				} else {
+					headers.Add(key, value)
+				}
 			}
 		}
 	}
