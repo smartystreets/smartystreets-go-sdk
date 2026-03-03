@@ -15,5 +15,6 @@ type (
 		DoubleDependentLocality string `json:"double_dependent_locality,omitempty"`
 		PostalCode              string `json:"postal_code,omitempty"`
 		PostalCodeExtra         string `json:"postal_code_extra,omitempty"`
+		Thoroughfare            string `json:"thoroughfare,omitempty"`
 	}
 )
