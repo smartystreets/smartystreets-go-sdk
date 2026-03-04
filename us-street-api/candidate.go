@@ -64,6 +64,9 @@ type (
 		TimeZone                 string                `json:"time_zone,omitempty"`
 		UTCOffset                float32               `json:"utc_offset,omitempty"`
 		DST                      bool                  `json:"dst,omitempty"`
+		IANATimeZone             string                `json:"iana_time_zone,omitempty"`
+		IANAUTCOffset            float32               `json:"iana_utc_offset,omitempty"`
+		IANADST                  bool                  `json:"iana_dst,omitempty"`
 		EWSMatch                 bool                  `json:"ews_match,omitempty"`
 	}
 
