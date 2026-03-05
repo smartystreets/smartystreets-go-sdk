@@ -36,6 +36,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 		{"address1": "3"}
 	]`
 	f.input.Freeform = "42"
+	f.input.Country = "CA"
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
@@ -46,7 +47,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(f.sender.request.URL.Path, should.Equal, verifyURL)
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
-	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?freeform=42")
+	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?country=CA&freeform=42")
 	f.So(f.input.Results, should.Resemble, []*Candidate{
 		{RootLevel: RootLevel{Address1: "1"}},
 		{RootLevel: RootLevel{Address1: "2"}},
@@ -60,12 +61,17 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 
 func (f *ClientFixture) TestNilLookupNOP() {
 	err := f.client.SendLookup(nil)
-	f.So(err.Error(), should.Equal, "lookup cannot be nil")
+	f.So(err, should.Equal, errors.New("lookup cannot be nil"))
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
 	err := f.client.SendLookup(new(Lookup))
-	f.So(err.Error(), should.Equal, "unexpected end of JSON input")
+	f.So(err, should.Equal, errors.New("country field is required"))
+}
+
+func (f *ClientFixture) TestInvalidLookup_HasCountryMissingFreeformAndAddress1() {
+	err := f.client.SendLookup(&Lookup{Country: "CA"})
+	f.So(err, should.Equal, errors.New("either Freeform or Address1 is required"))
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
