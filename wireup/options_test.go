@@ -43,6 +43,21 @@ func (this *OptionsFixture) TestConfigure_WithFeatureComponentAnalysisAndCustom_
 	this.So(builder.customQueries.Get("features"), should.Equal, "component-analysis,test-feature")
 }
 
+func (this *OptionsFixture) TestConfigure_WithFeatureIANATimeZone() {
+	builder := configure(
+		WithFeatureIANATimeZone(),
+	)
+	this.So(builder.customQueries.Get("features"), should.Equal, "iana-timezone")
+}
+
+func (this *OptionsFixture) TestConfigure_WithFeatureIANATimeZoneAndComponentAnalysis_ShouldAppend() {
+	builder := configure(
+		WithFeatureComponentAnalysis(),
+		WithFeatureIANATimeZone(),
+	)
+	this.So(builder.customQueries.Get("features"), should.Equal, "component-analysis,iana-timezone")
+}
+
 func (this *OptionsFixture) TestConfigure_WithCustomQuery() {
 	builder := configure(
 		WithCustomQuery("test", "first"),

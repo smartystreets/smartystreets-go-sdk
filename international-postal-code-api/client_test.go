@@ -96,12 +96,13 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.sender.response = `[
 {
 	"input_id": "1",
-  "country_iso_3": "2",
+  	"country_iso_3": "2",
 	"locality": "3",
 	"administrative_area": "4",
 	"sub_administrative_area": "5",
 	"super_administrative_area": "6",
-	"postal_code": "7"
+	"postal_code": "7",
+	"thoroughfare": "8"
 }
 ]`
 	lookup := new(Lookup)
@@ -116,6 +117,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.SubAdministrativeArea, should.Equal, "5")
 	f.So(candidate.SuperAdministrativeArea, should.Equal, "6")
 	f.So(candidate.PostalCode, should.Equal, "7")
+	f.So(candidate.Thoroughfare, should.Equal, "8")
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

@@ -230,3 +230,8 @@ func WithCustomCommaSeparatedQuery(key, value string) Option {
 func WithFeatureComponentAnalysis() Option {
 	return WithCustomCommaSeparatedQuery("features", "component-analysis")
 }
+
+// WithFeatureIANATimeZone turns on the IANA timezone feature for the request.
+func WithFeatureIANATimeZone() Option {
+	return WithCustomCommaSeparatedQuery("features", "iana-timezone")
+}
