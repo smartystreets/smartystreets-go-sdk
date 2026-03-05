@@ -37,13 +37,13 @@ func (f *BatchProcessingFixture) TestManyLookupsSentInBatches() {
 	if !f.So(f.sender.callCount, should.Equal, 3) {
 		return
 	}
-	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
-	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
-	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200","candidates":5,"match":"enhanced"},`)
 
-	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
-	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
-	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249"}]`)
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249","candidates":5,"match":"enhanced"}]`)
 }
 
 func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
@@ -58,11 +58,11 @@ func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 	if !f.So(f.sender.callCount, should.Equal, 2) {
 		return
 	}
-	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
-	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100","candidates":5,"match":"enhanced"},`)
 
-	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
-	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199","candidates":5,"match":"enhanced"}]`)
 }
 
 func (f *BatchProcessingFixture) TestChannelOfLookupsSentInBatches() {
@@ -79,13 +79,13 @@ func (f *BatchProcessingFixture) TestChannelOfLookupsSentInBatches() {
 		return
 	}
 	f.So(len(unload(output)), should.Equal, 250)
-	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
-	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
-	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200"},`)
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[2], should.StartWith, `[{"input_id":"200","candidates":5,"match":"enhanced"},`)
 
-	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
-	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
-	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249"}]`)
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[2], should.EndWith, `,{"input_id":"249","candidates":5,"match":"enhanced"}]`)
 }
 
 func unload(stream chan *Lookup) (lookups []*Lookup) {
@@ -107,11 +107,11 @@ func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsOnChannelFromBeingBa
 	if !f.So(f.sender.callCount, should.Equal, 2) {
 		return
 	}
-	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0"},`)
-	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100"},`)
+	f.So(f.sender.requestBodies[0], should.StartWith, `[{"input_id":"0","candidates":5,"match":"enhanced"},`)
+	f.So(f.sender.requestBodies[1], should.StartWith, `[{"input_id":"100","candidates":5,"match":"enhanced"},`)
 
-	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99"}]`)
-	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199"}]`)
+	f.So(f.sender.requestBodies[0], should.EndWith, `,{"input_id":"99","candidates":5,"match":"enhanced"}]`)
+	f.So(f.sender.requestBodies[1], should.EndWith, `,{"input_id":"199","candidates":5,"match":"enhanced"}]`)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
