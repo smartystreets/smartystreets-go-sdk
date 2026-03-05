@@ -32,8 +32,8 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 // If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
 func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
-	if lookup == nil {
-		return errors.New("lookup cannot be nil")
+	if err := ensureEnoughInfo(lookup); err != nil {
+		return err
 	}
 
 	request := buildRequest(lookup)
@@ -46,6 +46,19 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 		return err
 	}
 	return deserializeResponse(response, lookup)
+}
+
+func ensureEnoughInfo(lookup *Lookup) error {
+	if lookup == nil {
+		return errors.New("lookup cannot be nil")
+	}
+	if lookup.Country == "" {
+		return errors.New("country field is required")
+	}
+	if lookup.Freeform == "" && lookup.Address1 == "" {
+		return errors.New("either Freeform or Address1 is required")
+	}
+	return nil
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {
