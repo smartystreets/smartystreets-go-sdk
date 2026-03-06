@@ -1,6 +1,7 @@
 package street
 
 import (
+	"encoding/json"
 	"net/url"
 	"strconv"
 )
@@ -18,15 +19,17 @@ type Lookup struct {
 	Addressee        string            `json:"addressee,omitempty"`
 	Urbanization     string            `json:"urbanization,omitempty"`
 	InputID          string            `json:"input_id,omitempty"`
-	MaxCandidates    int               `json:"candidates,omitempty"` // Default value: 1
-	MatchStrategy    MatchStrategy     `json:"match,omitempty"`
+	MaxCandidates    int               `json:"candidates,omitempty"` // Default value: 1, if MatchStrategy is "enhanced" default value: 5
+	MatchStrategy    MatchStrategy     `json:"match,omitempty"`      // Default value: "enhanced"
 	OutputFormat     OutputFormat      `json:"format,omitempty"`
 	CountySource     CountySource      `json:"county_source,omitempty"`
-	CustomParameters map[string]string `json:"custom_parameters,omitempty"`
+	CustomParameters map[string]string `json:"-"`
 
 	Results []*Candidate `json:"results,omitempty"`
 }
 
+// AddCustomParameter adds custom query parameters/json properties to the request, it will overwrite
+// existing key value pairs.
 func (l *Lookup) AddCustomParameter(name, value string) {
 	if l.CustomParameters == nil {
 		l.CustomParameters = make(map[string]string)
@@ -45,28 +48,17 @@ func (l *Lookup) encodeQueryString(query url.Values) {
 	encode(query, l.Addressee, "addressee")
 	encode(query, l.Urbanization, "urbanization")
 	encode(query, l.InputID, "input_id")
-	matchStrategy := l.MatchStrategy
-	if matchStrategy == "" {
-		matchStrategy = MatchEnhanced
+	encode(query, string(l.OutputFormat), "format")
+	encode(query, string(l.CountySource), "county_source")
+
+	matchStrategy, maxCandidates := l.defaultValues()
+	encode(query, string(matchStrategy), "match")
+	if maxCandidates > 0 {
+		encode(query, strconv.Itoa(maxCandidates), "candidates")
 	}
-	if l.MaxCandidates > 0 {
-		encode(query, strconv.Itoa(l.MaxCandidates), "candidates")
-	} else if matchStrategy == MatchEnhanced {
-		encode(query, "5", "candidates")
-	}
-	if matchStrategy != MatchStrict {
-		encode(query, string(matchStrategy), "match")
-	}
-	if l.OutputFormat != FormatDefault {
-		encode(query, string(l.OutputFormat), "format")
-	}
-	if l.CountySource != PostalCounty {
-		encode(query, string(l.CountySource), "county_source")
-	}
-	if len(l.CustomParameters) > 0 {
-		for k, v := range l.CustomParameters {
-			encode(query, v, k)
-		}
+
+	for k, v := range l.CustomParameters {
+		encode(query, v, k)
 	}
 }
 
@@ -74,6 +66,40 @@ func encode(query url.Values, source string, target string) {
 	if source != "" {
 		query.Set(target, source)
 	}
+}
+
+func (l *Lookup) MarshalJSON() ([]byte, error) {
+	type alias Lookup
+	lc := alias(*l)
+	lc.MatchStrategy, lc.MaxCandidates = l.defaultValues()
+	data, err := json.Marshal(lc)
+	if err != nil || len(l.CustomParameters) == 0 {
+		return data, err
+	}
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+	for k, v := range l.CustomParameters {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return nil, err
+		}
+		m[k] = b
+	}
+	return json.Marshal(m)
+}
+
+func (l *Lookup) defaultValues() (matchStrategy MatchStrategy, maxCandidates int) {
+	matchStrategy = l.MatchStrategy
+	if matchStrategy == "" {
+		matchStrategy = MatchEnhanced
+	}
+	maxCandidates = l.MaxCandidates
+	if maxCandidates == 0 && matchStrategy == MatchEnhanced {
+		maxCandidates = 5
+	}
+	return matchStrategy, maxCandidates
 }
 
 /**************************************************************************/
