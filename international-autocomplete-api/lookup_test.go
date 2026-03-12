@@ -62,12 +62,12 @@ func (f *LookupFixture) TestMaxGroupResults() {
 	f.So(f.query.Get("max_group_results"), should.Equal, "7")
 }
 func (f *LookupFixture) TestGeolocation() {
-	f.lookup.Geolocation = "locality"
+	f.lookup.Geolocation = true
 
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 3)
-	f.So(f.query.Get("geolocation"), should.Equal, "locality")
+	f.So(f.query.Get("geolocation"), should.Equal, "on")
 }
 func (f *LookupFixture) TestLocality() {
 	f.lookup.Locality = "Hello, World!"

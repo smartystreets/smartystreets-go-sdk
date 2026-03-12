@@ -17,7 +17,7 @@ type Lookup struct {
 	AddressID       string
 	MaxResults      int
 	MaxGroupResults int
-	Geolocation     string
+	Geolocation     bool
 	Locality        string
 	PostalCode      string
 	Result          *Result
@@ -57,8 +57,8 @@ func (l Lookup) populateMaxGroupResults(query url.Values) {
 	query.Set("max_group_results", strconv.Itoa(maxGroupResults))
 }
 func (l Lookup) populateGeolocation(query url.Values) {
-	if len(l.Geolocation) > 0 {
-		query.Set("geolocation", l.Geolocation)
+	if l.Geolocation {
+		query.Set("geolocation", "on")
 	}
 }
 func (l Lookup) populateLocality(query url.Values) {
