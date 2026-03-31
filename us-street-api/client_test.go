@@ -146,6 +146,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
     "last_line": "Provo UT 84604-4405",
     "delivery_point_barcode": "846044405140",
     "smarty_key": "1750774478",
+	"smarty_key_ext": "0",
     "components": {
       "primary_number": "3214",
       "street_predirection": "N",
@@ -252,6 +253,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 			LastLine:             "Provo UT 84604-4405",
 			DeliveryPointBarcode: "846044405140",
 			SmartyKey:            "1750774478",
+			SmartyKeyEXT:         "0",
 			Components: Components{
 				PrimaryNumber:            "3214",
 				StreetPredirection:       "N",
