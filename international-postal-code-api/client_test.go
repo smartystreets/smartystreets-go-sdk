@@ -151,7 +151,26 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSig
 	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+
+	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &FakeCredential{err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
+}
+
 /*////////////////////////////////////////////////////////////////////////*/
+
+type FakeCredential struct {
+	err error
+}
+
+func (f *FakeCredential) Sign(*http.Request) error {
+	return f.err
+}
 
 type FakeSender struct {
 	callCount int

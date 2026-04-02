@@ -600,7 +600,26 @@ var validRiskResponse = `[{"smarty_key":"123","data_set_name":"risk","attributes
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`
 var validSecondaryCountResponse = `[{"smarty_key":"123","count":3}]`
 
+func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+
+	err, _ := f.client.SendPropertyPrincipalWithContextAndAuth(context.Background(), lookup, &FakeCredential{err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
+}
+
 /**************************************************************************/
+
+type FakeCredential struct {
+	err error
+}
+
+func (f *FakeCredential) Sign(*http.Request) error {
+	return f.err
+}
 
 type FakeSender struct {
 	callCount int

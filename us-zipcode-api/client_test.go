@@ -150,7 +150,27 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_NilCredentialDoesNotSign
 	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42", ZIPCode: "10001"}
+	f.batch.Append(input)
+
+	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &FakeCredential{err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
+}
+
 /*////////////////////////////////////////////////////////////////////////*/
+
+type FakeCredential struct {
+	err error
+}
+
+func (f *FakeCredential) Sign(*http.Request) error {
+	return f.err
+}
 
 type FakeSender struct {
 	callCount int
