@@ -12,6 +12,8 @@ import (
 	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
+type testContextKey string
+
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
 }
@@ -36,7 +38,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.sender.response = validPrincipalResponse
 	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -125,7 +127,7 @@ func (f *ClientFixture) TestGeoReference() {
 	f.sender.response = validGeoReferenceResponse
 	f.input = &geoReferenceLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -147,7 +149,7 @@ func (f *ClientFixture) TestRiskLookup() {
 	f.sender.response = validRiskResponse
 	f.input = &riskLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -169,7 +171,7 @@ func (f *ClientFixture) TestSecondaryLookup() {
 	f.sender.response = validSecondaryResponse
 	f.input = &secondaryLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -191,7 +193,7 @@ func (f *ClientFixture) TestSecondaryCount() {
 	f.sender.response = validSecondaryCountResponse
 	f.input = &secondaryCountLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -229,9 +231,9 @@ func (f *ClientFixture) TestSendPropertyPrincipal() {
 func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "myAuthID", "myAuthToken")
+	err, response := f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("myAuthID", "myAuthToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -257,9 +259,9 @@ func (f *ClientFixture) TestSendGeoReferencePublicMethod() {
 func (f *ClientFixture) TestSendGeoReferenceWithContextAndAuth() {
 	f.sender.response = validGeoReferenceResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendGeoReferenceWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendGeoReferenceWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -284,9 +286,9 @@ func (f *ClientFixture) TestSendGeoReferenceWithVersion() {
 func (f *ClientFixture) TestSendGeoReferenceWithVersionContextAndAuth() {
 	f.sender.response = validGeoReferenceResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendGeoReferenceWithVersionContextAndAuth(ctx, lookup, "census-2010", "authID", "authToken")
+	err, response := f.client.SendGeoReferenceWithVersionContextAndAuth(ctx, lookup, "census-2010", sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/geo-reference/census-2010")
@@ -312,9 +314,9 @@ func (f *ClientFixture) TestSendRiskPublicMethod() {
 func (f *ClientFixture) TestSendRiskWithContextAndAuth() {
 	f.sender.response = validRiskResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendRiskWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendRiskWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -339,9 +341,9 @@ func (f *ClientFixture) TestSendSecondaryPublicMethod() {
 func (f *ClientFixture) TestSendSecondaryWithContextAndAuth() {
 	f.sender.response = validSecondaryResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendSecondaryWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendSecondaryWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -367,9 +369,9 @@ func (f *ClientFixture) TestSendSecondaryCountPublicMethod() {
 func (f *ClientFixture) TestSendSecondaryCountWithContextAndAuth() {
 	f.sender.response = validSecondaryCountResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendSecondaryCountWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendSecondaryCountWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -396,7 +398,7 @@ func (f *ClientFixture) TestSendUniversalLookup() {
 func (f *ClientFixture) TestSendUniversalLookupWithContext() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendUniversalLookupWithContext(ctx, lookup, "property", "principal")
 
@@ -411,9 +413,9 @@ func (f *ClientFixture) TestSendUniversalLookupWithContext() {
 func (f *ClientFixture) TestSendUniversalLookupWithContextAndAuth() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
-	err, response := f.client.SendUniversalLookupWithContextAndAuth(ctx, lookup, "property", "principal", "authID", "authToken")
+	err, response := f.client.SendUniversalLookupWithContextAndAuth(ctx, lookup, "property", "principal", sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property/principal")
@@ -536,30 +538,26 @@ func (f *ClientFixture) TestIsHTTPErrorCode_NilError() {
 
 // Tests for per-request auth with empty credentials (should not set auth)
 
-func (f *ClientFixture) TestPerRequestAuthEmptyCredentialsNotSet() {
+func (f *ClientFixture) TestPerRequestAuthNilCredentialNotSet() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.Background()
 
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "", "")
+	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, nil)
 
 	f.So(f.sender.hasBasicAuth, should.BeFalse)
 }
 
-func (f *ClientFixture) TestPerRequestAuthPartialCredentialsNotSet() {
+func (f *ClientFixture) TestPerRequestAuthWithSecretKeyCredential() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.Background()
 
-	// Only authID provided
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "authID", "")
-	f.So(f.sender.hasBasicAuth, should.BeFalse)
+	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
-	f.sender.Reset()
-
-	// Only authToken provided
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "", "authToken")
 	f.So(f.sender.hasBasicAuth, should.BeFalse)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
 }
 
 // Tests for deprecated methods
@@ -601,6 +599,17 @@ var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-refer
 var validRiskResponse = `[{"smarty_key":"123","data_set_name":"risk","attributes":{"AGRIVALUE":"data","ALR_NPCTL":"data","ALR_VALA":"data","ALR_VALB":"data","ALR_VALP":"data","ALR_VRA_NPCTL":"data","AREA":"data","AVLN_AFREQ":"data","AVLN_ALRB":"data","AVLN_ALRP":"data","AVLN_ALR_NPCTL":"data","AVLN_EALB":"data","AVLN_EALP":"data","AVLN_EALPE":"data","AVLN_EALR":"data","AVLN_EALS":"data","AVLN_EALT":"data","AVLN_EVNTS":"data","AVLN_EXPB":"data","AVLN_EXPP":"data","AVLN_EXPPE":"data"}}]`
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`
 var validSecondaryCountResponse = `[{"smarty_key":"123","count":3}]`
+
+func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+
+	err, _ := f.client.SendPropertyPrincipalWithContextAndAuth(context.Background(), lookup, &sdk.FakeCredential{Err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
+}
 
 /**************************************************************************/
 

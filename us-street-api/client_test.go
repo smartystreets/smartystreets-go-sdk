@@ -10,8 +10,11 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
+
+type testContextKey string
 
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
@@ -36,7 +39,7 @@ func (f *ClientFixture) TestSingleAddressBatchWithContext_SentInQueryStringAsGET
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
@@ -369,6 +372,47 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 			},
 		},
 	})
+}
+
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+
+	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+
+	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
+}
+
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+	ctx := context.Background()
+
+	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

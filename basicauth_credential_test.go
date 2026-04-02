@@ -20,8 +20,12 @@ func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithValidCrede
 	cred := NewBasicAuthCredential("testID", "testToken")
 
 	this.So(cred, should.NotBeNil)
-	this.So(cred.authID, should.Equal, "testID")
-	this.So(cred.authToken, should.Equal, "testToken")
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+	cred.Sign(req)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "testID")
+	this.So(password, should.Equal, "testToken")
 }
 
 func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithEmptyAuthID() {
@@ -40,8 +44,12 @@ func (this *BasicAuthCredentialFixture) TestNewBasicAuthCredentialWithSpecialCha
 	cred := NewBasicAuthCredential("test@id#123", "token!@#$%^&*()")
 
 	this.So(cred, should.NotBeNil)
-	this.So(cred.authID, should.Equal, "test@id#123")
-	this.So(cred.authToken, should.Equal, "token!@#$%^&*()")
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+	cred.Sign(req)
+	username, password, ok := req.BasicAuth()
+	this.So(ok, should.BeTrue)
+	this.So(username, should.Equal, "test@id#123")
+	this.So(password, should.Equal, "token!@#$%^&*()")
 }
 
 func (this *BasicAuthCredentialFixture) TestSignWithValidCredentials() {

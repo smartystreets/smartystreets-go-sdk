@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func NewWebsiteKeyCredential(key, hostNameOrIP string) *websiteKeyCredential {
+func NewWebsiteKeyCredential(key, hostNameOrIP string) Credential {
 	if !strings.HasPrefix(hostNameOrIP, httpsScheme) && !strings.HasPrefix(hostNameOrIP, httpScheme) {
 		hostNameOrIP = httpScheme + hostNameOrIP
 	}
