@@ -38,7 +38,9 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
 	if credential != nil {
-		credential.Sign(request)
+		if err := credential.Sign(request); err != nil {
+			return err
+		}
 	}
 	response, err := c.sender.Send(request)
 	if err != nil {
