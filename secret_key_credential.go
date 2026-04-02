@@ -11,7 +11,7 @@ type secretKeyCredential struct {
 	authToken string
 }
 
-func NewSecretKeyCredential(authID, authToken string) *secretKeyCredential {
+func NewSecretKeyCredential(authID, authToken string) Credential {
 	if oldStyleBase64AuthTokenIsAlreadyURLEncoded(authToken) {
 		authToken, _ = url.QueryUnescape(authToken)
 	}

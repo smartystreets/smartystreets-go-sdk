@@ -8,6 +8,8 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -118,6 +120,33 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.SuperAdministrativeArea, should.Equal, "6")
 	f.So(candidate.PostalCode, should.Equal, "7")
 	f.So(candidate.Thoroughfare, should.Equal, "8")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+	ctx := context.Background()
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

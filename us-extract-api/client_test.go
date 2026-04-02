@@ -8,6 +8,8 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -77,6 +79,33 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(f.input.Result, should.BeNil)
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
+	ctx := context.Background()
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

@@ -8,6 +8,8 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -379,6 +381,35 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.DeliveryInstallationQualifierName, should.Equal, "blank")
 	f.So(ccomponents.RouteType, should.Equal, "blank")
 	f.So(ccomponents.RouteNumber, should.Equal, "blank")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `[{"address1": "1"}]`
+	f.input.Freeform = "42"
+	f.input.Country = "CA"
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `[{"address1": "1"}]`
+	f.input.Freeform = "42"
+	f.input.Country = "CA"
+	ctx := context.Background()
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

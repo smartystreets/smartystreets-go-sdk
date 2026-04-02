@@ -10,6 +10,8 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 func TestClientFixture(t *testing.T) {
@@ -115,6 +117,35 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(input.Result, should.BeNil)
+}
+
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42", ZIPCode: "10001"}
+	f.batch.Append(input)
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendBatchWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
+	input := &Lookup{InputID: "42", ZIPCode: "10001"}
+	f.batch.Append(input)
+	ctx := context.Background()
+
+	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
