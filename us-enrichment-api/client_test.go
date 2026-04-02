@@ -231,7 +231,7 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "myAuthID", "myAuthToken")
+	err, response := f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("myAuthID", "myAuthToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
@@ -259,7 +259,7 @@ func (f *ClientFixture) TestSendGeoReferenceWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendGeoReferenceWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendGeoReferenceWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -286,7 +286,7 @@ func (f *ClientFixture) TestSendGeoReferenceWithVersionContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendGeoReferenceWithVersionContextAndAuth(ctx, lookup, "census-2010", "authID", "authToken")
+	err, response := f.client.SendGeoReferenceWithVersionContextAndAuth(ctx, lookup, "census-2010", sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/geo-reference/census-2010")
@@ -314,7 +314,7 @@ func (f *ClientFixture) TestSendRiskWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendRiskWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendRiskWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -341,7 +341,7 @@ func (f *ClientFixture) TestSendSecondaryWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendSecondaryWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendSecondaryWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -369,7 +369,7 @@ func (f *ClientFixture) TestSendSecondaryCountWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendSecondaryCountWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendSecondaryCountWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -413,7 +413,7 @@ func (f *ClientFixture) TestSendUniversalLookupWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendUniversalLookupWithContextAndAuth(ctx, lookup, "property", "principal", "authID", "authToken")
+	err, response := f.client.SendUniversalLookupWithContextAndAuth(ctx, lookup, "property", "principal", sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property/principal")
@@ -536,30 +536,26 @@ func (f *ClientFixture) TestIsHTTPErrorCode_NilError() {
 
 // Tests for per-request auth with empty credentials (should not set auth)
 
-func (f *ClientFixture) TestPerRequestAuthEmptyCredentialsNotSet() {
+func (f *ClientFixture) TestPerRequestAuthNilCredentialNotSet() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.Background()
 
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "", "")
+	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, nil)
 
 	f.So(f.sender.hasBasicAuth, should.BeFalse)
 }
 
-func (f *ClientFixture) TestPerRequestAuthPartialCredentialsNotSet() {
+func (f *ClientFixture) TestPerRequestAuthWithSecretKeyCredential() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.Background()
 
-	// Only authID provided
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "authID", "")
-	f.So(f.sender.hasBasicAuth, should.BeFalse)
+	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
-	f.sender.Reset()
-
-	// Only authToken provided
-	f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, "", "authToken")
 	f.So(f.sender.hasBasicAuth, should.BeFalse)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
 }
 
 // Tests for deprecated methods
