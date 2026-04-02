@@ -114,7 +114,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &FakeCredential{err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")
@@ -122,14 +122,6 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 }
 
 /*////////////////////////////////////////////////////////////////////////*/
-
-type FakeCredential struct {
-	err error
-}
-
-func (f *FakeCredential) Sign(*http.Request) error {
-	return f.err
-}
 
 type FakeSender struct {
 	callCount int

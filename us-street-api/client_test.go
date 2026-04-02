@@ -394,7 +394,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_SignErrorPropagated() {
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
 
-	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &FakeCredential{err: errors.New("sign failed")})
+	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")
@@ -434,12 +434,4 @@ func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 		f.requestBody, _ = io.ReadAll(request.Body)
 	}
 	return []byte(f.response), f.err
-}
-
-type FakeCredential struct {
-	err error
-}
-
-func (f *FakeCredential) Sign(*http.Request) error {
-	return f.err
 }

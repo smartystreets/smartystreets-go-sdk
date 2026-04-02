@@ -604,7 +604,7 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
 
-	err, _ := f.client.SendPropertyPrincipalWithContextAndAuth(context.Background(), lookup, &FakeCredential{err: errors.New("sign failed")})
+	err, _ := f.client.SendPropertyPrincipalWithContextAndAuth(context.Background(), lookup, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")
@@ -612,14 +612,6 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 }
 
 /**************************************************************************/
-
-type FakeCredential struct {
-	err error
-}
-
-func (f *FakeCredential) Sign(*http.Request) error {
-	return f.err
-}
 
 type FakeSender struct {
 	callCount int
