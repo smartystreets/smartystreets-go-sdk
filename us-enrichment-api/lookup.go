@@ -348,6 +348,115 @@ func (s *secondaryCountLookup) populate(query url.Values) {
 	s.Lookup.populateFeatures(query)
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
+type businessSummaryLookup struct {
+	*Lookup
+	Response []*BusinessSummaryResponse
+}
+
+func (b *businessSummaryLookup) getSmartyKey() string {
+	return b.SmartyKey
+}
+
+func (b *businessSummaryLookup) getDataSet() string {
+	return businessDataSet
+}
+
+func (b *businessSummaryLookup) getDataSubset() string {
+	return emptyDataSubset
+}
+
+func (b *businessSummaryLookup) getLookup() *Lookup {
+	return b.Lookup
+}
+
+func (b *businessSummaryLookup) getResponse() interface{} {
+	return b.Response
+}
+
+func (b *businessSummaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(b.Response) > 0 {
+				b.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (b *businessSummaryLookup) populate(query url.Values) {
+	b.Lookup.populateInclude(query)
+	b.Lookup.populateExclude(query)
+	b.Lookup.populateFreeform(query)
+	b.Lookup.populateStreet(query)
+	b.Lookup.populateCity(query)
+	b.Lookup.populateState(query)
+	b.Lookup.populateZIPCode(query)
+	b.Lookup.populateFeatures(query)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+type businessDetailLookup struct {
+	Lookup     *Lookup
+	BusinessID string
+	Response   []*BusinessDetailResponse
+}
+
+func (b *businessDetailLookup) getSmartyKey() string {
+	return b.Lookup.SmartyKey
+}
+
+func (b *businessDetailLookup) getDataSet() string {
+	return businessDataSet
+}
+
+func (b *businessDetailLookup) getDataSubset() string {
+	return b.BusinessID
+}
+
+func (b *businessDetailLookup) getLookup() *Lookup {
+	return b.Lookup
+}
+
+func (b *businessDetailLookup) getResponse() interface{} {
+	return b.Response
+}
+
+func (b *businessDetailLookup) unmarshalResponse(bytes []byte, header http.Header) error {
+	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+		return err
+	}
+
+	if header != nil {
+		if etag, found := header[lookupETagHeader]; found {
+			if len(etag) > 0 && len(b.Response) > 0 {
+				b.Response[0].Etag = etag[0]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (b *businessDetailLookup) populate(query url.Values) {
+	b.Lookup.populateInclude(query)
+	b.Lookup.populateExclude(query)
+	b.Lookup.populateFreeform(query)
+	b.Lookup.populateStreet(query)
+	b.Lookup.populateCity(query)
+	b.Lookup.populateState(query)
+	b.Lookup.populateZIPCode(query)
+	b.Lookup.populateFeatures(query)
+}
+
 const (
 	principalDataSubset = "principal"
 	propertyDataSet     = "property"
@@ -355,6 +464,7 @@ const (
 	riskDataSet         = "risk"
 	secondaryData       = "secondary"
 	secondaryDataCount  = "count"
+	businessDataSet     = "business"
 	emptyDataSubset     = ""
 )
 

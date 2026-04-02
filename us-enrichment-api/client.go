@@ -121,6 +121,30 @@ func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCo
 	return c.SendSecondaryCount(lookup)
 }
 
+func (c *Client) SendBusinessSummary(lookup *Lookup) (error, []*BusinessSummaryResponse) {
+	bLookup := &businessSummaryLookup{Lookup: lookup}
+	err := c.sendLookup(bLookup)
+	return err, bLookup.Response
+}
+
+func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*BusinessSummaryResponse) {
+	bLookup := &businessSummaryLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, bLookup, authID, authToken)
+	return err, bLookup.Response
+}
+
+func (c *Client) SendBusinessDetail(lookup *Lookup, businessID string) (error, []*BusinessDetailResponse) {
+	bLookup := &businessDetailLookup{Lookup: lookup, BusinessID: businessID}
+	err := c.sendLookup(bLookup)
+	return err, bLookup.Response
+}
+
+func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, businessID, authID, authToken string) (error, []*BusinessDetailResponse) {
+	bLookup := &businessDetailLookup{Lookup: lookup, BusinessID: businessID}
+	err := c.sendLookupWithContextAndAuth(ctx, bLookup, authID, authToken)
+	return err, bLookup.Response
+}
+
 func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
 	return c.SendUniversalLookupWithContext(context.Background(), lookup, dataSet, dataSubset)
 }
