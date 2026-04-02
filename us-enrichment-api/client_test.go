@@ -12,6 +12,8 @@ import (
 	"github.com/smartystreets/smartystreets-go-sdk"
 )
 
+type testContextKey string
+
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
 }
@@ -36,7 +38,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.sender.response = validPrincipalResponse
 	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -125,7 +127,7 @@ func (f *ClientFixture) TestGeoReference() {
 	f.sender.response = validGeoReferenceResponse
 	f.input = &geoReferenceLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -147,7 +149,7 @@ func (f *ClientFixture) TestRiskLookup() {
 	f.sender.response = validRiskResponse
 	f.input = &riskLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -169,7 +171,7 @@ func (f *ClientFixture) TestSecondaryLookup() {
 	f.sender.response = validSecondaryResponse
 	f.input = &secondaryLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -191,7 +193,7 @@ func (f *ClientFixture) TestSecondaryCount() {
 	f.sender.response = validSecondaryCountResponse
 	f.input = &secondaryCountLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -229,7 +231,7 @@ func (f *ClientFixture) TestSendPropertyPrincipal() {
 func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendPropertyPrincipalWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("myAuthID", "myAuthToken"))
 
@@ -257,7 +259,7 @@ func (f *ClientFixture) TestSendGeoReferencePublicMethod() {
 func (f *ClientFixture) TestSendGeoReferenceWithContextAndAuth() {
 	f.sender.response = validGeoReferenceResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendGeoReferenceWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
@@ -284,7 +286,7 @@ func (f *ClientFixture) TestSendGeoReferenceWithVersion() {
 func (f *ClientFixture) TestSendGeoReferenceWithVersionContextAndAuth() {
 	f.sender.response = validGeoReferenceResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendGeoReferenceWithVersionContextAndAuth(ctx, lookup, "census-2010", sdk.NewBasicAuthCredential("authID", "authToken"))
 
@@ -312,7 +314,7 @@ func (f *ClientFixture) TestSendRiskPublicMethod() {
 func (f *ClientFixture) TestSendRiskWithContextAndAuth() {
 	f.sender.response = validRiskResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendRiskWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
@@ -339,7 +341,7 @@ func (f *ClientFixture) TestSendSecondaryPublicMethod() {
 func (f *ClientFixture) TestSendSecondaryWithContextAndAuth() {
 	f.sender.response = validSecondaryResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendSecondaryWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
@@ -367,7 +369,7 @@ func (f *ClientFixture) TestSendSecondaryCountPublicMethod() {
 func (f *ClientFixture) TestSendSecondaryCountWithContextAndAuth() {
 	f.sender.response = validSecondaryCountResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendSecondaryCountWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
@@ -396,7 +398,7 @@ func (f *ClientFixture) TestSendUniversalLookup() {
 func (f *ClientFixture) TestSendUniversalLookupWithContext() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendUniversalLookupWithContext(ctx, lookup, "property", "principal")
 
@@ -411,7 +413,7 @@ func (f *ClientFixture) TestSendUniversalLookupWithContext() {
 func (f *ClientFixture) TestSendUniversalLookupWithContextAndAuth() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123"}
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err, response := f.client.SendUniversalLookupWithContextAndAuth(ctx, lookup, "property", "principal", sdk.NewBasicAuthCredential("authID", "authToken"))
 

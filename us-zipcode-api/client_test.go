@@ -14,6 +14,8 @@ import (
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
+type testContextKey string
+
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
 }
@@ -38,7 +40,7 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	input := &Lookup{InputID: "42", ZIPCode: "10001", City: "NYC", State: "NY"}
 	f.batch.Append(input)
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
@@ -123,7 +125,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_CredentialSignsRequest()
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42", ZIPCode: "10001"}
 	f.batch.Append(input)
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 

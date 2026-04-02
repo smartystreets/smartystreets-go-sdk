@@ -12,6 +12,8 @@ import (
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
+type testContextKey string
+
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
 }
@@ -35,7 +37,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -84,7 +86,7 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
