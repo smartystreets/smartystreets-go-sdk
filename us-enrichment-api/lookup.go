@@ -8,16 +8,17 @@ import (
 )
 
 type Lookup struct {
-	SmartyKey string
-	Include   string
-	Exclude   string
-	Freeform  string
-	Street    string
-	City      string
-	State     string
-	ZIPCode   string
-	ETag      string
-	Features  string
+	SmartyKey  string
+	BusinessID string
+	Include    string
+	Exclude    string
+	Freeform   string
+	Street     string
+	City       string
+	State      string
+	ZIPCode    string
+	ETag       string
+	Features   string
 }
 
 type enrichmentLookup interface {
@@ -367,6 +368,10 @@ func (b *businessSummaryLookup) getDataSubset() string {
 	return emptyDataSubset
 }
 
+func (b *businessSummaryLookup) getBusinessID() string {
+	return b.Lookup.BusinessID
+}
+
 func (b *businessSummaryLookup) getLookup() *Lookup {
 	return b.Lookup
 }
@@ -405,9 +410,8 @@ func (b *businessSummaryLookup) populate(query url.Values) {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 type businessDetailLookup struct {
-	Lookup     *Lookup
-	BusinessID string
-	Response   []*BusinessDetailResponse
+	Lookup   *Lookup
+	Response []*BusinessDetailResponse
 }
 
 func (b *businessDetailLookup) getSmartyKey() string {
@@ -419,7 +423,11 @@ func (b *businessDetailLookup) getDataSet() string {
 }
 
 func (b *businessDetailLookup) getDataSubset() string {
-	return b.BusinessID
+	return emptyDataSubset
+}
+
+func (b *businessDetailLookup) getBusinessID() string {
+	return b.Lookup.BusinessID
 }
 
 func (b *businessDetailLookup) getLookup() *Lookup {

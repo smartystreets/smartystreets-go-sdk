@@ -662,13 +662,24 @@ func (f *ClientFixture) TestBusinessSummaryAddressSearch() {
 	f.So(f.sender.request.URL.Query().Get("freeform"), should.Equal, "123 Main St, Denver CO")
 }
 
+func (f *ClientFixture) TestBusinessSummaryWithBusinessID() {
+	f.sender.response = validBusinessSummaryResponse
+	lookup := &Lookup{BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
+
+	err, response := f.client.SendBusinessSummary(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
+	f.So(response, should.NotBeEmpty)
+}
+
 // Tests for Business Detail
 
 func (f *ClientFixture) TestBusinessDetailLookup() {
-	smartyKey := "123"
 	businessID := "GEYTCMZSGU2TCMBZHE3DIOI"
 	f.sender.response = validBusinessDetailResponse
-	f.input = &businessDetailLookup{Lookup: &Lookup{SmartyKey: smartyKey}, BusinessID: businessID}
+	f.input = &businessDetailLookup{Lookup: &Lookup{SmartyKey: "123", BusinessID: businessID}}
 
 	ctx := context.WithValue(context.Background(), "key", "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
@@ -676,7 +687,7 @@ func (f *ClientFixture) TestBusinessDetailLookup() {
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
 	f.So(f.sender.request.Method, should.Equal, "GET")
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/business/"+businessID)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/"+businessID)
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
 	response := f.input.(*businessDetailLookup).Response
@@ -689,13 +700,13 @@ func (f *ClientFixture) TestBusinessDetailLookup() {
 
 func (f *ClientFixture) TestSendBusinessDetailPublicMethod() {
 	f.sender.response = validBusinessDetailResponse
-	lookup := &Lookup{SmartyKey: "123"}
+	lookup := &Lookup{SmartyKey: "123", BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
 
-	err, response := f.client.SendBusinessDetail(lookup, "GEYTCMZSGU2TCMBZHE3DIOI")
+	err, response := f.client.SendBusinessDetail(lookup)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/business/GEYTCMZSGU2TCMBZHE3DIOI")
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
 	f.So(response, should.NotBeEmpty)
 	f.So(response[0].SmartyKey, should.Equal, "7")
 	f.So(response[0].BusinessID, should.Equal, "7")
@@ -704,13 +715,13 @@ func (f *ClientFixture) TestSendBusinessDetailPublicMethod() {
 
 func (f *ClientFixture) TestSendBusinessDetailWithContextAndAuth() {
 	f.sender.response = validBusinessDetailResponse
-	lookup := &Lookup{SmartyKey: "123"}
+	lookup := &Lookup{SmartyKey: "123", BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendBusinessDetailWithContextAndAuth(ctx, lookup, "GEYTCMZSGU2TCMBZHE3DIOI", "authID", "authToken")
+	err, response := f.client.SendBusinessDetailWithContextAndAuth(ctx, lookup, "authID", "authToken")
 
 	f.So(err, should.BeNil)
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/business/GEYTCMZSGU2TCMBZHE3DIOI")
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
 	f.So(f.sender.request.Context(), should.Equal, ctx)
 	f.So(f.sender.hasBasicAuth, should.BeTrue)
 	f.So(f.sender.capturedAuthID, should.Equal, "authID")
@@ -720,17 +731,17 @@ func (f *ClientFixture) TestSendBusinessDetailWithContextAndAuth() {
 
 func (f *ClientFixture) TestBusinessDetailAddressSearch() {
 	f.sender.response = validBusinessDetailResponse
-	lookup := &Lookup{Freeform: "123 Main St, Denver CO"}
+	lookup := &Lookup{Freeform: "123 Main St, Denver CO", BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
 
-	err, _ := f.client.SendBusinessDetail(lookup, "GEYTCMZSGU2TCMBZHE3DIOI")
+	err, _ := f.client.SendBusinessDetail(lookup)
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.NotBeNil)
-	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/search/business/GEYTCMZSGU2TCMBZHE3DIOI")
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
 	f.So(f.sender.request.URL.Query().Get("freeform"), should.Equal, "123 Main St, Denver CO")
 }
 
-var validPrincipalResponse =`[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft","lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
+var validPrincipalResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft","lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-reference","data_set_version":"census-2020","attributes":{"census_block":{"accuracy":"block","geoid":"180759630002012"},"census_county_division":{"accuracy":"exact","code":"1807581764","name":"Wayne"},"census_tract":{"code":"9630.00"},"place":{"accuracy":"exact","code":"1861236","name":"Portland","type":"incorporated"}}}]`
 var validRiskResponse = `[{"smarty_key":"123","data_set_name":"risk","attributes":{"AGRIVALUE":"data","ALR_NPCTL":"data","ALR_VALA":"data","ALR_VALB":"data","ALR_VALP":"data","ALR_VRA_NPCTL":"data","AREA":"data","AVLN_AFREQ":"data","AVLN_ALRB":"data","AVLN_ALRP":"data","AVLN_ALR_NPCTL":"data","AVLN_EALB":"data","AVLN_EALP":"data","AVLN_EALPE":"data","AVLN_EALR":"data","AVLN_EALS":"data","AVLN_EALT":"data","AVLN_EVNTS":"data","AVLN_EXPB":"data","AVLN_EXPP":"data","AVLN_EXPPE":"data"}}]`
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`

@@ -52,11 +52,11 @@ func main() {
 	fmt.Printf("\nFetching details for business: %s (ID: %s)\n", summaryResults[0].Businesses[0].CompanyName, businessID)
 
 	detailLookup := us_enrichment.Lookup{
-		SmartyKey: smartyKey,
-		ETag:      "", // optional: check if the record has been updated
+		BusinessID: businessID,
+		ETag:       "", // optional: check if the record has been updated
 	}
 
-	err, detailResults := client.SendBusinessDetail(&detailLookup, businessID)
+	err, detailResults := client.SendBusinessDetail(&detailLookup)
 	if err != nil {
 		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
 			log.Printf("Record has not been modified since the last request")

@@ -133,14 +133,14 @@ func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, look
 	return err, bLookup.Response
 }
 
-func (c *Client) SendBusinessDetail(lookup *Lookup, businessID string) (error, []*BusinessDetailResponse) {
-	bLookup := &businessDetailLookup{Lookup: lookup, BusinessID: businessID}
+func (c *Client) SendBusinessDetail(lookup *Lookup) (error, []*BusinessDetailResponse) {
+	bLookup := &businessDetailLookup{Lookup: lookup}
 	err := c.sendLookup(bLookup)
 	return err, bLookup.Response
 }
 
-func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, businessID, authID, authToken string) (error, []*BusinessDetailResponse) {
-	bLookup := &businessDetailLookup{Lookup: lookup, BusinessID: businessID}
+func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*BusinessDetailResponse) {
+	bLookup := &businessDetailLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, bLookup, authID, authToken)
 	return err, bLookup.Response
 }
@@ -219,6 +219,10 @@ func buildRequest(lookup enrichmentLookup) *http.Request {
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {
+	if bl, ok := lookup.(businessIDProvider); ok && len(bl.getBusinessID()) > 0 {
+		return "/lookup/" + lookup.getDataSet() + "/" + bl.getBusinessID()
+	}
+
 	var newLookupURL string
 	if len(lookup.getDataSubset()) == 0 {
 		newLookupURL = strings.Replace(lookupURLWithoutSubSet, lookupURLSmartyKey, getLookupURLSmartyKeyReplacement(lookup), 1)
@@ -228,6 +232,10 @@ func buildLookupURL(lookup enrichmentLookup) string {
 
 	newLookupURL = strings.Replace(newLookupURL, lookupURLDataSet, lookup.getDataSet(), 1)
 	return strings.TrimSuffix(strings.Replace(newLookupURL, lookupURLDataSubSet, lookup.getDataSubset(), 1), "/")
+}
+
+type businessIDProvider interface {
+	getBusinessID() string
 }
 
 func getLookupURLSmartyKeyReplacement(lookup enrichmentLookup) string {
