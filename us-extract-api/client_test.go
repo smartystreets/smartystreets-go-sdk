@@ -8,7 +8,11 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
+
+type testContextKey string
 
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
@@ -33,7 +37,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -77,6 +81,44 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(f.input.Result, should.BeNil)
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
+	ctx := context.Background()
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = `{"meta": {"lines": 42}}`
+	f.input.Text = "42"
+
+	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

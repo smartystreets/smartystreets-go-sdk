@@ -8,7 +8,11 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
+
+type testContextKey string
 
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
@@ -38,7 +42,7 @@ func (f *ClientFixture) TestLookupSerializedAndSent__ResponseSuggestionsIncorpor
 	]`
 	f.input.AdministrativeArea = "42"
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -118,6 +122,44 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.SuperAdministrativeArea, should.Equal, "6")
 	f.So(candidate.PostalCode, should.Equal, "7")
 	f.So(candidate.Thoroughfare, should.Equal, "8")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.Equal, "myAuthID")
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.Equal, "myAuthToken")
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+	ctx := context.Background()
+
+	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Query().Get("auth-id"), should.BeEmpty)
+	f.So(f.sender.request.URL.Query().Get("auth-token"), should.BeEmpty)
+}
+
+func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
+	f.sender.response = `[{"input_id": "1"}]`
+	f.input.Locality = "HI"
+
+	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+
+	f.So(err, should.NotBeNil)
+	f.So(err.Error(), should.Equal, "sign failed")
+	f.So(f.sender.request, should.BeNil)
 }
 
 /*////////////////////////////////////////////////////////////////////////*/

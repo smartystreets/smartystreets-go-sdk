@@ -12,7 +12,7 @@ type basicAuthCredential struct {
 	authToken string
 }
 
-func NewBasicAuthCredential(authID, authToken string) *basicAuthCredential {
+func NewBasicAuthCredential(authID, authToken string) Credential {
 	if len(authID) == 0 || len(authToken) == 0 {
 		panic(ErrCredentialsRequired)
 	}

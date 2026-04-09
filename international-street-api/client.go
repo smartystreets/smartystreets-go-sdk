@@ -25,21 +25,23 @@ func (c *Client) SendLookup(lookup *Lookup) error {
 }
 
 func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) error {
-	return c.SendLookupWithContextAndAuth(ctx, lookup, "", "")
+	return c.SendLookupWithContextAndAuth(ctx, lookup, nil)
 }
 
 // SendLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
-// If authID and authToken are both non-empty, they will be used for this request instead of the client-level credentials.
+// If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) error {
+func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) error {
 	if err := ensureEnoughInfo(lookup); err != nil {
 		return err
 	}
 
 	request := buildRequest(lookup)
 	request = request.WithContext(ctx)
-	if len(authID) > 0 && len(authToken) > 0 {
-		request.SetBasicAuth(authID, authToken)
+	if credential != nil {
+		if err := credential.Sign(request); err != nil {
+			return err
+		}
 	}
 	response, err := c.sender.Send(request)
 	if err != nil {
