@@ -127,9 +127,9 @@ func (c *Client) SendBusinessSummary(lookup *Lookup) (error, []*BusinessSummaryR
 	return err, bLookup.Response
 }
 
-func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*BusinessSummaryResponse) {
+func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*BusinessSummaryResponse) {
 	bLookup := &businessSummaryLookup{Lookup: lookup}
-	err := c.sendLookupWithContextAndAuth(ctx, bLookup, authID, authToken)
+	err := c.sendLookupWithContextAndAuth(ctx, bLookup, credential)
 	return err, bLookup.Response
 }
 
@@ -139,9 +139,9 @@ func (c *Client) SendBusinessDetail(lookup *Lookup) (error, []*BusinessDetailRes
 	return err, bLookup.Response
 }
 
-func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, authID, authToken string) (error, []*BusinessDetailResponse) {
+func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*BusinessDetailResponse) {
 	bLookup := &businessDetailLookup{Lookup: lookup}
-	err := c.sendLookupWithContextAndAuth(ctx, bLookup, authID, authToken)
+	err := c.sendLookupWithContextAndAuth(ctx, bLookup, credential)
 	return err, bLookup.Response
 }
 

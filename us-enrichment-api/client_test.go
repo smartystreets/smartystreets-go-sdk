@@ -638,7 +638,7 @@ func (f *ClientFixture) TestSendBusinessSummaryWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendBusinessSummaryWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendBusinessSummaryWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.Context(), should.Equal, ctx)
@@ -716,7 +716,7 @@ func (f *ClientFixture) TestSendBusinessDetailWithContextAndAuth() {
 	lookup := &Lookup{SmartyKey: "123", BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	err, response := f.client.SendBusinessDetailWithContextAndAuth(ctx, lookup, "authID", "authToken")
+	err, response := f.client.SendBusinessDetailWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("authID", "authToken"))
 
 	f.So(err, should.BeNil)
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
