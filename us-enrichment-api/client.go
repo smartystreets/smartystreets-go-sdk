@@ -221,8 +221,10 @@ func buildRequest(lookup enrichmentLookup) *http.Request {
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {
-	if bl, ok := lookup.(businessIDProvider); ok && len(bl.getBusinessID()) > 0 {
-		return "/lookup/" + lookup.getDataSet() + "/" + bl.getBusinessID()
+	if lookup.getDataSet() == businessDataSet {
+		if bl, ok := lookup.(businessIDProvider); ok && len(bl.getBusinessID()) > 0 {
+			return "/lookup/" + lookup.getDataSet() + "/" + bl.getBusinessID()
+		}
 	}
 
 	var newLookupURL string
