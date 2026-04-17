@@ -438,6 +438,30 @@ func (f *ClientFixture) TestSendUniversalLookupWithoutDataSubset() {
 	f.So(response, should.NotBeEmpty)
 }
 
+func (f *ClientFixture) TestSendUniversalLookupWithBusinessID() {
+	f.sender.response = validBusinessDetailResponse
+	lookup := &Lookup{BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
+
+	err, response := f.client.SendUniversalLookup(lookup, "business", "")
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/business/GEYTCMZSGU2TCMBZHE3DIOI")
+	f.So(response, should.NotBeEmpty)
+}
+
+func (f *ClientFixture) TestSendUniversalLookupBusinessIDIgnoredForNonBusinessDataset() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123", BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI"}
+
+	err, response := f.client.SendUniversalLookup(lookup, "property", "principal")
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property/principal")
+	f.So(response, should.NotBeEmpty)
+}
+
 // Tests for address search (freeform lookup without SmartyKey)
 
 func (f *ClientFixture) TestAddressSearchWithFreeform() {
