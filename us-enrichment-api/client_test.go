@@ -739,6 +739,36 @@ func (f *ClientFixture) TestBusinessDetailAddressSearch() {
 	f.So(f.sender.request.URL.Query().Get("freeform"), should.Equal, "123 Main St, Denver CO")
 }
 
+func (f *ClientFixture) TestBusinessSummaryWithIncludeExclude() {
+	f.sender.response = validBusinessSummaryResponse
+	lookup := &Lookup{
+		SmartyKey: "123",
+		Include:   "field1,field2",
+		Exclude:   "field3",
+	}
+
+	err, _ := f.client.SendBusinessSummary(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Query().Get("include"), should.Equal, "field1,field2")
+	f.So(f.sender.request.URL.Query().Get("exclude"), should.Equal, "field3")
+}
+
+func (f *ClientFixture) TestBusinessDetailWithIncludeExclude() {
+	f.sender.response = validBusinessDetailResponse
+	lookup := &Lookup{
+		BusinessID: "GEYTCMZSGU2TCMBZHE3DIOI",
+		Include:    "field1,field2",
+		Exclude:    "field3",
+	}
+
+	err, _ := f.client.SendBusinessDetail(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Query().Get("include"), should.Equal, "field1,field2")
+	f.So(f.sender.request.URL.Query().Get("exclude"), should.Equal, "field3")
+}
+
 var validPrincipalResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft","lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-reference","data_set_version":"census-2020","attributes":{"census_block":{"accuracy":"block","geoid":"180759630002012"},"census_county_division":{"accuracy":"exact","code":"1807581764","name":"Wayne"},"census_tract":{"code":"9630.00"},"place":{"accuracy":"exact","code":"1861236","name":"Portland","type":"incorporated"}}}]`
 var validRiskResponse = `[{"smarty_key":"123","data_set_name":"risk","attributes":{"AGRIVALUE":"data","ALR_NPCTL":"data","ALR_VALA":"data","ALR_VALB":"data","ALR_VALP":"data","ALR_VRA_NPCTL":"data","AREA":"data","AVLN_AFREQ":"data","AVLN_ALRB":"data","AVLN_ALRP":"data","AVLN_ALR_NPCTL":"data","AVLN_EALB":"data","AVLN_EALP":"data","AVLN_EALPE":"data","AVLN_EALR":"data","AVLN_EALS":"data","AVLN_EALT":"data","AVLN_EVNTS":"data","AVLN_EXPB":"data","AVLN_EXPP":"data","AVLN_EXPPE":"data"}}]`
