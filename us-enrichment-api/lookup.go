@@ -38,9 +38,8 @@ type universalLookup struct {
 	Response   []byte
 }
 
-func (g *universalLookup) getSmartyKey() string {
-	return g.Lookup.SmartyKey
-}
+func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
+func (g *universalLookup) getBusinessID() string    { return g.Lookup.BusinessID }
 func (g *universalLookup) getDataSet() string       { return g.DataSet }
 func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
 func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
