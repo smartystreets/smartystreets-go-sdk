@@ -66,21 +66,6 @@ func (c *Client) SendGeoReferenceWithVersionContextAndAuth(ctx context.Context, 
 	return err, geoRefLookup.Response
 }
 
-func (c *Client) SendRisk(lookup *Lookup) (error, []*RiskResponse) {
-	rLookup := &riskLookup{Lookup: lookup}
-	err := c.sendLookup(rLookup)
-	return err, rLookup.Response
-}
-
-// SendRiskWithContextAndAuth sends a lookup with the provided context and per-request credentials.
-// If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
-// This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendRiskWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*RiskResponse) {
-	rLookup := &riskLookup{Lookup: lookup}
-	err := c.sendLookupWithContextAndAuth(ctx, rLookup, credential)
-	return err, rLookup.Response
-}
-
 func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookup(sLookup)

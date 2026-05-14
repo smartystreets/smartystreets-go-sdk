@@ -28,7 +28,6 @@ integrate: compile test
 	@go run examples/us-enrichment-api/address-search/main.go > /dev/null
 	@go run examples/us-enrichment-api/geo-reference/main.go > /dev/null
 	@go run examples/us-enrichment-api/property-principal/main.go > /dev/null
-	@go run examples/us-enrichment-api/risk/main.go > /dev/null
 	@go run examples/us-enrichment-api/secondary/main.go > /dev/null
 	@go run examples/us-enrichment-api/secondary-count/main.go > /dev/null
 	@go run examples/us-enrichment-api/universal/main.go > /dev/null
