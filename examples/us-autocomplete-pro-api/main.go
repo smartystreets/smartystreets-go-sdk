@@ -32,7 +32,7 @@ func main() {
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
-		log.Fatal("Error sending batch:", err)
+		log.Fatal("Error sending lookup:", err)
 	}
 
 	fmt.Printf("Results for input: [%s]\n", lookup.Search)

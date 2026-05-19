@@ -14,6 +14,7 @@ import (
 	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
 	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
 	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
+	autocomplete "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
 	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
 	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
@@ -159,6 +160,11 @@ func (b *clientBuilder) buildUSAutocompleteProAPIClient() *autocomplete_pro.Clie
 	return autocomplete_pro.NewClient(b.buildHTTPSender())
 }
 
+func (b *clientBuilder) buildUSAutocompleteAPIClient() *autocomplete.Client {
+	b.ensureBaseURLNotNil(defaultBaseURL_USAutocompleteAPI)
+	return autocomplete.NewClient(b.buildHTTPSender())
+}
+
 func (b *clientBuilder) buildUSEnrichmentAPIClient() *us_enrichment.Client {
 	b.ensureBaseURLNotNil(defaultBaseURL_USEnrichmentAPI)
 	return us_enrichment.NewClient(b.buildHTTPSender())
@@ -253,4 +259,5 @@ var (
 	defaultBaseURL_USExtractAPI                 = &url.URL{Scheme: "https", Host: "us-extract.api.smarty.com"}
 	defaultBaseURL_USReverseGeocodingAPI        = &url.URL{Scheme: "https", Host: "us-reverse-geo.api.smarty.com"}
 	defaultBaseURL_USAutocompleteProAPI         = &url.URL{Scheme: "https", Host: "us-autocomplete-pro.api.smarty.com"}
+	defaultBaseURL_USAutocompleteAPI            = &url.URL{Scheme: "https", Host: "us-autocomplete.api.smarty.com"}
 )

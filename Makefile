@@ -24,6 +24,7 @@ integrate: compile test
 	@go run examples/international-autocomplete-api/main.go > /dev/null
 	@go run examples/international-postal-code-api/main.go > /dev/null
 	@go run examples/international-street-api/main.go > /dev/null
+	@go run examples/us-autocomplete-api/main.go > /dev/null
 	@go run examples/us-autocomplete-pro-api/main.go > /dev/null
 	@go run examples/us-enrichment-api/address-search/main.go > /dev/null
 	@go run examples/us-enrichment-api/geo-reference/main.go > /dev/null
