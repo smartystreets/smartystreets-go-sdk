@@ -8,17 +8,18 @@ import (
 )
 
 type Lookup struct {
-	SmartyKey  string
-	BusinessID string
-	Include    string
-	Exclude    string
-	Freeform   string
-	Street     string
-	City       string
-	State      string
-	ZIPCode    string
-	ETag       string
-	Features   string
+	SmartyKey    string
+	BusinessID   string
+	BusinessName string
+	Include      string
+	Exclude      string
+	Freeform     string
+	Street       string
+	City         string
+	State        string
+	ZIPCode      string
+	ETag         string
+	Features     string
 }
 
 type enrichmentLookup interface {
@@ -75,6 +76,7 @@ func (g *universalLookup) populate(query url.Values) {
 	g.Lookup.populateState(query)
 	g.Lookup.populateZIPCode(query)
 	g.Lookup.populateFeatures(query)
+	g.Lookup.populateBusinessName(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +131,7 @@ func (e *principalLookup) populate(query url.Values) {
 	e.Lookup.populateState(query)
 	e.Lookup.populateZIPCode(query)
 	e.Lookup.populateFeatures(query)
+	e.Lookup.populateBusinessName(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +155,7 @@ func (g *geoReferenceLookup) populate(query url.Values) {
 	g.Lookup.populateState(query)
 	g.Lookup.populateZIPCode(query)
 	g.Lookup.populateFeatures(query)
+	g.Lookup.populateBusinessName(query)
 }
 
 func (g *geoReferenceLookup) getSmartyKey() string {
@@ -238,6 +242,7 @@ func (s *secondaryLookup) populate(query url.Values) {
 	s.Lookup.populateState(query)
 	s.Lookup.populateZIPCode(query)
 	s.Lookup.populateFeatures(query)
+	s.Lookup.populateBusinessName(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -292,6 +297,7 @@ func (s *secondaryCountLookup) populate(query url.Values) {
 	s.Lookup.populateState(query)
 	s.Lookup.populateZIPCode(query)
 	s.Lookup.populateFeatures(query)
+	s.Lookup.populateBusinessName(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -350,6 +356,7 @@ func (b *businessSummaryLookup) populate(query url.Values) {
 	b.Lookup.populateState(query)
 	b.Lookup.populateZIPCode(query)
 	b.Lookup.populateFeatures(query)
+	b.Lookup.populateBusinessName(query)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -408,6 +415,7 @@ func (b *businessDetailLookup) populate(query url.Values) {
 	b.Lookup.populateState(query)
 	b.Lookup.populateZIPCode(query)
 	b.Lookup.populateFeatures(query)
+	b.Lookup.populateBusinessName(query)
 }
 
 const (
@@ -465,5 +473,11 @@ func (l Lookup) populateZIPCode(query url.Values) {
 func (l Lookup) populateFeatures(query url.Values) {
 	if len(l.Features) > 0 {
 		query.Set("features", l.Features)
+	}
+}
+
+func (l Lookup) populateBusinessName(query url.Values) {
+	if len(l.BusinessName) > 0 {
+		query.Set("business_name", l.BusinessName)
 	}
 }

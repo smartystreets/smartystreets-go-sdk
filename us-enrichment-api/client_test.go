@@ -466,6 +466,19 @@ func (f *ClientFixture) TestLookupWithIncludeExcludeFeatures() {
 	f.So(f.sender.request.URL.Query().Get("features"), should.Equal, "feature1")
 }
 
+func (f *ClientFixture) TestLookupWithBusinessName() {
+	f.sender.response = validBusinessSummaryResponse
+	lookup := &Lookup{
+		SmartyKey:    "123",
+		BusinessName: "Style Studio",
+	}
+
+	err, _ := f.client.SendBusinessSummary(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Query().Get("business_name"), should.Equal, "Style Studio")
+}
+
 func (f *ClientFixture) TestLookupWithETag() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{
