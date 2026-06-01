@@ -46,7 +46,7 @@ type clientBuilder struct {
 func newClientBuilder() *clientBuilder {
 	return &clientBuilder{
 		credential:    &internal.NopCredential{},
-		retries:       4,
+		retries:       5,
 		timeout:       time.Second * 10,
 		headers:       initializeHeadersWithUserAgent(),
 		appendHeaders: make(map[string]string),
