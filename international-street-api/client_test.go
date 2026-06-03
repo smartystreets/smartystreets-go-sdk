@@ -78,6 +78,20 @@ func (f *ClientFixture) TestInvalidLookup_HasCountryMissingFreeformAndAddress1()
 	f.So(err, should.Equal, errors.New("either Freeform or Address1 is required"))
 }
 
+func (f *ClientFixture) TestInvalidLookup_InvalidLanguageValue() {
+	err := f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: "not-a-language"})
+	f.So(err, should.Equal, errors.New("invalid Language value; must be 'native' or 'latin'"))
+}
+
+func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
+	f.sender.response = `[{"address1": "1"}]`
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Native}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Latin}), should.BeNil)
+	// empty Language is fine
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42"}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: ""}), should.BeNil)
+}
+
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("GOPHERS!")
 	f.sender.response = `{"suggestions":[

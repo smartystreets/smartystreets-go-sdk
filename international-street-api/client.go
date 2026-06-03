@@ -60,6 +60,9 @@ func ensureEnoughInfo(lookup *Lookup) error {
 	if lookup.Freeform == "" && lookup.Address1 == "" {
 		return errors.New("either Freeform or Address1 is required")
 	}
+	if lookup.Language != "" && lookup.Language != Native && lookup.Language != Latin {
+		return errors.New("invalid Language value; must be unset, 'native', or 'latin'")
+	}
 	return nil
 }
 
