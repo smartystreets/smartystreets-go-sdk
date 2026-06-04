@@ -42,7 +42,7 @@ func (r *RetryClient) Do(request *http.Request) (*http.Response, error) {
 
 func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err error) {
 	ctx := request.Context()
-	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+	for attempt := 0; r.backOff(ctx, attempt, response); attempt++ {
 		if err = ctx.Err(); err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		if !r.handleHttpStatusCode(ctx, response, &attempt) {
+		if !r.handleHttpStatusCode(response) {
 			break
 		}
 	}
@@ -71,7 +71,7 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 	}
 
 	ctx := request.Context()
-	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+	for attempt := 0; r.backOff(ctx, attempt, response); attempt++ {
 		if err = ctx.Err(); err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		if !r.handleHttpStatusCode(ctx, response, &attempt) {
+		if !r.handleHttpStatusCode(response) {
 			break
 		}
 	}
@@ -94,7 +94,7 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 	return response, err
 }
 
-func (r *RetryClient) handleHttpStatusCode(ctx context.Context, response *http.Response, attempt *int) bool {
+func (r *RetryClient) handleHttpStatusCode(response *http.Response) bool {
 	if response == nil {
 		return true
 	}
@@ -103,15 +103,6 @@ func (r *RetryClient) handleHttpStatusCode(ctx context.Context, response *http.R
 	}
 	if response.StatusCode == http.StatusNotModified {
 		return false
-	}
-	if response.StatusCode == http.StatusTooManyRequests {
-		sleepDuration := r.rateLimitSleepDuration(response)
-		r.sleeper(ctx, sleepDuration)
-		if ctx.Err() != nil {
-			return false
-		}
-		// Setting attempt to 1 will make 429s retry indefinitely; this is intended behavior.
-		*attempt = 1
 	}
 	return true
 }
@@ -122,7 +113,7 @@ func (r *RetryClient) rateLimitSleepDuration(response *http.Response) time.Durat
 			return time.Second * time.Duration(retryAfter)
 		}
 	}
-	return time.Second * time.Duration(r.random(backOffRateLimit))
+	return defaultRateLimitSleep
 }
 
 func (r *RetryClient) readBody(response *http.Response) bool {
@@ -140,16 +131,21 @@ func (r *RetryClient) readBody(response *http.Response) bool {
 	return false
 }
 
-func (r *RetryClient) backOff(ctx context.Context, attempt int) bool {
+func (r *RetryClient) backOff(ctx context.Context, attempt int, response *http.Response) bool {
 	if attempt == 0 {
 		return true
 	}
 	if attempt > r.maxRetries {
 		return false
 	}
-	backOffCap := max(0, min(maxBackOffDuration, attempt))
-	backOff := time.Second * time.Duration(r.random(backOffCap))
-	r.sleeper(ctx, backOff)
+	// If the server specified how long to wait via Retry-After on a 429 error,
+	// honor that duration. Otherwise, use randomized exponential backoff.
+	if response != nil && response.StatusCode == http.StatusTooManyRequests {
+		r.sleeper(ctx, r.rateLimitSleepDuration(response))
+	} else {
+		backOffCap := max(0, min(maxBackOffDuration, attempt))
+		r.sleeper(ctx, time.Second*time.Duration(r.random(backOffCap)))
+	}
 	return ctx.Err() == nil
 }
 
@@ -177,6 +173,6 @@ func (r *RetryClient) random(cap int) int {
 }
 
 const (
-	maxBackOffDuration = 10
-	backOffRateLimit   = 10
+	maxBackOffDuration    = 10
+	defaultRateLimitSleep = 10 * time.Second
 )
