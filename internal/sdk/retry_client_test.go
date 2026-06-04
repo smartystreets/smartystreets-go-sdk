@@ -186,7 +186,7 @@ func (f *RetryClientFixture) TestBackOffRateLimitedPost() {
 	f.So(len(f.naps), should.Equal, retries)
 }
 
-func (f *RetryClientFixture) TestRetryAfterHeaderUsedFor429() {
+func (f *RetryClientFixture) TestRetryAfterHeaderUsedFor429Post() {
 	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
 	retryAfterSeconds := 7
 	f.inner.headerKey = "Retry-After"
@@ -208,7 +208,7 @@ func (f *RetryClientFixture) TestRetryAfterHeaderUsedFor429() {
 	f.So(hasRetryAfterNap, should.BeTrue)
 }
 
-func (f *RetryClientFixture) TestFallsBackToDefaultSleepWithoutRetryAfterHeader() {
+func (f *RetryClientFixture) TestFallsBackToDefaultSleepWithoutRetryAfterHeaderPost() {
 	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
 	f.inner.headerKey = "X-Invalid-Header" // Not Retry-After
 	f.inner.rateLimitTime = 100            // Would be obvious if used
@@ -219,6 +219,42 @@ func (f *RetryClientFixture) TestFallsBackToDefaultSleepWithoutRetryAfterHeader(
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, 4)
 	// Without Retry-After header, each 429 uses the fixed default sleep
+	for _, nap := range f.naps {
+		f.So(nap, should.Equal, defaultRateLimitSleep)
+	}
+}
+
+func (f *RetryClientFixture) TestRetryAfterHeaderUsedFor429Get() {
+	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
+	retryAfterSeconds := 7
+	f.inner.headerKey = "Retry-After"
+	f.inner.rateLimitTime = retryAfterSeconds
+	f.inner.responses[3].Body = io.NopCloser(strings.NewReader("Success"))
+
+	_, f.err = f.sendGetWithRetry(3) // 3 retries allows for 4 attempts
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 4)
+	hasRetryAfterNap := false
+	for _, nap := range f.naps {
+		if nap == time.Second*time.Duration(retryAfterSeconds) {
+			hasRetryAfterNap = true
+			break
+		}
+	}
+	f.So(hasRetryAfterNap, should.BeTrue)
+}
+
+func (f *RetryClientFixture) TestFallsBackToDefaultSleepWithoutRetryAfterHeaderGet() {
+	f.inner = NewFailingHTTPClient(429, 429, 429, http.StatusOK)
+	f.inner.headerKey = "X-Invalid-Header" // Not Retry-After
+	f.inner.rateLimitTime = 100            // Would be obvious if used
+	f.inner.responses[3].Body = io.NopCloser(strings.NewReader("Success"))
+
+	_, f.err = f.sendGetWithRetry(3) // 3 retries allows for 4 attempts
+
+	f.So(f.err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 4)
 	for _, nap := range f.naps {
 		f.So(nap, should.Equal, defaultRateLimitSleep)
 	}

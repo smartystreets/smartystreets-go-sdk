@@ -13,12 +13,11 @@ import (
 
 // RetryClient sends failed requests multiple times depending on the parameters passed to NewRetryClient.
 type RetryClient struct {
-	inner        HTTPClient
-	maxRetries   int
-	sleeper      func(context.Context, time.Duration)
-	lock         *sync.Mutex
-	rand         *rand.Rand
-	pendingSleep time.Duration
+	inner      HTTPClient
+	maxRetries int
+	sleeper    func(context.Context, time.Duration)
+	lock       *sync.Mutex
+	rand       *rand.Rand
 }
 
 func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper func(context.Context, time.Duration)) HTTPClient {
@@ -43,7 +42,7 @@ func (r *RetryClient) Do(request *http.Request) (*http.Response, error) {
 
 func (r *RetryClient) doGet(request *http.Request) (response *http.Response, err error) {
 	ctx := request.Context()
-	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+	for attempt := 0; r.backOff(ctx, attempt, response); attempt++ {
 		if err = ctx.Err(); err != nil {
 			return nil, err
 		}
@@ -72,7 +71,7 @@ func (r *RetryClient) doBufferedPost(request *http.Request) (response *http.Resp
 	}
 
 	ctx := request.Context()
-	for attempt := 0; r.backOff(ctx, attempt); attempt++ {
+	for attempt := 0; r.backOff(ctx, attempt, response); attempt++ {
 		if err = ctx.Err(); err != nil {
 			return nil, err
 		}
@@ -105,10 +104,6 @@ func (r *RetryClient) handleHttpStatusCode(response *http.Response) bool {
 	if response.StatusCode == http.StatusNotModified {
 		return false
 	}
-	// On StatusTooManyRequests, set a custom sleep time to match other SDKs
-	if response.StatusCode == http.StatusTooManyRequests {
-		r.pendingSleep = r.rateLimitSleepDuration(response)
-	}
 	return true
 }
 
@@ -136,19 +131,17 @@ func (r *RetryClient) readBody(response *http.Response) bool {
 	return false
 }
 
-func (r *RetryClient) backOff(ctx context.Context, attempt int) bool {
+func (r *RetryClient) backOff(ctx context.Context, attempt int, response *http.Response) bool {
 	if attempt == 0 {
 		return true
 	}
 	if attempt > r.maxRetries {
 		return false
 	}
-	// If the server specified how long to wait (e.g. via Retry-After on a 429),
+	// If the server specified how long to wait via Retry-After on a 429 error,
 	// honor that duration. Otherwise, use randomized exponential backoff.
-	if r.pendingSleep > 0 {
-		sleep := r.pendingSleep
-		r.pendingSleep = 0
-		r.sleeper(ctx, sleep)
+	if response != nil && response.StatusCode == http.StatusTooManyRequests {
+		r.sleeper(ctx, r.rateLimitSleepDuration(response))
 	} else {
 		backOffCap := max(0, min(maxBackOffDuration, attempt))
 		r.sleeper(ctx, time.Second*time.Duration(r.random(backOffCap)))
