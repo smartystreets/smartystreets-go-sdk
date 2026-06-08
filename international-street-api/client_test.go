@@ -130,16 +130,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	"address6": "also empty",
 	"address7": "there",
 	"address8": "is",
-	"address9": "nothing",
-	"address10": "to",
-	"address11": "show",
-	"address12": "here",
 	"components": {
+	  "attention": "Attn: John",
 	  "super_administrative_area": "super_blah",
 	  "administrative_area": "SP",
 	  "administrative_area_iso2": "BR-SP",
-	  "administrative_area_short": "SP",
-	  "administrative_area_long": "São Paulo",
 	  "sub_administrative_area": "sub_blah",
 	  "building": "building",
 	  "dependent_locality": "Casa Verde",
@@ -155,6 +150,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	  "premise_number": "121",
 	  "premise_type": "premise_type",
 	  "premise_prefix_number": "prefix",
+	  "short_address_code": "short_code",
+	  "sub_building_leading_type": "sub_lead",
+	  "sub_building_block": "sub_block",
+	  "sub_building_door": "sub_door",
+	  "sub_building_staircase": "sub_stair",
 	  "thoroughfare": "Rua Antônio Lopes Marin",
 	  "thoroughfare_predirection": "Q",
 	  "thoroughfare_postdirection": "K",
@@ -203,16 +203,12 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"address6": "6",
 		"address7": "7",
 		"address8": "8",
-		"address9": "9",
-		"address10": "10",
-		"address11": "11",
-		"address12": "12",
+		"country": "Brazil",
 		"components": {
-	 	  "super_administrative_area": "blank",
+	 	  "attention": "Attn: John",
+		  "super_administrative_area": "blank",
 		  "administrative_area": "Verified-NoChange",
 		  "administrative_area_iso2": "Added",
-		  "administrative_area_short": "blank",
-		  "administrative_area_long": "blank",
 		  "sub_administrative_area": "blank",
 		  "building": "blank",
 		  "dependent_locality": "Added",
@@ -228,6 +224,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		  "premise_number": "Verified-NoChange",
 		  "premise_type": "blank",
 		  "premise_prefix_number": "blank",
+		  "short_address_code": "blank",
+		  "sub_building_leading_type": "blank",
+		  "sub_building_block": "blank",
+		  "sub_building_door": "blank",
+		  "sub_building_staircase": "blank",
 		  "thoroughfare": "Verified-SmallChange",
 		  "thoroughfare_predirection": "blank",
 		  "thoroughfare_postdirection": "blank",
@@ -282,15 +283,10 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.Address6, should.Equal, "also empty")
 	f.So(candidate.Address7, should.Equal, "there")
 	f.So(candidate.Address8, should.Equal, "is")
-	f.So(candidate.Address9, should.Equal, "nothing")
-	f.So(candidate.Address10, should.Equal, "to")
-	f.So(candidate.Address11, should.Equal, "show")
-	f.So(candidate.Address12, should.Equal, "here")
+	f.So(component.Attention, should.Equal, "Attn: John")
 	f.So(component.SuperAdministrativeArea, should.Equal, "super_blah")
 	f.So(component.AdministrativeArea, should.Equal, "SP")
 	f.So(component.AdministrativeAreaISO2, should.Equal, "BR-SP")
-	f.So(component.AdministrativeAreaShort, should.Equal, "SP")
-	f.So(component.AdministrativeAreaLong, should.Equal, "São Paulo")
 	f.So(component.SubAdministrativeArea, should.Equal, "sub_blah")
 	f.So(component.Building, should.Equal, "building")
 	f.So(component.DependentLocality, should.Equal, "Casa Verde")
@@ -306,6 +302,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(component.PremiseNumber, should.Equal, "121")
 	f.So(component.PremiseType, should.Equal, "premise_type")
 	f.So(component.PremisePrefixNumber, should.Equal, "prefix")
+	f.So(component.ShortAddressCode, should.Equal, "short_code")
+	f.So(component.SubBuildingLeadingType, should.Equal, "sub_lead")
+	f.So(component.SubBuildingBlock, should.Equal, "sub_block")
+	f.So(component.SubBuildingDoor, should.Equal, "sub_door")
+	f.So(component.SubBuildingStaircase, should.Equal, "sub_stair")
 	f.So(component.Thoroughfare, should.Equal, "Rua Antônio Lopes Marin")
 	f.So(component.ThoroughfarePredirection, should.Equal, "Q")
 	f.So(component.ThoroughfarePostdirection, should.Equal, "K")
@@ -349,10 +350,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(changes.Address6, should.Equal, "6")
 	f.So(changes.Address7, should.Equal, "7")
 	f.So(changes.Address8, should.Equal, "8")
-	f.So(changes.Address9, should.Equal, "9")
-	f.So(changes.Address10, should.Equal, "10")
-	f.So(changes.Address11, should.Equal, "11")
-	f.So(changes.Address12, should.Equal, "12")
+	f.So(changes.Country, should.Equal, "Brazil")
+	f.So(ccomponents.Attention, should.Equal, "Attn: John")
 	f.So(ccomponents.SuperAdministrativeArea, should.Equal, "blank")
 	f.So(ccomponents.AdministrativeArea, should.Equal, "Verified-NoChange")
 	f.So(ccomponents.SubAdministrativeArea, should.Equal, "blank")
@@ -370,6 +369,11 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(ccomponents.PremiseNumber, should.Equal, "Verified-NoChange")
 	f.So(ccomponents.PremiseType, should.Equal, "blank")
 	f.So(ccomponents.PremisePrefixNumber, should.Equal, "blank")
+	f.So(ccomponents.ShortAddressCode, should.Equal, "blank")
+	f.So(ccomponents.SubBuildingLeadingType, should.Equal, "blank")
+	f.So(ccomponents.SubBuildingBlock, should.Equal, "blank")
+	f.So(ccomponents.SubBuildingDoor, should.Equal, "blank")
+	f.So(ccomponents.SubBuildingStaircase, should.Equal, "blank")
 	f.So(ccomponents.Thoroughfare, should.Equal, "Verified-SmallChange")
 	f.So(ccomponents.ThoroughfarePredirection, should.Equal, "blank")
 	f.So(ccomponents.ThoroughfarePostdirection, should.Equal, "blank")
