@@ -21,20 +21,15 @@ type (
 		Address6     string `json:"address6,omitempty"`
 		Address7     string `json:"address7,omitempty"`
 		Address8     string `json:"address8,omitempty"`
-		Address9     string `json:"address9,omitempty"`
-		Address10    string `json:"address10,omitempty"`
-		Address11    string `json:"address11,omitempty"`
-		Address12    string `json:"address12,omitempty"`
 	}
 
 	// Components contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#components
 	Components struct {
+		Attention                          string `json:"attention,omitempty"`
 		SuperAdministrativeArea            string `json:"super_administrative_area,omitempty"`
 		AdministrativeArea                 string `json:"administrative_area,omitempty"`
 		AdministrativeAreaISO2             string `json:"administrative_area_iso2,omitempty"`
-		AdministrativeAreaShort            string `json:"administrative_area_short,omitempty"`
-		AdministrativeAreaLong             string `json:"administrative_area_long,omitempty"`
 		SubAdministrativeArea              string `json:"sub_administrative_area,omitempty"`
 		Building                           string `json:"building,omitempty"`
 		DependentLocality                  string `json:"dependent_locality,omitempty"`
@@ -50,6 +45,11 @@ type (
 		PremiseNumber                      string `json:"premise_number,omitempty"`
 		PremiseType                        string `json:"premise_type,omitempty"`
 		PremisePrefixNumber                string `json:"premise_prefix_number,omitempty"`
+		ShortAddressCode                   string `json:"short_address_code,omitempty"`
+		SubBuildingLeadingType             string `json:"sub_building_leading_type,omitempty"`
+		SubBuildingBlock                   string `json:"sub_building_block,omitempty"`
+		SubBuildingDoor                    string `json:"sub_building_door,omitempty"`
+		SubBuildingStaircase               string `json:"sub_building_staircase,omitempty"`
 		Thoroughfare                       string `json:"thoroughfare,omitempty"`
 		ThoroughfarePredirection           string `json:"thoroughfare_predirection,omitempty"`
 		ThoroughfarePostdirection          string `json:"thoroughfare_postdirection,omitempty"`
@@ -108,6 +108,7 @@ type (
 	// https://smartystreets.com/docs/international-street-api#changes
 	Changes struct {
 		RootLevel
+		Country    string     `json:"country,omitempty"`
 		Components Components `json:"components,omitempty"`
 	}
 )
