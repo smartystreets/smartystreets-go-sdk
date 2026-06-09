@@ -52,10 +52,6 @@ func main() {
 		display(candidate.Address6)
 		display(candidate.Address7)
 		display(candidate.Address8)
-		display(candidate.Address9)
-		display(candidate.Address10)
-		display(candidate.Address11)
-		display(candidate.Address12)
 		fmt.Println()
 	}
 
