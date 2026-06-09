@@ -108,7 +108,6 @@ type (
 	// https://smartystreets.com/docs/international-street-api#changes
 	Changes struct {
 		RootLevel
-		Country    string     `json:"country,omitempty"`
 		Components Components `json:"components,omitempty"`
 	}
 )

@@ -203,7 +203,6 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 		"address6": "6",
 		"address7": "7",
 		"address8": "8",
-		"country": "Brazil",
 		"components": {
 	 	  "attention": "Attn: John",
 		  "super_administrative_area": "blank",
@@ -350,7 +349,6 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(changes.Address6, should.Equal, "6")
 	f.So(changes.Address7, should.Equal, "7")
 	f.So(changes.Address8, should.Equal, "8")
-	f.So(changes.Country, should.Equal, "Brazil")
 	f.So(ccomponents.Attention, should.Equal, "Attn: John")
 	f.So(ccomponents.SuperAdministrativeArea, should.Equal, "blank")
 	f.So(ccomponents.AdministrativeArea, should.Equal, "Verified-NoChange")
