@@ -2,16 +2,19 @@ name: Build
 
 on:
   push:
-    branches:
+    tags:
     - '*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.25', 'stable']
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-go@v6
       with:
-        go-version: 'stable'
+        go-version: ${{ matrix.go-version }}
         cache-dependency-path: "**/*.sum"
     - run: make build
