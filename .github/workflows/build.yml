@@ -2,16 +2,11 @@ name: Build
 
 on:
   push:
-    branches:
+    tags:
     - '*'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-go@v6
-      with:
-        go-version: 'stable'
-        cache-dependency-path: "**/*.sum"
-    - run: make build
+    uses: ./.github/workflows/test.yml
+    with:
+      make-target: build

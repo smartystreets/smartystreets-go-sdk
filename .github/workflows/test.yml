@@ -1,0 +1,23 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      make-target:
+        required: false
+        type: string
+        default: test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.25', 'stable']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache-dependency-path: "**/*.sum"
+      - run: make ${{ inputs.make-target }}

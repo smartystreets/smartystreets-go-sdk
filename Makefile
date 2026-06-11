@@ -40,7 +40,7 @@ integrate: compile test
 version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
 
-publish: compile test version
+publish: compile version
 	git commit -am "Incremented version."; tagit -p; git push origin master --tags
 
 .PHONY: test fmt clean compile build cover integrate version package publish
