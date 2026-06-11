@@ -1,12 +1,12 @@
-name: Go Tests
+name: Test
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - '**'
+  workflow_call:
+    inputs:
+      make-target:
+        required: false
+        type: string
+        default: test
 
 jobs:
   test:
@@ -20,4 +20,4 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: "**/*.sum"
-      - run: make test
+      - run: make ${{ inputs.make-target }}

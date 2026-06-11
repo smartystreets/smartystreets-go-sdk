@@ -7,14 +7,6 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ['1.25', 'stable']
-    steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-go@v6
-      with:
-        go-version: ${{ matrix.go-version }}
-        cache-dependency-path: "**/*.sum"
-    - run: make build
+    uses: ./.github/workflows/test.yml
+    with:
+      make-target: build
