@@ -29,7 +29,7 @@ make integrate
 
 ## Architecture
 
-This is the official Go SDK for SmartyStreets address validation APIs. The SDK uses two key architectural patterns:
+This is the official Go SDK for SmartyStreets address validation APIs. Compatible with Go 1.25. The SDK uses two key architectural patterns:
 
 ### Middleware/Decorator Pattern (internal/sdk/)
 
