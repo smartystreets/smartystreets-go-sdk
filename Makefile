@@ -35,6 +35,7 @@ integrate: compile test
 	@go run examples/us-extract-api/main.go > /dev/null
 	@go run examples/us-reverse-geo-api/main.go > /dev/null
 	@go run examples/us-street-api/main.go > /dev/null
+	@go run examples/us-street-api/match-strategy/main.go > /dev/null
 	@go run examples/us-zipcode-api/main.go > /dev/null
 
 version:
