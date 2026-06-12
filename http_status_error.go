@@ -30,16 +30,17 @@ func (e *HTTPStatusError) Error() string {
 	if message := extractAPIErrorMessage(e.content); message != "" {
 		return statusText(e.statusCode) + "\n" + message
 	}
-	return statusText(e.statusCode) + "\n" + fallbackMessage(e.statusCode)
+	if e.statusCode == http.StatusNotModified {
+		return statusText(e.statusCode) + "\n" + fallbackMessage(e.statusCode)
+	}
+	message := strings.TrimSpace(fallbackMessage(e.statusCode) + " Body: " + strings.TrimSpace(e.content))
+	return statusText(e.statusCode) + "\n" + message
 }
 
 func statusText(code int) string {
 	return fmt.Sprintf("HTTP %d %s", code, http.StatusText(code))
 }
 
-// extractAPIErrorMessage pulls the message(s) from the API's JSON error body
-// ({"errors":[{"message":"..."}]}), returning "" when the body is empty,
-// unparseable, or missing the expected fields.
 func extractAPIErrorMessage(content string) string {
 	var body struct {
 		Errors []struct {

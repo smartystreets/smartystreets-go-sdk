@@ -31,7 +31,6 @@ func TestHTTPStatusErrorFallsBackToStandardMessages(t *testing.T) {
 	t.Parallel()
 
 	cases := map[int]string{
-		http.StatusNotModified:           "Not Modified: The requested record has not been modified since the previous request with the Etag value.",
 		http.StatusBadRequest:            "Bad Request (Malformed Payload): A GET request lacked a required field or the request body of a POST request contained malformed JSON.",
 		http.StatusUnauthorized:          "Unauthorized: The credentials were provided incorrectly or did not match any existing, active credentials.",
 		http.StatusPaymentRequired:       "Payment Required: There is no active subscription for the account associated with the credentials submitted with the request.",
@@ -50,28 +49,48 @@ func TestHTTPStatusErrorFallsBackToStandardMessages(t *testing.T) {
 	assert := assertions.New(t)
 	for code, message := range cases {
 		err := NewHTTPStatusError(code, nil)
-		assert.So(err.Error(), should.Equal, statusText(code)+"\n"+message)
+		assert.So(err.Error(), should.Equal, statusText(code)+"\n"+message+" Body:")
 	}
 }
 
-func TestHTTPStatusErrorFallsBackWhenContentNotUsable(t *testing.T) {
+func TestHTTPStatusError304OmitsBodyLabel(t *testing.T) {
+	t.Parallel()
+
+	err := NewHTTPStatusError(http.StatusNotModified, nil)
+
+	assertions.New(t).So(err.Error(), should.Equal,
+		"HTTP 304 Not Modified\nNot Modified: The requested record has not been modified since the previous request with the Etag value.")
+}
+
+func TestHTTPStatusErrorFallsBackAndAppendsUnusableContent(t *testing.T) {
 	t.Parallel()
 
 	fallback := "HTTP 401 Unauthorized\nUnauthorized: The credentials were provided incorrectly or did not match any existing, active credentials."
 
 	assert := assertions.New(t)
-	assert.So(NewHTTPStatusError(401, []byte("not json")).Error(), should.Equal, fallback)
-	assert.So(NewHTTPStatusError(401, []byte(`{"other":"shape"}`)).Error(), should.Equal, fallback)
-	assert.So(NewHTTPStatusError(401, []byte(`{"errors":[]}`)).Error(), should.Equal, fallback)
-	assert.So(NewHTTPStatusError(401, []byte(`{"errors":[{"message":""}]}`)).Error(), should.Equal, fallback)
+	assert.So(NewHTTPStatusError(401, []byte("not json")).Error(), should.Equal, fallback+" Body: not json")
+	assert.So(NewHTTPStatusError(401, []byte(`{"other":"shape"}`)).Error(), should.Equal, fallback+" Body: "+`{"other":"shape"}`)
+	assert.So(NewHTTPStatusError(401, []byte(`{"errors":[]}`)).Error(), should.Equal, fallback+" Body: "+`{"errors":[]}`)
+	assert.So(NewHTTPStatusError(401, []byte(`{"errors":[{"message":""}]}`)).Error(), should.Equal, fallback+" Body: "+`{"errors":[{"message":""}]}`)
 }
 
-func TestHTTPStatusErrorContentStillExposesRawBody(t *testing.T) {
+func TestHTTPStatusErrorFallbackLabelsBlankContent(t *testing.T) {
+	t.Parallel()
+
+	fallback := "HTTP 401 Unauthorized\nUnauthorized: The credentials were provided incorrectly or did not match any existing, active credentials."
+
+	assert := assertions.New(t)
+	assert.So(NewHTTPStatusError(401, nil).Error(), should.Equal, fallback+" Body:")
+	assert.So(NewHTTPStatusError(401, []byte("  \n  ")).Error(), should.Equal, fallback+" Body:")
+}
+
+func TestHTTPStatusError(t *testing.T) {
 	t.Parallel()
 
 	err := NewHTTPStatusError(http.StatusTeapot, []byte("Hello, World!"))
 
 	assert := assertions.New(t)
+	assert.So(err.Error(), should.Equal, "HTTP 418 I'm a teapot\nThe server returned an unexpected HTTP status code: 418 Body: Hello, World!")
 	assert.So(err.StatusCode(), should.Equal, http.StatusTeapot)
 	assert.So(err.Content(), should.Equal, "Hello, World!")
 }
