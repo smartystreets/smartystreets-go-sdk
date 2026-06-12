@@ -11,7 +11,7 @@ import (
 type (
 	Lookup struct {
 		Search        string
-		Source        string
+		Source        Source
 		MaxResults    int
 		CityFilter    []string
 		StateFilter   []string
@@ -27,11 +27,15 @@ type (
 		Results []*Suggestion
 	}
 	Geolocation string
+	Source      string
 )
 
 const (
 	GeolocateCity Geolocation = "city"
 	GeolocateNone Geolocation = "none"
+
+	SourceAll    Source = "all"
+	SourcePostal Source = "postal"
 )
 
 func (l Lookup) populate(query url.Values) {
@@ -115,7 +119,7 @@ func (l Lookup) populateGeolocation(query url.Values) {
 }
 func (l Lookup) populateSource(query url.Values) {
 	if len(l.Source) > 0 {
-		query.Set("source", l.Source)
+		query.Set("source", string(l.Source))
 	}
 }
 func (l Lookup) populateSelected(query url.Values) {

@@ -4,6 +4,13 @@ package us_reverse_geo
 type Lookup struct {
 	Latitude  float64
 	Longitude float64
-	Source    string
+	Source    Source
 	Response  Response
 }
+
+type Source string
+
+const (
+	SourceAll    Source = "all"
+	SourcePostal Source = "postal"
+)
