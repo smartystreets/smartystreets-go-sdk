@@ -7,7 +7,7 @@ import (
 )
 
 // Lookup represents all input fields documented here:
-// https://smartystreets.com/docs/cloud/us-autocomplete-pro-api#http-request-input-fields
+// https://www.smarty.com/docs/apis/us-autocomplete-v2/reference#http-request-input-fields
 type (
 	Lookup struct {
 		Search        string
@@ -23,6 +23,7 @@ type (
 		PreferRatio   int
 		Geolocation   Geolocation
 		Selected      string
+		Exclude       string
 
 		Results []*Suggestion
 	}
@@ -48,6 +49,7 @@ func (l Lookup) populate(query url.Values) {
 	l.populateGeolocation(query)
 	l.populateSource(query)
 	l.populateSelected(query)
+	l.populateExclude(query)
 }
 
 func (l Lookup) populateSearch(query url.Values) {
@@ -121,5 +123,10 @@ func (l Lookup) populateSource(query url.Values) {
 func (l Lookup) populateSelected(query url.Values) {
 	if len(l.Selected) > 0 {
 		query.Set("selected", l.Selected)
+	}
+}
+func (l Lookup) populateExclude(query url.Values) {
+	if len(l.Exclude) > 0 {
+		query.Set("exclude", l.Exclude)
 	}
 }

@@ -27,7 +27,7 @@ func main() {
 	)
 
 	// Documentation for input fields can be found at:
-	// https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields
+	// https://www.smarty.com/docs/apis/us-autocomplete-v2/reference#http-request-input-fields
 
 	lookup := &autocomplete.Lookup{
 		Search:      "200",
