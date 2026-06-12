@@ -65,7 +65,7 @@ func buildRequest(lookup *Lookup) *http.Request {
 	query := request.URL.Query()
 	query.Set("latitude", strconv.FormatFloat(lookup.Latitude, 'f', 8, 64))
 	query.Set("longitude", strconv.FormatFloat(lookup.Longitude, 'f', 8, 64))
-	query.Set("source", lookup.Source)
+	query.Set("source", string(lookup.Source))
 	request.URL.RawQuery = query.Encode()
 	return request
 }
