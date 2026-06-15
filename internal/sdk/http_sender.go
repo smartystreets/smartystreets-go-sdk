@@ -48,7 +48,7 @@ func readResponseBody(response *http.Response) ([]byte, error) {
 }
 
 func interpret(response *http.Response, content []byte) ([]byte, error) {
-	if response.StatusCode == http.StatusOK {
+	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNotModified {
 		return content, nil
 	}
 	return nil, sdk.NewHTTPStatusError(response.StatusCode, content)

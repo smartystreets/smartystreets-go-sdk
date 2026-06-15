@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
@@ -39,12 +38,12 @@ func main() {
 	err, results := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
-		// If ETag was supplied in the lookup, this status will be returned if the ETag value for the record is current
-		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
-			log.Printf("Record has not been modified since the last request")
-			return
-		}
 		log.Fatal("Error sending lookup:", err)
+	}
+
+	if lookup.ETag != "" && len(results) == 0 {
+		log.Printf("Record has not been modified since the last request")
+		return
 	}
 
 	fmt.Println("Results for address search:")

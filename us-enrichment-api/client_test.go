@@ -777,12 +777,45 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 
 /**************************************************************************/
 
+func (f *ClientFixture) TestLookup304IsSuccessWithRefreshedEtagAndUntouchedResults() {
+	f.sender.statusCode = 304
+	priorResponse := []*PrincipalResponse{{SmartyKey: "prior"}}
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
+
+	err := f.client.sendLookupWithContext(context.Background(), f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.input.getLookup().ETag, should.Equal, "ABCDEFG")
+	f.So(f.input.(*principalLookup).Response, should.Resemble, priorResponse)
+}
+
+func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
+	f.sender.err = sdk.NewHTTPStatusError(401, nil)
+	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123"}}
+
+	err := f.client.sendLookupWithContext(context.Background(), f.input)
+
+	f.So(err, should.Equal, f.sender.err)
+}
+
+func (f *ClientFixture) TestSuccessRefreshesLookupETag() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123", ETag: "old-tag"}
+	f.input = &principalLookup{Lookup: lookup}
+
+	err := f.client.sendLookupWithContext(context.Background(), f.input)
+
+	f.So(err, should.BeNil)
+	f.So(lookup.ETag, should.Equal, "ABCDEFG")
+}
+
 type FakeSender struct {
 	callCount int
 	request   *http.Request
 
-	response string
-	err      error
+	response   string
+	statusCode int
+	err        error
 
 	capturedAuthID    string
 	capturedAuthToken string
@@ -792,7 +825,7 @@ type FakeSender struct {
 func (f *FakeSender) Send(request *http.Request) ([]byte, error) {
 	f.callCount++
 	f.request = request
-	f.request.Response = &http.Response{Header: http.Header{"Etag": []string{"ABCDEFG"}}}
+	f.request.Response = &http.Response{StatusCode: f.statusCode, Header: http.Header{"Etag": []string{"ABCDEFG"}}}
 	f.capturedAuthID, f.capturedAuthToken, f.hasBasicAuth = request.BasicAuth()
 	return []byte(f.response), f.err
 }
