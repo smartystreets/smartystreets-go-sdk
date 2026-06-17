@@ -56,7 +56,7 @@ func main() {
 		log.Fatal("Error sending detail lookup:", err)
 	}
 
-	if detailLookup.ETag != "" && len(detailResults) == 0 {
+	if len(detailResults) == 0 {
 		log.Printf("Record has not been modified since the last request")
 		return
 	}
@@ -66,6 +66,8 @@ func main() {
 		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
+
+	fmt.Printf("Etag: %s\n", detailLookup.ResponseETag)
 
 	log.Println("OK")
 }

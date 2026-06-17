@@ -187,7 +187,7 @@ func (c *Client) sendLookupWithContextAndAuth(ctx context.Context, lookup enrich
 	}
 
 	if etag := headers.Get(lookupETagHeader); etag != "" {
-		lookup.getLookup().ETag = etag
+		lookup.getLookup().ResponseETag = etag
 	}
 
 	if request.Response != nil && request.Response.StatusCode == http.StatusNotModified {

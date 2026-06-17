@@ -34,7 +34,7 @@ func main() {
 		log.Fatal("Error sending lookup:", err)
 	}
 
-	if lookup.ETag != "" && len(results) == 0 {
+	if len(results) == 0 {
 		log.Printf("Record has not been modified since the last request")
 		return
 	}
@@ -47,6 +47,8 @@ func main() {
 		}
 		fmt.Printf("Response %d: %s", i, prettyPrinted)
 	}
+
+	fmt.Printf("Etag: %s\n", lookup.ResponseETag)
 
 	log.Println("OK")
 }

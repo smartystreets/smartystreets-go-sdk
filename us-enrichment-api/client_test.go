@@ -777,7 +777,7 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 
 /**************************************************************************/
 
-func (f *ClientFixture) TestLookup304IsSuccessWithRefreshedEtagAndUntouchedResults() {
+func (f *ClientFixture) TestLookup304RefreshesResponseEtagWithUntouchedResults() {
 	f.sender.statusCode = 304
 	priorResponse := []*PrincipalResponse{{SmartyKey: "prior"}}
 	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
@@ -785,7 +785,8 @@ func (f *ClientFixture) TestLookup304IsSuccessWithRefreshedEtagAndUntouchedResul
 	err := f.client.sendLookupWithContext(context.Background(), f.input)
 
 	f.So(err, should.BeNil)
-	f.So(f.input.getLookup().ETag, should.Equal, "ABCDEFG")
+	f.So(f.input.getLookup().ETag, should.Equal, "old-tag")
+	f.So(f.input.getLookup().ResponseETag, should.Equal, "ABCDEFG")
 	f.So(f.input.(*principalLookup).Response, should.Resemble, priorResponse)
 }
 
@@ -798,7 +799,7 @@ func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
 	f.So(err, should.Equal, f.sender.err)
 }
 
-func (f *ClientFixture) TestSuccessRefreshesLookupETag() {
+func (f *ClientFixture) TestSuccessSetsResponseEtagNotInputEtag() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123", ETag: "old-tag"}
 	f.input = &principalLookup{Lookup: lookup}
@@ -806,7 +807,9 @@ func (f *ClientFixture) TestSuccessRefreshesLookupETag() {
 	err := f.client.sendLookupWithContext(context.Background(), f.input)
 
 	f.So(err, should.BeNil)
-	f.So(lookup.ETag, should.Equal, "ABCDEFG")
+	f.So(lookup.ETag, should.Equal, "old-tag")
+	f.So(lookup.ResponseETag, should.Equal, "ABCDEFG")
+	f.So(f.input.(*principalLookup).Response[0].Etag, should.Equal, "ABCDEFG")
 }
 
 type FakeSender struct {
