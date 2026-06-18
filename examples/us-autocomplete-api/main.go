@@ -35,7 +35,7 @@ func main() {
 		CityFilter:  []string{"Denver,Aurora,CO", "Provo,UT"},
 		PreferState: []string{"CO"},
 		PreferRatio: 3,
-		Source:      "all",
+		Source:      autocomplete.SourceAll,
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {

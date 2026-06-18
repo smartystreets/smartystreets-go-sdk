@@ -40,13 +40,23 @@ func (f *LookupSerializationFixture) TestSearch() {
 	f.So(f.query, should.HaveLength, 1)
 	f.So(f.query.Get("search"), should.Equal, "Hello, World!")
 }
-func (f *LookupSerializationFixture) TestSource() {
-	f.lookup.Source = "all"
+
+func (f *LookupSerializationFixture) TestSourceAll() {
+	f.lookup.Source = SourceAll
 
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
 	f.So(f.query.Get("source"), should.Equal, "all")
+}
+
+func (f *LookupSerializationFixture) TestSourcePostal() {
+	f.lookup.Source = SourcePostal
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("source"), should.Equal, "postal")
 }
 
 func (f *LookupSerializationFixture) TestSuggestions() {
