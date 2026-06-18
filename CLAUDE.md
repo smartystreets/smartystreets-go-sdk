@@ -55,8 +55,8 @@ client := wireup.BuildUSStreetAPIClient(
 
 ### API Client Packages
 
-Nine API packages follow identical structure:
-- `us-street-api/`, `us-zipcode-api/`, `us-autocomplete-pro-api/`
+Ten API packages follow identical structure:
+- `us-street-api/`, `us-zipcode-api/`, `us-autocomplete-api`, `us-autocomplete-pro-api/`
 - `us-enrichment-api/`, `us-extract-api/`, `us-reverse-geo-api/`
 - `international-street-api/`, `international-postal-code-api/`, `international-autocomplete-api/`
 
