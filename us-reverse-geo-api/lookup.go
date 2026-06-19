@@ -11,6 +11,6 @@ type Lookup struct {
 type Source string
 
 const (
-	SourceAll    Source = "all"
-	SourcePostal Source = "postal"
+	SourceAll    = Source("all")
+	SourcePostal = Source("postal")
 )
