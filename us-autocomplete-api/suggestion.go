@@ -15,4 +15,5 @@ type Suggestion struct {
 	State      string `json:"state"`
 	ZIPCode    string `json:"zipcode"`
 	Entries    int    `json:"entries"`
+	Source     string `json:"source"`
 }
