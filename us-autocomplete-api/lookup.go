@@ -10,30 +10,30 @@ import (
 // https://www.smarty.com/docs/apis/us-autocomplete-v2/reference#http-request-input-fields
 type (
 	Lookup struct {
-		Search        string
-		Source        Source
-		MaxResults    int
-		CityFilter    []string
-		StateFilter   []string
-		ZIPFilter     []string
-		ExcludeStates []string
-		PreferCity    []string
-		PreferState   []string
-		PreferZIP     []string
-		PreferRatio   int
-		Geolocation   Geolocation
-		Selected      string
-		Exclude       string
+		Search            string
+		Source            Source
+		MaxResults        int
+		CityFilter        []string
+		StateFilter       []string
+		ZIPFilter         []string
+		ExcludeStates     []string
+		PreferCity        []string
+		PreferState       []string
+		PreferZIP         []string
+		PreferRatio       int
+		PreferGeolocation PreferGeolocation
+		Selected          string
+		Exclude           []string
 
 		Results []*Suggestion
 	}
-	Geolocation string
-	Source      string
+	PreferGeolocation string
+	Source            string
 )
 
 const (
-	GeolocateCity Geolocation = "city"
-	GeolocateNone Geolocation = "none"
+	GeolocateCity PreferGeolocation = "city"
+	GeolocateNone PreferGeolocation = "none"
 
 	SourceAll    Source = "all"
 	SourcePostal Source = "postal"
@@ -112,7 +112,7 @@ func (l Lookup) populateGeolocation(query url.Values) {
 		return
 	}
 
-	switch l.Geolocation {
+	switch l.PreferGeolocation {
 	case GeolocateCity:
 		query.Set("prefer_geolocation", "city")
 	case GeolocateNone:
@@ -131,6 +131,6 @@ func (l Lookup) populateSelected(query url.Values) {
 }
 func (l Lookup) populateExclude(query url.Values) {
 	if len(l.Exclude) > 0 {
-		query.Set("exclude", l.Exclude)
+		query.Set("exclude", strings.Join(l.Exclude, ","))
 	}
 }
