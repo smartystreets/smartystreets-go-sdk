@@ -48,8 +48,13 @@ func readResponseBody(response *http.Response) ([]byte, error) {
 }
 
 func interpret(response *http.Response, content []byte) ([]byte, error) {
-	if response.StatusCode == http.StatusOK {
+	switch response.StatusCode {
+	case http.StatusOK:
 		return content, nil
+	case http.StatusNotModified:
+		// 304 has no body; hand back JSON null so callers deserialize to an empty result instead of failing.
+		return []byte("null"), nil
+	default:
+		return nil, sdk.NewHTTPStatusError(response.StatusCode, content)
 	}
-	return nil, sdk.NewHTTPStatusError(response.StatusCode, content)
 }

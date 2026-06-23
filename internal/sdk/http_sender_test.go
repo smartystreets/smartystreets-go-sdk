@@ -103,6 +103,14 @@ func (f *HTTPSenderFixture) TestHTTP429() {
 	f.So(err, should.Resemble, sdk.NewHTTPStatusError(429, []byte("Hello, World!")))
 }
 
+func (f *HTTPSenderFixture) TestHTTP304NotModified_ReturnsJSONNullAndNoError() {
+	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("")}
+	f.client.response = &http.Response{StatusCode: 304, Body: body}
+	result, err := f.sender.Send(f.request)
+	f.So(err, should.BeNil)
+	f.So(string(result), should.Equal, "null")
+}
+
 func (f *HTTPSenderFixture) TestNon200StatusCode_ReturnsNoContentAndCustomError() {
 	body := &ErrorProneReadCloser{Buffer: bytes.NewBufferString("Hello, World!")}
 	f.client.response = &http.Response{

@@ -19,6 +19,7 @@ type Lookup struct {
 	State        string
 	ZIPCode      string
 	ETag         string
+	ResponseETag string
 	Features     string
 }
 

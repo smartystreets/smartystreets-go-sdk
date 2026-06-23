@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
@@ -31,10 +30,6 @@ func main() {
 
 	err, summaryResults := client.SendBusinessSummary(&summaryLookup)
 	if err != nil {
-		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
-			log.Printf("Record has not been modified since the last request")
-			return
-		}
 		log.Fatal("Error sending summary lookup:", err)
 	}
 
@@ -58,11 +53,12 @@ func main() {
 
 	err, detailResults := client.SendBusinessDetail(&detailLookup)
 	if err != nil {
-		if client.IsHTTPErrorCode(err, http.StatusNotModified) {
-			log.Printf("Record has not been modified since the last request")
-			return
-		}
 		log.Fatal("Error sending detail lookup:", err)
+	}
+
+	if len(detailResults) == 0 {
+		log.Printf("Record has not been modified since the last request")
+		return
 	}
 
 	fmt.Println("\nDetail results:")
@@ -70,6 +66,8 @@ func main() {
 		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
+
+	fmt.Printf("Etag: %s\n", detailLookup.ResponseETag)
 
 	log.Println("OK")
 }
