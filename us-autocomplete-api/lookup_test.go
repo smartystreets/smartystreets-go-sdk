@@ -140,7 +140,7 @@ func (f *LookupSerializationFixture) TestPreferRatio() {
 }
 
 func (f *LookupSerializationFixture) TestGeolocateNone() {
-	f.lookup.Geolocation = GeolocateNone
+	f.lookup.PreferGeolocation = GeolocateNone
 
 	f.populate()
 
@@ -149,7 +149,7 @@ func (f *LookupSerializationFixture) TestGeolocateNone() {
 }
 
 func (f *LookupSerializationFixture) TestGeolocateCity_DefaultValue() {
-	f.lookup.Geolocation = GeolocateCity
+	f.lookup.PreferGeolocation = GeolocateCity
 
 	f.populate()
 
@@ -164,4 +164,22 @@ func (f *LookupSerializationFixture) TestSelect() {
 
 	f.So(f.query, should.HaveLength, 1)
 	f.So(f.query.Get("selected"), should.Equal, "Hello World!")
+}
+
+func (f *LookupSerializationFixture) TestSource() {
+	f.lookup.Source = SourcePostal
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("source"), should.Equal, "postal")
+}
+
+func (f *LookupSerializationFixture) TestExclude() {
+	f.lookup.Exclude = []string{"exclude1", "exclude2"}
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("exclude"), should.Equal, "exclude1,exclude2")
 }

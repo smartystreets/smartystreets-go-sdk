@@ -5,7 +5,7 @@ type suggestionListing struct {
 }
 
 // Suggestion is the primary element in the response array.
-// Online documentation: https://smartystreets.com/docs/us-autocomplete-pro-api#http-response
+// Online documentation: https://www.smarty.com/docs/apis/us-autocomplete-v2/reference#http-response-status
 type Suggestion struct {
 	SmartyKey  string `json:"smarty_key"`
 	EntryID    string `json:"entry_id"`
@@ -15,4 +15,5 @@ type Suggestion struct {
 	State      string `json:"state"`
 	ZIPCode    string `json:"zipcode"`
 	Entries    int    `json:"entries"`
+	Source     string `json:"source"`
 }
