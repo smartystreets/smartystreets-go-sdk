@@ -2,10 +2,13 @@ package wireup
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 func TestBuilderFixture(t *testing.T) {
@@ -49,4 +52,46 @@ func (this *BuilderFixture) TestClient_SuppliedClientUsedVerbatim() {
 	builder := configure(WithHTTPClient(supplied))
 
 	this.So(builder.buildClient(), should.Equal, supplied)
+}
+
+func (this *BuilderFixture) TestClient_CleartextHTTP2UsesH2CTransport() {
+	client := configure(EnableCleartextHTTP2()).buildClient()
+
+	transport, ok := client.Transport.(*http2.Transport)
+	this.So(ok, should.BeTrue)
+	this.So(transport.AllowHTTP, should.BeTrue)
+}
+
+func (this *BuilderFixture) TestClient_CleartextHTTP2TakesPrecedenceOverDisableHTTP2() {
+	client := configure(DisableHTTP2(), EnableCleartextHTTP2()).buildClient()
+
+	_, ok := client.Transport.(*http2.Transport)
+	this.So(ok, should.BeTrue)
+}
+
+func (this *BuilderFixture) TestClient_CleartextHTTP2PanicsOnNonHTTPBaseURL() {
+	build := func() {
+		configure(EnableCleartextHTTP2(), CustomBaseURL("https://example.com")).buildClient()
+	}
+
+	this.So(build, should.Panic)
+}
+
+func (this *BuilderFixture) TestClient_CleartextHTTP2NegotiatesH2() {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	server := httptest.NewServer(h2c.NewHandler(handler, &http2.Server{}))
+	defer server.Close()
+
+	client := configure(EnableCleartextHTTP2()).buildClient()
+
+	response, err := client.Get(server.URL)
+	this.So(err, should.BeNil)
+	this.So(response, should.NotBeNil)
+	if response == nil {
+		return
+	}
+	defer func() { _ = response.Body.Close() }()
+	this.So(response.ProtoMajor, should.Equal, 2)
 }

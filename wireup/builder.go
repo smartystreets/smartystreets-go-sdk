@@ -1,6 +1,7 @@
 package wireup
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"math/rand"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"golang.org/x/net/http2"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
@@ -38,6 +41,7 @@ type clientBuilder struct {
 	appendHeaders map[string]string
 	idleConns     int
 	http2Disabled bool
+	h2cEnabled    bool
 	client        *http.Client
 	licenses      []string
 	customQueries url.Values
@@ -128,6 +132,11 @@ func (b *clientBuilder) withoutKeepAlive() *clientBuilder {
 
 func (b *clientBuilder) disableHTTP2() *clientBuilder {
 	b.http2Disabled = true
+	return b
+}
+
+func (b *clientBuilder) enableCleartextHTTP2() *clientBuilder {
+	b.h2cEnabled = true
 	return b
 }
 
@@ -226,7 +235,26 @@ func (b *clientBuilder) buildClient() *http.Client {
 	if b.client != nil {
 		return b.client
 	}
+	if b.h2cEnabled {
+		if b.baseURL != nil && b.baseURL.Scheme != "http" {
+			panic(fmt.Sprintf("EnableCleartextHTTP2 requires an http:// base URL (set one via CustomBaseURL); got scheme %q.", b.baseURL.Scheme))
+		}
+		return &http.Client{Timeout: b.timeout, Transport: b.buildCleartextHTTP2Transport()}
+	}
 	return &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
+}
+
+// buildCleartextHTTP2Transport builds a transport that speaks cleartext HTTP/2 (h2c) using
+// prior knowledge. It requires an http:// base URL and does not support proxies or the
+// connection-pool tuning available on the default transport.
+func (b *clientBuilder) buildCleartextHTTP2Transport() *http2.Transport {
+	return &http2.Transport{
+		AllowHTTP: true, // permit the http:// scheme
+		// h2c prior knowledge: dial plaintext TCP despite the "TLS" in the name.
+		DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
+			return (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext(ctx, network, addr)
+		},
+	}
 }
 
 func (b *clientBuilder) buildTransport() *http.Transport {

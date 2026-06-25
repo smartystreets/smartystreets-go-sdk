@@ -190,11 +190,28 @@ func DisableHTTP2() Option {
 	}
 }
 
+// EnableCleartextHTTP2 routes requests over cleartext HTTP/2 (h2c) using prior knowledge,
+// instead of HTTP/1.1 or TLS-negotiated HTTP/2.
+//
+// WARNING: h2c is UNENCRYPTED. Smarty's hosted APIs are HTTPS-only and do not accept h2c.
+// Use this only for local development or a TLS-terminating proxy/sidecar in front of the API,
+// and pair it with CustomBaseURL using an http:// host. Building a client while this is enabled
+// with a non-http:// base URL (including the https:// default) will panic.
+//
+// While enabled, ViaProxy and WithMaxIdleConnections have no effect, and this takes precedence
+// over DisableHTTP2.
+func EnableCleartextHTTP2() Option {
+	return func(builder *clientBuilder) {
+		builder.enableCleartextHTTP2()
+	}
+}
+
 // WithHTTPClient allows the caller to supply their own *http.Client. This is useful if you want full
 // control over the http client and its properties, but keep in mind that it reduces the following
 // options to no-ops (you would need to specify any of those details on the *http.Client you provide):
 //
 // - DisableHTTP2
+// - EnableCleartextHTTP2
 // - WithMaxIdleConnections
 // - ViaProxy
 // - Timeout
