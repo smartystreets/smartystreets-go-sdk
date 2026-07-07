@@ -31,7 +31,7 @@ func (f *ClientFixture) Setup() {
 
 func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	f.sender.response = `{"suggestions":[
-		{"street_line": "1","secondary": "2","city":"3","state":"4","zipcode":"5","entries":6},
+		{"urbanization":"urb","street_line": "1","secondary": "2","city":"3","state":"4","zipcode":"5","entries":6},
 		{"street_line": "7","secondary": "8","city":"9","state":"10","zipcode":"11","entries":12}
 	]}`
 	f.input.Search = "42"
@@ -49,20 +49,22 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 
 	f.So(f.input.Results, should.Resemble, []*Suggestion{
 		{
-			StreetLine: "1",
-			Secondary:  "2",
-			City:       "3",
-			State:      "4",
-			ZIPCode:    "5",
-			Entries:    6,
+			Urbanization: "urb",
+			StreetLine:   "1",
+			Secondary:    "2",
+			City:         "3",
+			State:        "4",
+			ZIPCode:      "5",
+			Entries:      6,
 		},
 		{
-			StreetLine: "7",
-			Secondary:  "8",
-			City:       "9",
-			State:      "10",
-			ZIPCode:    "11",
-			Entries:    12,
+			Urbanization: "",
+			StreetLine:   "7",
+			Secondary:    "8",
+			City:         "9",
+			State:        "10",
+			ZIPCode:      "11",
+			Entries:      12,
 		},
 	})
 }
