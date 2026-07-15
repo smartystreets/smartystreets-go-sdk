@@ -93,6 +93,8 @@ type (
 		MaxGeocodePrecision   string  `json:"max_geocode_precision,omitempty"`
 		AddressFormat         string  `json:"address_format,omitempty"`
 		OccupantUse           string  `json:"occupant_use,omitempty"`
+		SmartyKey             uint32  `json:"smartykey,omitempty"`
+		SmartyKeyTier         string  `json:"smartykey_tier,omitempty"`
 	}
 
 	// Analysis contains all output fields defined here:

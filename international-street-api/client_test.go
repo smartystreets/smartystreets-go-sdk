@@ -187,7 +187,9 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	  "geocode_precision": "Premise",
 	  "max_geocode_precision": "DeliveryPoint",
 	  "address_format": "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code",
-	  "occupant_use": "commercial"
+	  "occupant_use": "commercial",
+	  "smartykey": 240767767,
+	  "smartykey_tier": "building"
 	},
     "analysis": {
 	  "verification_status": "Verified",
@@ -337,6 +339,8 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(metadata.MaxGeocodePrecision, should.Equal, "DeliveryPoint")
 	f.So(metadata.AddressFormat, should.Equal, "thoroughfare, premise|dependent_locality|locality - administrative_area|postal_code")
 	f.So(metadata.OccupantUse, should.Equal, "commercial")
+	f.So(metadata.SmartyKey, should.Equal, 240767767)
+	f.So(metadata.SmartyKeyTier, should.Equal, "building")
 	f.So(analysis.VerificationStatus, should.Equal, "Verified")
 	f.So(analysis.AddressPrecision, should.Equal, "Premise")
 	f.So(analysis.MaxAddressPrecision, should.Equal, "DeliveryPoint")
