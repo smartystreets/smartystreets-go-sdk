@@ -98,6 +98,15 @@ func (f *LookupSerializationFixture) TestLanguageNative() {
 	f.So(f.query.Get("language"), should.Equal, "native")
 }
 
+func (f *LookupSerializationFixture) TestLanguageMixedCase() {
+	f.lookup.Language = Language("Latin")
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("language"), should.Equal, "latin")
+}
+
 func (f *LookupSerializationFixture) TestOrganization() {
 	f.lookup.Organization = "SmartyStreets"
 
