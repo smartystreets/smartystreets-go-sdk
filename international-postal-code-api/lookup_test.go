@@ -32,6 +32,15 @@ func (f *LookupSerializationFixture) TestNothingToSerialize() {
 	f.So(f.query, should.BeEmpty)
 }
 
+// The Language field is not yet serialized (see Lookup), so this covers the
+// helper directly to keep it honest until the field goes live.
+func (f *LookupSerializationFixture) TestLanguageNormalized() {
+	f.So(Language("Latin").normalized(), should.Equal, Latin)
+	f.So(Language("NATIVE").normalized(), should.Equal, Native)
+	f.So(Latin.normalized(), should.Equal, Latin)
+	f.So(Language("").normalized(), should.Equal, Language(""))
+}
+
 func (f *LookupSerializationFixture) TestFullLookup() {
 	f.lookup.InputID = "Hello, World!"
 	f.lookup.Country = "CAN"

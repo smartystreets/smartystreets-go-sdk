@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk"
 )
 
 // Client is responsible for sending batches of addresses to the international-street-api.
@@ -60,8 +60,9 @@ func ensureEnoughInfo(lookup *Lookup) error {
 	if lookup.Freeform == "" && lookup.Address1 == "" {
 		return errors.New("either Freeform or Address1 is required")
 	}
-	if lookup.Language != "" && lookup.Language != Native && lookup.Language != Latin {
-		return errors.New("invalid Language value; must be unset, 'native', or 'latin'")
+	lang := lookup.Language.normalized()
+	if lang != "" && lang != Native && lang != Latin {
+		return errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)")
 	}
 	return nil
 }
