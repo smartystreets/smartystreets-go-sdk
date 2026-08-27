@@ -68,3 +68,4 @@ Three authentication strategies defined at root level:
 - `SecretKeyCredential` - adds auth-id/auth-token as query parameters
 - `BasicAuthCredential` - HTTP Basic Authentication header
 - `WebsiteKeyCredential` - for client-side applications with referrer restrictions
+- Embedded/website keys are GET-only — not valid for batch (POST) requests or the US Extract API (POST-only): https://www.smarty.com/docs/cloud/authentication
