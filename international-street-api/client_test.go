@@ -53,13 +53,13 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?country=CA&freeform=42")
 	f.So(f.input.Results, should.Resemble, []*Candidate{
-		{RootLevel: RootLevel{Address1: "1"}},
-		{RootLevel: RootLevel{Address1: "2"}},
-		{RootLevel: RootLevel{Address1: "3"}}})
+		{Address1: "1"},
+		{Address1: "2"},
+		{Address1: "3"}})
 	f.So(f.input.Results, should.Resemble, []*Candidate{
-		{RootLevel: RootLevel{Address1: "1"}},
-		{RootLevel: RootLevel{Address1: "2"}},
-		{RootLevel: RootLevel{Address1: "3"}},
+		{Address1: "1"},
+		{Address1: "2"},
+		{Address1: "3"},
 	})
 }
 
@@ -90,7 +90,7 @@ func (f *ClientFixture) TestMixedCaseLanguage() {
 		"&locality=MESQUITA"+
 		"&postal_code=26557-700")
 	f.So(f.input.Results, should.Resemble, []*Candidate{
-		{RootLevel: RootLevel{Address1: "200 Rua Cascata"}}})
+		{Address1: "200 Rua Cascata"}})
 }
 
 func (f *ClientFixture) TestMixedCaseLanguageNotMutated() {

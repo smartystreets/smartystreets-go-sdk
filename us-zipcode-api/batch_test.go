@@ -20,7 +20,7 @@ type BatchFixture struct {
 func (f *BatchFixture) TestBatchKnowsWhenItsFullAndEmpty() {
 	batch := NewBatch()
 
-	for x := 0; x < MaxBatchSize; x++ {
+	for range MaxBatchSize {
 		f.So(batch.IsFull(), should.BeFalse)
 		batch.Append(&Lookup{})
 	}
@@ -34,7 +34,7 @@ func (f *BatchFixture) TestCapacityIsLimitedAt100Inputs() {
 	f.So(batch.Length(), should.Equal, 0)
 	f.So(batch.Records(), should.HaveLength, 0)
 
-	for x := 0; x < MaxBatchSize; x++ {
+	for x := range MaxBatchSize {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 	f.So(batch.Length(), should.Equal, MaxBatchSize)
@@ -63,7 +63,7 @@ func (f *BatchFixture) TestJSONSerializationShouldNeverFail() {
 
 func (f *BatchFixture) TestClearRemovesAllRecords() {
 	batch := NewBatch()
-	for x := 0; x < MaxBatchSize; x++ {
+	for x := range MaxBatchSize {
 		f.So(batch.Append(&Lookup{InputID: strconv.Itoa(x)}), should.BeTrue)
 	}
 

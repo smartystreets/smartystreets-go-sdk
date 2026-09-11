@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
 	"sync"
@@ -169,7 +169,7 @@ func ContextSleep(ctx context.Context, duration time.Duration) {
 func (r *RetryClient) random(cap int) int {
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	return r.rand.Intn(cap)
+	return r.rand.IntN(cap)
 }
 
 const (

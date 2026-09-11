@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -80,7 +81,7 @@ func initializeWriter(file io.Writer) *csv.Writer {
 func readRecords(reader *csv.Reader, pipe chan *street.Lookup) {
 	for {
 		record, err := reader.Read()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net"
 	"net/http"
 	"net/url"
@@ -220,7 +220,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = b.buildClient()
 	wrapped = internal.NewTracingClient(wrapped, b.trace)
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
-	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewSource(time.Now().UnixNano())), internal.ContextSleep)
+	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64())), internal.ContextSleep)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers, b.appendHeaders)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
