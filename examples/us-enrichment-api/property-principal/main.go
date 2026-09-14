@@ -31,7 +31,7 @@ func main() {
 		Features:  "financial",
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

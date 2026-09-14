@@ -28,7 +28,7 @@ type enrichmentLookup interface {
 	getDataSet() string
 	getDataSubset() string
 	getLookup() *Lookup
-	getResponse() interface{}
+	getResponse() any
 	unmarshalResponse([]byte, http.Header) error
 	populate(query url.Values)
 }
@@ -40,12 +40,12 @@ type universalLookup struct {
 	Response   []byte
 }
 
-func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
-func (g *universalLookup) getBusinessID() string    { return g.Lookup.BusinessID }
-func (g *universalLookup) getDataSet() string       { return g.DataSet }
-func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
-func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
-func (g *universalLookup) getResponse() interface{} { return g.Response }
+func (g *universalLookup) getSmartyKey() string  { return g.Lookup.SmartyKey }
+func (g *universalLookup) getBusinessID() string { return g.Lookup.BusinessID }
+func (g *universalLookup) getDataSet() string    { return g.DataSet }
+func (g *universalLookup) getDataSubset() string { return g.DataSubset }
+func (g *universalLookup) getLookup() *Lookup    { return g.Lookup }
+func (g *universalLookup) getResponse() any      { return g.Response }
 func (g *universalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
 	g.Response = bytes
 	if headers != nil {
@@ -103,7 +103,7 @@ func (p *principalLookup) getLookup() *Lookup {
 	return p.Lookup
 }
 
-func (f *principalLookup) getResponse() interface{} {
+func (f *principalLookup) getResponse() any {
 	return f.Response
 }
 
@@ -171,7 +171,7 @@ func (g *geoReferenceLookup) getLookup() *Lookup {
 	return g.Lookup
 }
 
-func (g *geoReferenceLookup) getResponse() interface{} {
+func (g *geoReferenceLookup) getResponse() any {
 	return g.Response
 }
 
@@ -214,7 +214,7 @@ func (s *secondaryLookup) getLookup() *Lookup {
 	return s.Lookup
 }
 
-func (s *secondaryLookup) getResponse() interface{} {
+func (s *secondaryLookup) getResponse() any {
 	return s.Response
 }
 
@@ -269,7 +269,7 @@ func (s *secondaryCountLookup) getLookup() *Lookup {
 	return s.Lookup
 }
 
-func (s *secondaryCountLookup) getResponse() interface{} {
+func (s *secondaryCountLookup) getResponse() any {
 	return s.Response
 }
 
@@ -328,7 +328,7 @@ func (b *businessSummaryLookup) getLookup() *Lookup {
 	return b.Lookup
 }
 
-func (b *businessSummaryLookup) getResponse() interface{} {
+func (b *businessSummaryLookup) getResponse() any {
 	return b.Response
 }
 
@@ -387,7 +387,7 @@ func (b *businessDetailLookup) getLookup() *Lookup {
 	return b.Lookup
 }
 
-func (b *businessDetailLookup) getResponse() interface{} {
+func (b *businessDetailLookup) getResponse() any {
 	return b.Response
 }
 

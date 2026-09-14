@@ -33,8 +33,7 @@ func (c *Client) SendBatchWithContextAndAuth(ctx context.Context, batch *Batch, 
 	if batch == nil || batch.Length() == 0 {
 		return nil
 	}
-	request := batch.buildRequest()
-	request = request.WithContext(ctx)
+	request := batch.buildRequest(ctx)
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err

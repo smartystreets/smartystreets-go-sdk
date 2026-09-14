@@ -40,7 +40,7 @@ func (f *ClientFixture) TestSingleLookupSerializedInQueryStringGET() {
 	input := &Lookup{InputID: "42", ZIPCode: "10001", City: "NYC", State: "NY"}
 	f.batch.Append(input)
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
@@ -125,7 +125,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_CredentialSignsRequest()
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42", ZIPCode: "10001"}
 	f.batch.Append(input)
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -140,7 +140,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_NilCredentialDoesNotSign
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42", ZIPCode: "10001"}
 	f.batch.Append(input)
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, nil)
 
@@ -155,7 +155,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_SignErrorPropagated() {
 	input := &Lookup{InputID: "42", ZIPCode: "10001"}
 	f.batch.Append(input)
 
-	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendBatchWithContextAndAuth(f.T().Context(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")

@@ -36,8 +36,7 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 		return err
 	}
 
-	request := buildRequest(lookup)
-	request = request.WithContext(ctx)
+	request := buildRequest(ctx, lookup)
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -76,8 +75,8 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 	return nil
 }
 
-func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", verifyURL, nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup *Lookup) *http.Request {
+	request, _ := http.NewRequestWithContext(ctx, "GET", verifyURL, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()

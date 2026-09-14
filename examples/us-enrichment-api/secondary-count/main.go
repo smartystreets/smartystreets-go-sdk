@@ -28,7 +28,7 @@ func main() {
 		ETag:      "", // optional: check if the record has been updated
 	}
 
-	err, results := client.SendSecondaryCountLookup(&lookup)
+	results, err := client.SendSecondaryCount(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

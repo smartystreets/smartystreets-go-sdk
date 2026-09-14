@@ -10,6 +10,8 @@ import (
 	"github.com/smarty/gunit"
 )
 
+type testContextKey string
+
 func TestClientFixture(t *testing.T) {
 	gunit.Run(new(ClientFixture), t)
 }
@@ -55,7 +57,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.input.Search = "42"
 	f.input.Country = "FRA"
 
-	ctx := context.WithValue(context.Background(), "key", "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)

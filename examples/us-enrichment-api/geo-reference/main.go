@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// supported census versions are: 2010, 2020, or leave empty for the latest census data available
-	err, results := client.SendGeoReferenceWithVersion(&lookup, "")
+	results, err := client.SendGeoReferenceWithVersion(&lookup, "")
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

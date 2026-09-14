@@ -6,9 +6,9 @@ type (
 	Candidate struct {
 		InputID string `json:"input_id,omitempty"`
 		RootLevel
-		Components Components `json:"components,omitempty"`
-		Metadata   Metadata   `json:"metadata,omitempty"`
-		Analysis   Analysis   `json:"analysis,omitempty"`
+		Components Components `json:"components"`
+		Metadata   Metadata   `json:"metadata"`
+		Analysis   Analysis   `json:"analysis"`
 	}
 
 	RootLevel struct {
@@ -101,13 +101,13 @@ type (
 		VerificationStatus  string  `json:"verification_status,omitempty"`
 		AddressPrecision    string  `json:"address_precision,omitempty"`
 		MaxAddressPrecision string  `json:"max_address_precision,omitempty"`
-		Changes             Changes `json:"changes,omitempty"`
+		Changes             Changes `json:"changes"`
 	}
 
 	// Changes contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#changes
 	Changes struct {
 		RootLevel
-		Components Components `json:"components,omitempty"`
+		Components Components `json:"components"`
 	}
 )

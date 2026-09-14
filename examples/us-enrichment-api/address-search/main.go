@@ -35,7 +35,7 @@ func main() {
 		ZIPCode:   "",                                      // optional: Query by address components instead of by SmartyKey
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

@@ -45,7 +45,7 @@ func main() {
 	log.Println("OK")
 }
 
-func DumpJSON(v interface{}) string {
+func DumpJSON(v any) string {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err.Error()

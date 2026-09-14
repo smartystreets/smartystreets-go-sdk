@@ -50,7 +50,7 @@ func composeDump(title string, dump string, err error) string {
 	if err != nil {
 		return fmt.Sprintf("Could not dump HTTP %s: %s\n", title, err.Error())
 	} else {
-		return fmt.Sprintf("HTTP %s:\n%s\n", strings.Title(title), dump)
+		return fmt.Sprintf("HTTP %s:\n%s\n", strings.ToUpper(title[:1])+title[1:], dump)
 	}
 }
 

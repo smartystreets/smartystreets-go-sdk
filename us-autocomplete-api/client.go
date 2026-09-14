@@ -28,8 +28,7 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 		return nil
 	}
 
-	request := buildRequest(lookup)
-	request = request.WithContext(ctx)
+	request := buildRequest(ctx, lookup)
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
@@ -48,8 +47,8 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 	return nil
 }
 
-func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", suggestURL, nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup *Lookup) *http.Request {
+	request, _ := http.NewRequestWithContext(ctx, "GET", suggestURL, nil) // We control the method and the URL. This is safe.
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()

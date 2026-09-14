@@ -42,7 +42,7 @@ func (f *ClientFixture) TestLookupSerializedAndSent__ResponseSuggestionsIncorpor
 	]`
 	f.input.AdministrativeArea = "42"
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -127,7 +127,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
 	f.sender.response = `[{"input_id": "1"}]`
 	f.input.Locality = "HI"
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -141,7 +141,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest(
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
 	f.sender.response = `[{"input_id": "1"}]`
 	f.input.Locality = "HI"
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
 
@@ -155,7 +155,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.sender.response = `[{"input_id": "1"}]`
 	f.input.Locality = "HI"
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(f.T().Context(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")

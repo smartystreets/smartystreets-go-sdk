@@ -63,9 +63,6 @@ func main() {
 		fmt.Printf("\nSecondaries for: [%s]\n", addressWithSecondaries)
 		for s, suggestion := range lookup.Results {
 			fmt.Printf("#%d: %#v\n", s, suggestion)
-			if suggestion.EntryID != "" {
-				entryID = suggestion.EntryID
-			}
 		}
 	}
 

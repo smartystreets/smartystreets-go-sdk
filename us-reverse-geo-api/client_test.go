@@ -38,7 +38,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -147,7 +147,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest(
 	f.sender.response = validResponseJSON
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -162,7 +162,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSig
 	f.sender.response = validResponseJSON
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
 
@@ -212,7 +212,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(f.T().Context(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")

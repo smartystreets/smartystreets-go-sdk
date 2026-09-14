@@ -1,16 +1,11 @@
 package wireup
 
 import (
-	"context"
-	"crypto/tls"
 	"fmt"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
-
-	"golang.org/x/net/http2"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
 	internal "github.com/smartystreets/smartystreets-go-sdk/internal/sdk"
@@ -220,7 +215,7 @@ func (b *clientBuilder) buildHTTPClient() (wrapped internal.HTTPClient) {
 	wrapped = b.buildClient()
 	wrapped = internal.NewTracingClient(wrapped, b.trace)
 	wrapped = internal.NewDebugOutputClient(wrapped, b.debug)
-	wrapped = internal.NewRetryClient(wrapped, b.retries, rand.New(rand.NewSource(time.Now().UnixNano())), internal.ContextSleep)
+	wrapped = internal.NewRetryClient(wrapped, b.retries, internal.ContextSleep)
 	wrapped = internal.NewSigningClient(wrapped, b.credential)
 	wrapped = internal.NewCustomHeadersClient(wrapped, b.headers, b.appendHeaders)
 	wrapped = internal.NewBaseURLClient(wrapped, b.baseURL)
@@ -235,26 +230,10 @@ func (b *clientBuilder) buildClient() *http.Client {
 	if b.client != nil {
 		return b.client
 	}
-	if b.h2cEnabled {
-		if b.baseURL != nil && b.baseURL.Scheme != "http" {
-			panic(fmt.Sprintf("EnableCleartextHTTP2 requires an http:// base URL (set one via CustomBaseURL); got scheme %q.", b.baseURL.Scheme))
-		}
-		return &http.Client{Timeout: b.timeout, Transport: b.buildCleartextHTTP2Transport()}
+	if b.h2cEnabled && b.baseURL != nil && b.baseURL.Scheme != "http" {
+		panic(fmt.Sprintf("EnableCleartextHTTP2 requires an http:// base URL (set one via CustomBaseURL); got scheme %q.", b.baseURL.Scheme))
 	}
 	return &http.Client{Timeout: b.timeout, Transport: b.buildTransport()}
-}
-
-// buildCleartextHTTP2Transport builds a transport that speaks cleartext HTTP/2 (h2c) using
-// prior knowledge. It requires an http:// base URL and does not support proxies or the
-// connection-pool tuning available on the default transport.
-func (b *clientBuilder) buildCleartextHTTP2Transport() *http2.Transport {
-	return &http2.Transport{
-		AllowHTTP: true, // permit the http:// scheme
-		// h2c prior knowledge: dial plaintext TCP despite the "TLS" in the name.
-		DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
-			return (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext(ctx, network, addr)
-		},
-	}
 }
 
 func (b *clientBuilder) buildTransport() *http.Transport {
@@ -271,10 +250,16 @@ func (b *clientBuilder) buildTransport() *http.Transport {
 		KeepAlive: 30 * time.Second,
 	}).DialContext
 
-	if b.http2Disabled {
-		// https://golang.org/pkg/net/http/ ("Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map.")
-		transport.TLSNextProto = make(map[string]func(authority string, c *tls.Conn) http.RoundTripper)
-	} else {
+	switch {
+	case b.h2cEnabled:
+		// Cleartext HTTP/2 (h2c) with prior knowledge: enabling only UnencryptedHTTP2 makes the
+		// transport speak HTTP/2 directly on http:// URLs, with no HTTP/1.1 upgrade round trip.
+		transport.Protocols = new(http.Protocols)
+		transport.Protocols.SetUnencryptedHTTP2(true)
+	case b.http2Disabled:
+		transport.Protocols = new(http.Protocols)
+		transport.Protocols.SetHTTP1(true)
+	default:
 		// The custom DialContext above would otherwise make net/http conservatively disable HTTP/2.
 		transport.ForceAttemptHTTP2 = true
 	}

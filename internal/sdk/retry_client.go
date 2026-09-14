@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -16,11 +15,9 @@ type RetryClient struct {
 	inner      HTTPClient
 	maxRetries int
 	sleeper    func(context.Context, time.Duration)
-	lock       *sync.Mutex
-	rand       *rand.Rand
 }
 
-func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper func(context.Context, time.Duration)) HTTPClient {
+func NewRetryClient(inner HTTPClient, maxRetries int, sleeper func(context.Context, time.Duration)) HTTPClient {
 	if maxRetries == 0 {
 		return inner
 	}
@@ -28,8 +25,6 @@ func NewRetryClient(inner HTTPClient, maxRetries int, rand *rand.Rand, sleeper f
 		inner:      inner,
 		maxRetries: maxRetries,
 		sleeper:    sleeper,
-		lock:       &sync.Mutex{},
-		rand:       rand,
 	}
 }
 
@@ -139,12 +134,14 @@ func (r *RetryClient) backOff(ctx context.Context, attempt int, response *http.R
 		return false
 	}
 	// If the server specified how long to wait via Retry-After on a 429 error,
-	// honor that duration. Otherwise, use randomized exponential backoff.
+	// honor that duration. Otherwise, sleep a random whole number of seconds
+	// in [1, attempt], capped at maxBackOffDuration. The +1 keeps the first
+	// retry from always sleeping zero and makes the cap itself reachable.
 	if response != nil && response.StatusCode == http.StatusTooManyRequests {
 		r.sleeper(ctx, r.rateLimitSleepDuration(response))
 	} else {
-		backOffCap := max(0, min(maxBackOffDuration, attempt))
-		r.sleeper(ctx, time.Second*time.Duration(r.random(backOffCap)))
+		backOffCap := min(maxBackOffDuration, attempt)
+		r.sleeper(ctx, time.Second*time.Duration(rand.IntN(backOffCap)+1))
 	}
 	return ctx.Err() == nil
 }
@@ -164,12 +161,6 @@ func ContextSleep(ctx context.Context, duration time.Duration) {
 	case <-ctx.Done():
 	case <-timer.C:
 	}
-}
-
-func (r *RetryClient) random(cap int) int {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	return r.rand.Intn(cap)
 }
 
 const (

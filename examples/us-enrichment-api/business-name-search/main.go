@@ -28,7 +28,7 @@ func main() {
 		City:         "atlanta",
 	}
 
-	err, summaryResults := client.SendBusinessSummary(&summaryLookup)
+	summaryResults, err := client.SendBusinessSummary(&summaryLookup)
 	if err != nil {
 		log.Fatal("Error sending summary lookup:", err)
 	}
@@ -51,7 +51,7 @@ func main() {
 		ETag:       "", // optional: check if the record has been updated
 	}
 
-	err, detailResults := client.SendBusinessDetail(&detailLookup)
+	detailResults, err := client.SendBusinessDetail(&detailLookup)
 	if err != nil {
 		log.Fatal("Error sending detail lookup:", err)
 	}

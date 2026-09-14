@@ -32,7 +32,7 @@ func main() {
 	// Universal lookup works with all datasets and optional subsets.
 	// Returns JSON bytes
 	// Note: The DataSubset field can be an empty string for datasets that have no subsets.
-	err, results := client.SendUniversalLookup(&lookup, "property", "principal")
+	results, err := client.SendUniversalLookup(&lookup, "property", "principal")
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

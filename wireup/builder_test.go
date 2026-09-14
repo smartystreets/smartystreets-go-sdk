@@ -7,8 +7,6 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 )
 
 func TestBuilderFixture(t *testing.T) {
@@ -31,8 +29,11 @@ func (this *BuilderFixture) TestTransport_DisableHTTP2OptsOut() {
 	transport := configure(DisableHTTP2()).buildTransport()
 
 	this.So(transport.ForceAttemptHTTP2, should.BeFalse)
-	this.So(transport.TLSNextProto, should.NotBeNil)
-	this.So(transport.TLSNextProto, should.BeEmpty)
+	if this.So(transport.Protocols, should.NotBeNil) {
+		this.So(transport.Protocols.HTTP1(), should.BeTrue)
+		this.So(transport.Protocols.HTTP2(), should.BeFalse)
+		this.So(transport.Protocols.UnencryptedHTTP2(), should.BeFalse)
+	}
 	this.So(transport.DialContext, should.NotBeNil)
 }
 
@@ -54,19 +55,32 @@ func (this *BuilderFixture) TestClient_SuppliedClientUsedVerbatim() {
 	this.So(builder.buildClient(), should.Equal, supplied)
 }
 
-func (this *BuilderFixture) TestClient_CleartextHTTP2UsesH2CTransport() {
+func (this *BuilderFixture) TestClient_CleartextHTTP2UsesUnencryptedHTTP2Only() {
 	client := configure(EnableCleartextHTTP2()).buildClient()
 
-	transport, ok := client.Transport.(*http2.Transport)
-	this.So(ok, should.BeTrue)
-	this.So(transport.AllowHTTP, should.BeTrue)
+	transport, ok := client.Transport.(*http.Transport)
+	if !this.So(ok, should.BeTrue) {
+		return
+	}
+	if !this.So(transport.Protocols, should.NotBeNil) {
+		return
+	}
+	this.So(transport.Protocols.UnencryptedHTTP2(), should.BeTrue)
+	this.So(transport.Protocols.HTTP1(), should.BeFalse)
+	this.So(transport.Protocols.HTTP2(), should.BeFalse)
 }
 
 func (this *BuilderFixture) TestClient_CleartextHTTP2TakesPrecedenceOverDisableHTTP2() {
 	client := configure(DisableHTTP2(), EnableCleartextHTTP2()).buildClient()
 
-	_, ok := client.Transport.(*http2.Transport)
-	this.So(ok, should.BeTrue)
+	transport, ok := client.Transport.(*http.Transport)
+	if !this.So(ok, should.BeTrue) {
+		return
+	}
+	if this.So(transport.Protocols, should.NotBeNil) {
+		this.So(transport.Protocols.UnencryptedHTTP2(), should.BeTrue)
+		this.So(transport.Protocols.HTTP1(), should.BeFalse)
+	}
 }
 
 func (this *BuilderFixture) TestClient_CleartextHTTP2PanicsOnNonHTTPBaseURL() {
@@ -81,15 +95,18 @@ func (this *BuilderFixture) TestClient_CleartextHTTP2NegotiatesH2() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
-	server := httptest.NewServer(h2c.NewHandler(handler, &http2.Server{}))
+	server := httptest.NewUnstartedServer(handler)
+	server.Config.Protocols = new(http.Protocols)
+	server.Config.Protocols.SetHTTP1(true)
+	server.Config.Protocols.SetUnencryptedHTTP2(true)
+	server.Start()
 	defer server.Close()
 
 	client := configure(EnableCleartextHTTP2()).buildClient()
 
 	response, err := client.Get(server.URL)
 	this.So(err, should.BeNil)
-	this.So(response, should.NotBeNil)
-	if response == nil {
+	if !this.So(response, should.NotBeNil) {
 		return
 	}
 	defer func() { _ = response.Body.Close() }()

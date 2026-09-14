@@ -25,7 +25,7 @@ type Lookup struct {
 	CountySource     CountySource      `json:"county_source,omitempty"`
 	CustomParameters map[string]string `json:"-"`
 
-	Results []*Candidate `json:"results,omitempty"`
+	Results []*Candidate `json:"results,omitzero"`
 }
 
 // AddCustomParameter adds custom query parameters/json properties to the request, it will overwrite

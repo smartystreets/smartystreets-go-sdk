@@ -23,13 +23,20 @@ make build
 # Generate coverage report (opens HTML)
 make cover
 
-# Run integration tests (executes all example programs - requires API credentials)
+# Run every example program (requires API credentials)
+make examples
+
+# Run one example (target = its path under examples/, slashes replaced with hyphens)
+make us-street-api
+make us-enrichment-api-address-search
+
+# Compile, test, then run every example program (requires API credentials)
 make integrate
 ```
 
 ## Architecture
 
-This is the official Go SDK for SmartyStreets address validation APIs. Compatible with Go 1.25. The SDK uses two key architectural patterns:
+This is the official Go SDK for SmartyStreets address validation APIs. Compatible with Go 1.27. The SDK uses two key architectural patterns:
 
 ### Middleware/Decorator Pattern (internal/sdk/)
 

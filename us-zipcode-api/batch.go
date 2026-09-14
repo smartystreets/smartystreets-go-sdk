@@ -2,6 +2,7 @@ package zipcode
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -57,8 +58,8 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
-func (b *Batch) buildRequest() *http.Request {
-	request, _ := http.NewRequest(http.MethodGet, placeholderURL, nil)
+func (b *Batch) buildRequest(ctx context.Context) *http.Request {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, placeholderURL, nil)
 	if b.Length() == 1 {
 		b.serializeGET(request)
 	} else {
