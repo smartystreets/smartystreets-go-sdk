@@ -2,10 +2,10 @@ package international_autocomplete_api
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 type Client struct {
@@ -26,7 +26,10 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 		return nil
 	}
 
-	request := buildRequest(ctx, lookup)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	response, err := c.sender.Send(request)
 	if err != nil {
 		return err
@@ -36,23 +39,27 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {
-	err := json.Unmarshal(response, &lookup.Result)
-	if err != nil {
+	var result *Result
+	if err := json.Unmarshal(response, &result); err != nil {
 		return err
 	}
+	lookup.Result = result
 	return nil
 }
 
-func buildRequest(ctx context.Context, lookup *Lookup) *http.Request {
+func buildRequest(ctx context.Context, lookup *Lookup) (*http.Request, error) {
 	var addressID = ""
 	if len(lookup.AddressID) > 0 {
 		addressID = "/" + lookup.AddressID
 	}
-	request, _ := http.NewRequestWithContext(ctx, "GET", suggestURL+addressID, nil) // We control the method and the URL. This is safe.
+	request, err := http.NewRequestWithContext(ctx, "GET", suggestURL+addressID, nil)
+	if err != nil {
+		return nil, err
+	}
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
-	return request
+	return request, nil
 }
 
 const suggestURL = "/v2/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.

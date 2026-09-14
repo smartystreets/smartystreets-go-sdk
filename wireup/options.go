@@ -197,8 +197,10 @@ func DisableHTTP2() Option {
 // and pair it with CustomBaseURL using an http:// host. Building a client while this is enabled
 // with a non-http:// base URL (including the https:// default) will panic.
 //
-// While enabled, ViaProxy and WithMaxIdleConnections have no effect, and this takes precedence
-// over DisableHTTP2.
+// While enabled, ViaProxy has no effect: an h2c connection sends the HTTP/2 preface straight to the
+// host it dials, so it cannot traverse an HTTP proxy. WithMaxIdleConnections is applied but has little
+// practical effect, since HTTP/2 multiplexes requests over a single connection per host. This option
+// takes precedence over DisableHTTP2.
 func EnableCleartextHTTP2() Option {
 	return func(builder *clientBuilder) {
 		builder.enableCleartextHTTP2()

@@ -83,6 +83,17 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Result, should.BeNil)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Text = "42"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"

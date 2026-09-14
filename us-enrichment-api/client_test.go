@@ -86,7 +86,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
+	f.So(f.input.(*principalLookup).Response, should.BeNil)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
@@ -120,6 +120,18 @@ func (f *ClientFixture) TestUniversalLookupUnmarshallingWithNoEtag() {
 	_ = lookup.unmarshalResponse(lookup.Response, httpHeaders)
 
 	f.So(lookup.Response, should.Equal, []byte(validPrincipalResponse))
+}
+
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	lookup := &Lookup{SmartyKey: "123"}
+
+	var ctx context.Context
+	response, err := f.client.SendUniversalLookupWithContext(ctx, lookup, "property", "principal")
+
+	f.So(err, should.NotBeNil)
+	f.So(response, should.BeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestGeoReference() {

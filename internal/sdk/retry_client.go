@@ -135,13 +135,12 @@ func (r *RetryClient) backOff(ctx context.Context, attempt int, response *http.R
 	}
 	// If the server specified how long to wait via Retry-After on a 429 error,
 	// honor that duration. Otherwise, sleep a random whole number of seconds
-	// in [1, attempt], capped at maxBackOffDuration. The +1 keeps the first
-	// retry from always sleeping zero and makes the cap itself reachable.
+	// in [0, attempt], capped at maxBackOffDuration (the cap itself is reachable).
 	if response != nil && response.StatusCode == http.StatusTooManyRequests {
 		r.sleeper(ctx, r.rateLimitSleepDuration(response))
 	} else {
 		backOffCap := min(maxBackOffDuration, attempt)
-		r.sleeper(ctx, time.Second*time.Duration(rand.IntN(backOffCap)+1))
+		r.sleeper(ctx, time.Second*time.Duration(rand.IntN(backOffCap+1)))
 	}
 	return ctx.Err() == nil
 }

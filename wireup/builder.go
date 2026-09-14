@@ -238,7 +238,9 @@ func (b *clientBuilder) buildClient() *http.Client {
 
 func (b *clientBuilder) buildTransport() *http.Transport {
 	transport := &http.Transport{}
-	if b.proxy != nil {
+	// An h2c prior-knowledge connection sends the HTTP/2 preface straight to the host it dials, so it
+	// cannot traverse an HTTP proxy; ViaProxy is deliberately ignored in that mode.
+	if b.proxy != nil && !b.h2cEnabled {
 		transport.Proxy = http.ProxyURL(b.proxy)
 	}
 	if b.idleConns > 0 {

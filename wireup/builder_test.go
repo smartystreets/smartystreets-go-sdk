@@ -47,6 +47,17 @@ func (this *BuilderFixture) TestTransport_ProxyAndIdleConnectionsWired() {
 	this.So(transport.MaxIdleConnsPerHost, should.Equal, 7)
 }
 
+func (this *BuilderFixture) TestTransport_CleartextHTTP2IgnoresProxy() {
+	transport := configure(
+		EnableCleartextHTTP2(),
+		ViaProxy("http://proxy.example:8080"),
+		WithMaxIdleConnections(7),
+	).buildTransport()
+
+	this.So(transport.Proxy, should.BeNil)
+	this.So(transport.MaxIdleConnsPerHost, should.Equal, 7)
+}
+
 func (this *BuilderFixture) TestClient_SuppliedClientUsedVerbatim() {
 	supplied := &http.Client{}
 

@@ -129,7 +129,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Response.Results, should.BeEmpty)
+	f.So(f.input.Response, should.BeZeroValue)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
@@ -141,6 +141,18 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 
 	f.So(err, should.NotBeNil)
 	f.So(f.input.Response.Results, should.BeEmpty)
+}
+
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Latitude = 40
+	f.input.Longitude = -111
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {

@@ -3,9 +3,10 @@ package zipcode
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.
@@ -58,14 +59,17 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
-func (b *Batch) buildRequest(ctx context.Context) *http.Request {
-	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, placeholderURL, nil)
+func (b *Batch) buildRequest(ctx context.Context) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, placeholderURL, nil)
+	if err != nil {
+		return nil, err
+	}
 	if b.Length() == 1 {
 		b.serializeGET(request)
 	} else {
 		b.serializePOST(request)
 	}
-	return request
+	return request, nil
 }
 
 func (b *Batch) serializeGET(request *http.Request) {

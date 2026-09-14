@@ -58,17 +58,17 @@ type (
 		RDI                      string                `json:"rdi,omitempty"`
 		ELOTSequence             string                `json:"elot_sequence,omitempty"`
 		ELOTSort                 string                `json:"elot_sort,omitempty"`
-		Latitude                 float64               `json:"latitude,omitempty"`
-		Longitude                float64               `json:"longitude,omitempty"`
+		Latitude                 float64               `json:"latitude,omitzero"`
+		Longitude                float64               `json:"longitude,omitzero"`
 		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitempty"`
 		Precision                string                `json:"precision,omitempty"`
 		TimeZone                 string                `json:"time_zone,omitempty"`
-		UTCOffset                float32               `json:"utc_offset,omitempty"`
-		DST                      bool                  `json:"dst,omitempty"`
+		UTCOffset                float32               `json:"utc_offset,omitzero"`
+		DST                      bool                  `json:"dst,omitzero"`
 		IANATimeZone             string                `json:"iana_time_zone,omitempty"`
-		IANAUTCOffset            float32               `json:"iana_utc_offset,omitempty"`
-		IANADST                  bool                  `json:"iana_dst,omitempty"`
-		EWSMatch                 bool                  `json:"ews_match,omitempty"`
+		IANAUTCOffset            float32               `json:"iana_utc_offset,omitzero"`
+		IANADST                  bool                  `json:"iana_dst,omitzero"`
+		EWSMatch                 bool                  `json:"ews_match,omitzero"`
 	}
 
 	// Analysis contains all output fields defined here:
@@ -83,8 +83,8 @@ type (
 		Footnotes         string            `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
 		LACSLinkCode      string            `json:"lacslink_code,omitempty"`
 		LACSLinkIndicator string            `json:"lacslink_indicator,omitempty"`
-		SuiteLinkMatch    bool              `json:"suitelink_match,omitempty"`
-		EWSMatch          bool              `json:"ews_match,omitempty"`      // deprecated
+		SuiteLinkMatch    bool              `json:"suitelink_match,omitzero"`
+		EWSMatch          bool              `json:"ews_match,omitzero"`       // deprecated
 		EnhancedMatch     string            `json:"enhanced_match,omitempty"` //v2 integration
 		Components        ComponentAnalysis `json:"components"`
 	}
@@ -108,6 +108,6 @@ type (
 
 	MatchInfo struct {
 		Status string   `json:"status,omitempty"`
-		Change []string `json:"change,omitzero"`
+		Change []string `json:"change,omitempty"`
 	}
 )

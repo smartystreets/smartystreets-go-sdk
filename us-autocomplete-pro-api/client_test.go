@@ -106,6 +106,17 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Results, should.BeEmpty)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Search = "42"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 /*////////////////////////////////////////////////////////////////////////*/
 
 type FakeSender struct {

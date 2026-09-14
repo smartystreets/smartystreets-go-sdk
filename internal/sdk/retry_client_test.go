@@ -81,7 +81,7 @@ func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(len(f.naps), should.Equal, 4) // 4 backoff sleeps for 5 attempts (first attempt has no backoff)
 	for i, nap := range f.naps {
 		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
-		f.So(nap, should.BeGreaterThanOrEqualTo, time.Second)
+		f.So(nap, should.BeGreaterThanOrEqualTo, time.Duration(0))
 		f.So(nap, should.BeLessThanOrEqualTo, cap)
 	}
 }
@@ -158,7 +158,7 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 	f.So(slices.Contains(f.naps, maxBackOffDuration*time.Second), should.BeTrue)
 	for i, nap := range f.naps {
 		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
-		f.So(nap, should.BeGreaterThanOrEqualTo, time.Second)
+		f.So(nap, should.BeGreaterThanOrEqualTo, time.Duration(0))
 		f.So(nap, should.BeLessThanOrEqualTo, cap)
 	}
 }

@@ -1,9 +1,11 @@
 package street
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
 	"net/url"
 	"strconv"
+
+	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 // Lookup contains all input fields defined here:
@@ -19,13 +21,13 @@ type Lookup struct {
 	Addressee        string            `json:"addressee,omitempty"`
 	Urbanization     string            `json:"urbanization,omitempty"`
 	InputID          string            `json:"input_id,omitempty"`
-	MaxCandidates    int               `json:"candidates,omitempty"` // Default value: 1, if MatchStrategy is "enhanced" default value: 5
-	MatchStrategy    MatchStrategy     `json:"match,omitempty"`      // Default value: "enhanced"
+	MaxCandidates    int               `json:"candidates,omitzero"` // Default value: 1, if MatchStrategy is "enhanced" default value: 5
+	MatchStrategy    MatchStrategy     `json:"match,omitempty"`     // Default value: "enhanced"
 	OutputFormat     OutputFormat      `json:"format,omitempty"`
 	CountySource     CountySource      `json:"county_source,omitempty"`
 	CustomParameters map[string]string `json:"-"`
 
-	Results []*Candidate `json:"results,omitzero"`
+	Results []*Candidate `json:"results,omitempty"`
 }
 
 // AddCustomParameter adds custom query parameters/json properties to the request, it will overwrite
@@ -76,7 +78,7 @@ func (l *Lookup) MarshalJSON() ([]byte, error) {
 	if err != nil || len(l.CustomParameters) == 0 {
 		return data, err
 	}
-	var m map[string]json.RawMessage
+	var m map[string]jsontext.Value
 	if err := json.Unmarshal(data, &m); err != nil {
 		return nil, err
 	}

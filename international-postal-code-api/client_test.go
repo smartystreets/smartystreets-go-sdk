@@ -68,7 +68,7 @@ func (f *ClientFixture) TestNilLookupNOP() {
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
 	err := f.client.SendLookup(new(Lookup))
-	f.So(err.Error(), should.Equal, "unexpected end of JSON input")
+	f.So(err, should.NotBeNil)
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
@@ -122,6 +122,17 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	f.So(candidate.SuperAdministrativeArea, should.Equal, "6")
 	f.So(candidate.PostalCode, should.Equal, "7")
 	f.So(candidate.Thoroughfare, should.Equal, "8")
+}
+
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Locality = "HI"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {

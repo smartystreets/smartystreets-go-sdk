@@ -1,10 +1,11 @@
 package sdk
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 func NewHTTPStatusError(statusCode int, content []byte) *HTTPStatusError {

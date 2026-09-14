@@ -88,6 +88,18 @@ func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: ""}), should.BeNil)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Country = "CA"
+	f.input.Freeform = "42"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("GOPHERS!")
 	f.sender.response = `{"suggestions":[

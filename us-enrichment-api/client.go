@@ -169,7 +169,10 @@ func (c *Client) sendLookupWithContextAndAuth(ctx context.Context, lookup enrich
 		return nil
 	}
 
-	request := buildRequest(ctx, lookup)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -203,13 +206,16 @@ func (c *Client) IsHTTPErrorCode(err error, code int) bool {
 	return false
 }
 
-func buildRequest(ctx context.Context, lookup enrichmentLookup) *http.Request {
-	request, _ := http.NewRequestWithContext(ctx, "GET", buildLookupURL(lookup), nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup enrichmentLookup) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, "GET", buildLookupURL(lookup), nil)
+	if err != nil {
+		return nil, err
+	}
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.Header.Add(lookupETagHeader, lookup.getLookup().ETag)
 	request.URL.RawQuery = query.Encode()
-	return request
+	return request, nil
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {

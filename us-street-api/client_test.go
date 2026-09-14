@@ -81,6 +81,18 @@ func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesInc
 	f.So(input2.Results, should.Resemble, []*Candidate{{InputID: "44", InputIndex: 2}, {InputID: "44", InputIndex: 2, CandidateIndex: 1}})
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+
+	var ctx context.Context
+	err := f.client.SendBatchWithContext(ctx, f.batch)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestNilBatchNOP() {
 	err := f.client.SendBatch(nil)
 	f.So(err, should.BeNil)

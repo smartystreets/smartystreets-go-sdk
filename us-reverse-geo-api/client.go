@@ -2,11 +2,11 @@ package us_reverse_geo
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 type Client struct {
@@ -36,7 +36,10 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 		return nil
 	}
 
-	request := buildRequest(ctx, lookup)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -52,15 +55,19 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 }
 
 func deserializeResponse(body []byte, lookup *Lookup) error {
-	err := json.Unmarshal(body, &lookup.Response)
-	if err != nil {
+	var response Response
+	if err := json.Unmarshal(body, &response); err != nil {
 		return err
 	}
+	lookup.Response = response
 	return nil
 }
 
-func buildRequest(ctx context.Context, lookup *Lookup) *http.Request {
-	request, _ := http.NewRequestWithContext(ctx, "GET", lookupURL, nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup *Lookup) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, "GET", lookupURL, nil)
+	if err != nil {
+		return nil, err
+	}
 	query := request.URL.Query()
 	query.Set("latitude", strconv.FormatFloat(lookup.Latitude, 'f', 8, 64))
 	query.Set("longitude", strconv.FormatFloat(lookup.Longitude, 'f', 8, 64))
@@ -68,7 +75,7 @@ func buildRequest(ctx context.Context, lookup *Lookup) *http.Request {
 		query.Set("source", string(lookup.Source))
 	}
 	request.URL.RawQuery = query.Encode()
-	return request
+	return request, nil
 }
 
 const lookupURL = "/lookup" // Remaining parts will be completed later by the sdk.BaseURLClient.

@@ -128,6 +128,18 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Result, should.BeNil)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Search = "42"
+	f.input.Country = "FRA"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestAddressIDAppendsToURL() {
 	f.input.Country = "FRA"
 	f.input.AddressID = "thisisid"
