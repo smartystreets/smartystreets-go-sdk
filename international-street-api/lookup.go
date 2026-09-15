@@ -2,6 +2,7 @@ package street
 
 import (
 	"net/url"
+	"strings"
 )
 
 // Lookup contains all input fields defined here:
@@ -34,13 +35,19 @@ const (
 	Latin  = Language("latin")
 )
 
+// normalized lets callers supply any letter case (eg. "Latin"); the API accepts
+// either, so this is about sending one canonical form.
+func (l Language) normalized() Language {
+	return Language(strings.ToLower(string(l)))
+}
+
 /**************************************************************************/
 
 func (l *Lookup) populate(query url.Values) {
 	populate(query, "input_id", l.InputID)
 	populate(query, "country", l.Country)
 	populate(query, "geocode", boolString(l.Geocode))
-	populate(query, "language", string(l.Language))
+	populate(query, "language", string(l.Language.normalized()))
 	populate(query, "features", l.Features)
 	populate(query, "freeform", l.Freeform)
 	populate(query, "address1", l.Address1)
