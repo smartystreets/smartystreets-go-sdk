@@ -63,6 +63,46 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	})
 }
 
+func (f *ClientFixture) TestMixedCaseLanguage() {
+	f.sender.response = `[{"address1": "200 Rua Cascata"}]`
+	f.input = &Lookup{
+		Country:            "BRA",
+		Address1:           "200 Rua Cascata",
+		Address2:           "Casa",
+		Locality:           "MESQUITA",
+		AdministrativeArea: "Rio de Janeiro",
+		PostalCode:         "26557-700",
+		Language:           Language("Latin"),
+		Geocode:            true,
+	}
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+
+		"?address1=200+Rua+Cascata"+
+		"&address2=Casa"+
+		"&administrative_area=Rio+de+Janeiro"+
+		"&country=BRA"+
+		"&geocode=true"+
+		"&language=latin"+
+		"&locality=MESQUITA"+
+		"&postal_code=26557-700")
+	f.So(f.input.Results, should.Resemble, []*Candidate{
+		{RootLevel: RootLevel{Address1: "200 Rua Cascata"}}})
+}
+
+func (f *ClientFixture) TestMixedCaseLanguageNotMutated() {
+	f.sender.response = `[{"address1": "1"}]`
+	f.input = &Lookup{Country: "BRA", Address1: "200 Rua Cascata", Language: Language("Latin")}
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.input.Language, should.Equal, Language("Latin"))
+}
+
 func (f *ClientFixture) TestNilLookupNOP() {
 	err := f.client.SendLookup(nil)
 	f.So(err, should.Equal, errors.New("lookup cannot be nil"))
@@ -80,7 +120,12 @@ func (f *ClientFixture) TestInvalidLookup_HasCountryMissingFreeformAndAddress1()
 
 func (f *ClientFixture) TestInvalidLookup_InvalidLanguageValue() {
 	err := f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: "not-a-language"})
-	f.So(err, should.Equal, errors.New("invalid Language value; must be unset, 'native', or 'latin'"))
+	f.So(err, should.Equal, errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)"))
+}
+
+func (f *ClientFixture) TestInvalidLookup_InvalidMixedCaseLanguageValue() {
+	err := f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Language("Klingon")})
+	f.So(err, should.Equal, errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)"))
 }
 
 func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
@@ -90,6 +135,8 @@ func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
 	// empty Language is fine
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42"}), should.BeNil)
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: ""}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Language("Latin")}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Language("NATIVE")}), should.BeNil)
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
@@ -174,7 +221,7 @@ func (f *ClientFixture) TestFullJSONResponseDeserialization() {
 	  "sub_building_number": "almost_bldg_number",
 	  "sub_building_name": "almost_bldg_name",
 	  "sub_building": "almost_bldg",
-      "level_type": "almost_level_type", 
+      "level_type": "almost_level_type",
       "level_number": "almost_level_number",
 	  "post_box": "box",
 	  "post_box_type": "cube",
