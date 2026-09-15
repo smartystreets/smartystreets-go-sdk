@@ -2,7 +2,7 @@ package us_enrichment
 
 import (
 	bytesPackage "bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 	"net/url"
 )
@@ -28,7 +28,7 @@ type enrichmentLookup interface {
 	getDataSet() string
 	getDataSubset() string
 	getLookup() *Lookup
-	getResponse() interface{}
+	getResponse() any
 	unmarshalResponse([]byte, http.Header) error
 	populate(query url.Values)
 }
@@ -40,12 +40,12 @@ type universalLookup struct {
 	Response   []byte
 }
 
-func (g *universalLookup) getSmartyKey() string     { return g.Lookup.SmartyKey }
-func (g *universalLookup) getBusinessID() string    { return g.Lookup.BusinessID }
-func (g *universalLookup) getDataSet() string       { return g.DataSet }
-func (g *universalLookup) getDataSubset() string    { return g.DataSubset }
-func (g *universalLookup) getLookup() *Lookup       { return g.Lookup }
-func (g *universalLookup) getResponse() interface{} { return g.Response }
+func (g *universalLookup) getSmartyKey() string  { return g.Lookup.SmartyKey }
+func (g *universalLookup) getBusinessID() string { return g.Lookup.BusinessID }
+func (g *universalLookup) getDataSet() string    { return g.DataSet }
+func (g *universalLookup) getDataSubset() string { return g.DataSubset }
+func (g *universalLookup) getLookup() *Lookup    { return g.Lookup }
+func (g *universalLookup) getResponse() any      { return g.Response }
 func (g *universalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
 	g.Response = bytes
 	if headers != nil {
@@ -103,14 +103,16 @@ func (p *principalLookup) getLookup() *Lookup {
 	return p.Lookup
 }
 
-func (f *principalLookup) getResponse() interface{} {
+func (f *principalLookup) getResponse() any {
 	return f.Response
 }
 
 func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	if err := json.Unmarshal(bytes, &p.Response); err != nil {
+	var response []*PrincipalResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	p.Response = response
 
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found {
@@ -171,14 +173,16 @@ func (g *geoReferenceLookup) getLookup() *Lookup {
 	return g.Lookup
 }
 
-func (g *geoReferenceLookup) getResponse() interface{} {
+func (g *geoReferenceLookup) getResponse() any {
 	return g.Response
 }
 
 func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	if err := json.Unmarshal(bytes, &g.Response); err != nil {
+	var response []*GeoReferenceResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	g.Response = response
 
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found {
@@ -214,14 +218,16 @@ func (s *secondaryLookup) getLookup() *Lookup {
 	return s.Lookup
 }
 
-func (s *secondaryLookup) getResponse() interface{} {
+func (s *secondaryLookup) getResponse() any {
 	return s.Response
 }
 
 func (s *secondaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+	var response []*SecondaryResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	s.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -269,14 +275,16 @@ func (s *secondaryCountLookup) getLookup() *Lookup {
 	return s.Lookup
 }
 
-func (s *secondaryCountLookup) getResponse() interface{} {
+func (s *secondaryCountLookup) getResponse() any {
 	return s.Response
 }
 
 func (s *secondaryCountLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+	var response []*SecondaryCountResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	s.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -328,14 +336,16 @@ func (b *businessSummaryLookup) getLookup() *Lookup {
 	return b.Lookup
 }
 
-func (b *businessSummaryLookup) getResponse() interface{} {
+func (b *businessSummaryLookup) getResponse() any {
 	return b.Response
 }
 
 func (b *businessSummaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+	var response []*BusinessSummaryResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	b.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -387,14 +397,16 @@ func (b *businessDetailLookup) getLookup() *Lookup {
 	return b.Lookup
 }
 
-func (b *businessDetailLookup) getResponse() interface{} {
+func (b *businessDetailLookup) getResponse() any {
 	return b.Response
 }
 
 func (b *businessDetailLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+	var response []*BusinessDetailResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	b.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {

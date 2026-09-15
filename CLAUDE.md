@@ -23,23 +23,35 @@ make build
 # Generate coverage report (opens HTML)
 make cover
 
-# Run integration tests (executes all example programs - requires API credentials)
+# Run every example program (requires API credentials)
+make examples
+
+# Run one example (target = its path under examples/, slashes replaced with hyphens)
+make us-street-api
+make us-enrichment-api-address-search
+
+# Compile, test, then run every example program (requires API credentials)
 make integrate
 ```
 
 ## Architecture
 
-This is the official Go SDK for SmartyStreets address validation APIs. Compatible with Go 1.25. The SDK uses two key architectural patterns:
+This is the official Go SDK for SmartyStreets address validation APIs. Compatible with Go 1.27. The SDK uses two key architectural patterns:
 
 ### Middleware/Decorator Pattern (internal/sdk/)
 
 HTTP request processing is implemented as a chain of composable clients that wrap each other:
 
 ```
-signing_client → retry_client → base_url_client → custom_header_client → http_sender
+custom_query_client → license_client → keep_alive_close_client → base_url_client → custom_headers_client
+  → signing_client → retry_client → debug_output_client → tracing_client → http.Client
 ```
 
-Each middleware client implements the `sdk.RequestSender` interface and wraps another sender, adding specific functionality (authentication, retries, base URL injection, custom headers, etc.).
+Each middleware client implements the internal `HTTPClient` interface (`Do(*http.Request)`) and wraps another one, adding specific functionality (authentication, retries, base URL injection, custom headers, etc.). The outermost client is wrapped by `HTTPSender`, which implements the root-level `sdk.RequestSender` interface that the API packages consume.
+
+### JSON Encoding
+
+Library code marshals and unmarshals with `encoding/json/v2` directly, using its default options. Do not import `encoding/json` (v1) in library packages. Example programs are consumer code and may use either package.
 
 ### Builder Pattern (wireup/)
 
@@ -60,7 +72,7 @@ Ten API packages follow identical structure:
 - `us-enrichment-api/`, `us-extract-api/`, `us-reverse-geo-api/`
 - `international-street-api/`, `international-postal-code-api/`, `international-autocomplete-api/`
 
-Each contains: `client.go` (Client struct with Send methods), `lookup.go` (request struct), and usually `batch.go` for batch operations. All clients support context and per-request authentication via `SendBatchWithContextAndAuth()`.
+Each contains: `client.go` (Client struct with Send methods), `lookup.go` (request struct), and usually `batch.go` for batch operations. Every client accepts a context and per-request credentials through the `*WithContextAndAuth` variants of its Send methods.
 
 ### Credential Types
 

@@ -20,23 +20,25 @@ build: test compile
 cover: compile
 	go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
-integrate: compile test
-	@go run examples/international-autocomplete-api/main.go > /dev/null
-	@go run examples/international-postal-code-api/main.go > /dev/null
-	@go run examples/international-street-api/main.go > /dev/null
-	@go run examples/us-autocomplete-api/main.go > /dev/null
-	@go run examples/us-autocomplete-pro-api/main.go > /dev/null
-	@go run examples/us-enrichment-api/address-search/main.go > /dev/null
-	@go run examples/us-enrichment-api/geo-reference/main.go > /dev/null
-	@go run examples/us-enrichment-api/property-principal/main.go > /dev/null
-	@go run examples/us-enrichment-api/secondary/main.go > /dev/null
-	@go run examples/us-enrichment-api/secondary-count/main.go > /dev/null
-	@go run examples/us-enrichment-api/universal/main.go > /dev/null
-	@go run examples/us-extract-api/main.go > /dev/null
-	@go run examples/us-reverse-geo-api/main.go > /dev/null
-	@go run examples/us-street-api/main.go > /dev/null
-	@go run examples/us-street-api/match-strategy/main.go > /dev/null
-	@go run examples/us-zipcode-api/main.go > /dev/null
+# Every directory under examples/ that holds a main.go is an example program. Its target name is the
+# path under examples/ with slashes replaced by hyphens (examples/us-street-api/list -> us-street-api-list).
+# Each example runs from its own directory so that relative paths such as input.txt resolve.
+EXAMPLE_DIRS    := $(patsubst %/main.go,%,$(wildcard examples/*/main.go examples/*/*/main.go))
+example-target   = $(subst /,-,$(patsubst examples/%,%,$(1)))
+EXAMPLE_TARGETS := $(foreach dir,$(EXAMPLE_DIRS),$(call example-target,$(dir)))
+
+define EXAMPLE_RULE
+$(call example-target,$(1)):
+	cd $(1) && go run .
+endef
+$(foreach dir,$(EXAMPLE_DIRS),$(eval $(call EXAMPLE_RULE,$(dir))))
+
+# The enrichment API has no top-level example, only sub-examples; this aggregate runs them all.
+us-enrichment-api: $(filter us-enrichment-api-%,$(EXAMPLE_TARGETS))
+
+examples: $(EXAMPLE_TARGETS)
+
+integrate: compile test examples
 
 version:
 	printf 'package sdk\n\nconst VERSION = "%s"\n' "$(VERSION)" > "$(VERSION_FILE)"
@@ -44,4 +46,4 @@ version:
 publish: compile test version
 	git commit -am "Incremented version."; tagit -p; git push origin master --tags
 
-.PHONY: test fmt clean compile build cover integrate version package publish
+.PHONY: test fmt clean compile build cover integrate version package publish examples us-enrichment-api $(EXAMPLE_TARGETS)

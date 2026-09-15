@@ -4,16 +4,16 @@ import (
 	"net/http"
 	"time"
 
-	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
-	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
-	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	autocomplete "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
-	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
-	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/v2/international-autocomplete-api"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/v2/international-postal-code-api"
+	international_street "github.com/smartystreets/smartystreets-go-sdk/v2/international-street-api"
+	autocomplete "github.com/smartystreets/smartystreets-go-sdk/v2/us-autocomplete-api"
+	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/v2/us-autocomplete-pro-api"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-extract-api"
+	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/v2/us-reverse-geo-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-zipcode-api"
 )
 
 // BuildUSStreetAPIClient builds a client for the US Street API using the provided options.
@@ -182,8 +182,7 @@ func WithMaxIdleConnections(max int) Option {
 }
 
 // DisableHTTP2 opts out of HTTP/2, which clients negotiate by default, forcing requests over HTTP/1.1.
-// This is achieved by following the instructions from the http package documentation (see: https://golang.org/pkg/net/http):
-// > "Programs that must disable HTTP/2 can do so by setting Transport.TLSNextProto to a non-nil, empty map."
+// This is achieved by restricting the transport's Protocols to HTTP/1 only (see http.Transport.Protocols).
 func DisableHTTP2() Option {
 	return func(builder *clientBuilder) {
 		builder.disableHTTP2()
@@ -198,8 +197,10 @@ func DisableHTTP2() Option {
 // and pair it with CustomBaseURL using an http:// host. Building a client while this is enabled
 // with a non-http:// base URL (including the https:// default) will panic.
 //
-// While enabled, ViaProxy and WithMaxIdleConnections have no effect, and this takes precedence
-// over DisableHTTP2.
+// While enabled, ViaProxy has no effect: an h2c connection sends the HTTP/2 preface straight to the
+// host it dials, so it cannot traverse an HTTP proxy. WithMaxIdleConnections is applied but has little
+// practical effect, since HTTP/2 multiplexes requests over a single connection per host. This option
+// takes precedence over DisableHTTP2.
 func EnableCleartextHTTP2() Option {
 	return func(builder *clientBuilder) {
 		builder.enableCleartextHTTP2()

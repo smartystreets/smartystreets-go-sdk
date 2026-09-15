@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
 	"log"
 	"os"
 	"strconv"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 const (
@@ -80,7 +81,7 @@ func initializeWriter(file io.Writer) *csv.Writer {
 func readRecords(reader *csv.Reader, pipe chan *street.Lookup) {
 	for {
 		record, err := reader.Read()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

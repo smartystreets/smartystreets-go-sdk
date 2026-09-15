@@ -1,6 +1,6 @@
 package us_reverse_geo
 
-import "github.com/smartystreets/smartystreets-go-sdk"
+import "github.com/smartystreets/smartystreets-go-sdk/v2"
 
 // Response structure defined here: https://smartystreets.com/docs/cloud/us-reverse-geo-api#http-response-output
 type Response struct {

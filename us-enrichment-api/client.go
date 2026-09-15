@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type Client struct {
@@ -17,132 +17,132 @@ func NewClient(sender sdk.RequestSender) *Client {
 }
 
 // Deprecated: SendPropertyPrincipalLookup is deprecated. Use SendPropertyPrincipal
-func (c *Client) SendPropertyPrincipalLookup(smartyKey string) (error, []*PrincipalResponse) {
+func (c *Client) SendPropertyPrincipalLookup(smartyKey string) ([]*PrincipalResponse, error) {
 	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
 }
 
-func (c *Client) SendPropertyPrincipal(lookup *Lookup) (error, []*PrincipalResponse) {
+func (c *Client) SendPropertyPrincipal(lookup *Lookup) ([]*PrincipalResponse, error) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
-	return err, propertyLookup.Response
+	return propertyLookup.Response, err
 }
 
 // SendPropertyPrincipalWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*PrincipalResponse) {
+func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*PrincipalResponse, error) {
 	propertyLookup := &principalLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, propertyLookup, credential)
-	return err, propertyLookup.Response
+	return propertyLookup.Response, err
 }
 
-func (c *Client) SendGeoReference(lookup *Lookup) (error, []*GeoReferenceResponse) {
+func (c *Client) SendGeoReference(lookup *Lookup) ([]*GeoReferenceResponse, error) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup}
 	err := c.sendLookup(geoRefLookup)
-	return err, geoRefLookup.Response
+	return geoRefLookup.Response, err
 }
 
 // SendGeoReferenceWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendGeoReferenceWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*GeoReferenceResponse) {
+func (c *Client) SendGeoReferenceWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*GeoReferenceResponse, error) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, credential)
-	return err, geoRefLookup.Response
+	return geoRefLookup.Response, err
 }
 
-func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion string) (error, []*GeoReferenceResponse) {
+func (c *Client) SendGeoReferenceWithVersion(lookup *Lookup, censusVersion string) ([]*GeoReferenceResponse, error) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
 	err := c.sendLookup(geoRefLookup)
-	return err, geoRefLookup.Response
+	return geoRefLookup.Response, err
 }
 
 // SendGeoReferenceWithVersionContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendGeoReferenceWithVersionContextAndAuth(ctx context.Context, lookup *Lookup, censusVersion string, credential sdk.Credential) (error, []*GeoReferenceResponse) {
+func (c *Client) SendGeoReferenceWithVersionContextAndAuth(ctx context.Context, lookup *Lookup, censusVersion string, credential sdk.Credential) ([]*GeoReferenceResponse, error) {
 	geoRefLookup := &geoReferenceLookup{Lookup: lookup, CensusVersion: censusVersion}
 	err := c.sendLookupWithContextAndAuth(ctx, geoRefLookup, credential)
-	return err, geoRefLookup.Response
+	return geoRefLookup.Response, err
 }
 
-func (c *Client) SendSecondary(lookup *Lookup) (error, []*SecondaryResponse) {
+func (c *Client) SendSecondary(lookup *Lookup) ([]*SecondaryResponse, error) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookup(sLookup)
-	return err, sLookup.Response
+	return sLookup.Response, err
 }
 
 // SendSecondaryWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendSecondaryWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*SecondaryResponse) {
+func (c *Client) SendSecondaryWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*SecondaryResponse, error) {
 	sLookup := &secondaryLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, sLookup, credential)
-	return err, sLookup.Response
+	return sLookup.Response, err
 }
 
 // Deprecated: SendSecondaryLookup is deprecated. Use SendSecondary
-func (c *Client) SendSecondaryLookup(lookup *Lookup) (error, []*SecondaryResponse) {
+func (c *Client) SendSecondaryLookup(lookup *Lookup) ([]*SecondaryResponse, error) {
 	return c.SendSecondary(lookup)
 }
 
-func (c *Client) SendSecondaryCount(lookup *Lookup) (error, []*SecondaryCountResponse) {
+func (c *Client) SendSecondaryCount(lookup *Lookup) ([]*SecondaryCountResponse, error) {
 	scLookup := &secondaryCountLookup{Lookup: lookup}
 	err := c.sendLookup(scLookup)
-	return err, scLookup.Response
+	return scLookup.Response, err
 }
 
 // SendSecondaryCountWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendSecondaryCountWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*SecondaryCountResponse) {
+func (c *Client) SendSecondaryCountWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*SecondaryCountResponse, error) {
 	scLookup := &secondaryCountLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, scLookup, credential)
-	return err, scLookup.Response
+	return scLookup.Response, err
 }
 
 // Deprecated: SendSecondaryCountLookup is deprecated. Use SendSecondaryCount
-func (c *Client) SendSecondaryCountLookup(lookup *Lookup) (error, []*SecondaryCountResponse) {
+func (c *Client) SendSecondaryCountLookup(lookup *Lookup) ([]*SecondaryCountResponse, error) {
 	return c.SendSecondaryCount(lookup)
 }
 
-func (c *Client) SendBusinessSummary(lookup *Lookup) (error, []*BusinessSummaryResponse) {
+func (c *Client) SendBusinessSummary(lookup *Lookup) ([]*BusinessSummaryResponse, error) {
 	bLookup := &businessSummaryLookup{Lookup: lookup}
 	err := c.sendLookup(bLookup)
-	return err, bLookup.Response
+	return bLookup.Response, err
 }
 
-func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*BusinessSummaryResponse) {
+func (c *Client) SendBusinessSummaryWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*BusinessSummaryResponse, error) {
 	bLookup := &businessSummaryLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, bLookup, credential)
-	return err, bLookup.Response
+	return bLookup.Response, err
 }
 
-func (c *Client) SendBusinessDetail(lookup *Lookup) (error, []*BusinessDetailResponse) {
+func (c *Client) SendBusinessDetail(lookup *Lookup) ([]*BusinessDetailResponse, error) {
 	bLookup := &businessDetailLookup{Lookup: lookup}
 	err := c.sendLookup(bLookup)
-	return err, bLookup.Response
+	return bLookup.Response, err
 }
 
-func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) (error, []*BusinessDetailResponse) {
+func (c *Client) SendBusinessDetailWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*BusinessDetailResponse, error) {
 	bLookup := &businessDetailLookup{Lookup: lookup}
 	err := c.sendLookupWithContextAndAuth(ctx, bLookup, credential)
-	return err, bLookup.Response
+	return bLookup.Response, err
 }
 
-func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
+func (c *Client) SendUniversalLookup(lookup *Lookup, dataSet, dataSubset string) ([]byte, error) {
 	return c.SendUniversalLookupWithContext(context.Background(), lookup, dataSet, dataSubset)
 }
 
 // SendUniversalLookupWithContext sends a lookup with the provided context.
-func (c *Client) SendUniversalLookupWithContext(ctx context.Context, lookup *Lookup, dataSet, dataSubset string) (error, []byte) {
+func (c *Client) SendUniversalLookupWithContext(ctx context.Context, lookup *Lookup, dataSet, dataSubset string) ([]byte, error) {
 	return c.SendUniversalLookupWithContextAndAuth(ctx, lookup, dataSet, dataSubset, nil)
 }
 
 // SendUniversalLookupWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendUniversalLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, dataSet, dataSubset string, credential sdk.Credential) (error, []byte) {
+func (c *Client) SendUniversalLookupWithContextAndAuth(ctx context.Context, lookup *Lookup, dataSet, dataSubset string, credential sdk.Credential) ([]byte, error) {
 	u := &universalLookup{
 		Lookup:     lookup,
 		DataSet:    dataSet,
@@ -150,7 +150,7 @@ func (c *Client) SendUniversalLookupWithContextAndAuth(ctx context.Context, look
 	}
 
 	err := c.sendLookupWithContextAndAuth(ctx, u, credential)
-	return err, u.Response
+	return u.Response, err
 }
 
 func (c *Client) sendLookup(lookup enrichmentLookup) error {
@@ -169,8 +169,10 @@ func (c *Client) sendLookupWithContextAndAuth(ctx context.Context, lookup enrich
 		return nil
 	}
 
-	request := buildRequest(lookup)
-	request = request.WithContext(ctx)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -204,13 +206,16 @@ func (c *Client) IsHTTPErrorCode(err error, code int) bool {
 	return false
 }
 
-func buildRequest(lookup enrichmentLookup) *http.Request {
-	request, _ := http.NewRequest("GET", buildLookupURL(lookup), nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup enrichmentLookup) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, "GET", buildLookupURL(lookup), nil)
+	if err != nil {
+		return nil, err
+	}
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.Header.Add(lookupETagHeader, lookup.getLookup().ETag)
 	request.URL.RawQuery = query.Encode()
-	return request
+	return request, nil
 }
 
 func buildLookupURL(lookup enrichmentLookup) string {

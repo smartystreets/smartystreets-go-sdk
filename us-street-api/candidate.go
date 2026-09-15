@@ -1,6 +1,6 @@
 package street
 
-import sdk "github.com/smartystreets/smartystreets-go-sdk"
+import sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 
 type (
 	// Candidate contains all output fields defined here:
@@ -16,9 +16,9 @@ type (
 		DeliveryPointBarcode string     `json:"delivery_point_barcode,omitempty"`
 		SmartyKey            string     `json:"smarty_key,omitempty"`
 		SmartyKeyEXT         string     `json:"smarty_key_ext,omitempty"`
-		Components           Components `json:"components,omitempty"`
-		Metadata             Metadata   `json:"metadata,omitempty"`
-		Analysis             Analysis   `json:"analysis,omitempty"`
+		Components           Components `json:"components"`
+		Metadata             Metadata   `json:"metadata"`
+		Analysis             Analysis   `json:"analysis"`
 	}
 
 	// Components contains all output fields defined here:
@@ -58,17 +58,17 @@ type (
 		RDI                      string                `json:"rdi,omitempty"`
 		ELOTSequence             string                `json:"elot_sequence,omitempty"`
 		ELOTSort                 string                `json:"elot_sort,omitempty"`
-		Latitude                 float64               `json:"latitude,omitempty"`
-		Longitude                float64               `json:"longitude,omitempty"`
-		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitempty"`
+		Latitude                 float64               `json:"latitude,omitzero"`
+		Longitude                float64               `json:"longitude,omitzero"`
+		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitzero"`
 		Precision                string                `json:"precision,omitempty"`
 		TimeZone                 string                `json:"time_zone,omitempty"`
-		UTCOffset                float32               `json:"utc_offset,omitempty"`
-		DST                      bool                  `json:"dst,omitempty"`
+		UTCOffset                float32               `json:"utc_offset,omitzero"`
+		DST                      bool                  `json:"dst,omitzero"`
 		IANATimeZone             string                `json:"iana_time_zone,omitempty"`
-		IANAUTCOffset            float32               `json:"iana_utc_offset,omitempty"`
-		IANADST                  bool                  `json:"iana_dst,omitempty"`
-		EWSMatch                 bool                  `json:"ews_match,omitempty"`
+		IANAUTCOffset            float32               `json:"iana_utc_offset,omitzero"`
+		IANADST                  bool                  `json:"iana_dst,omitzero"`
+		EWSMatch                 bool                  `json:"ews_match,omitzero"`
 	}
 
 	// Analysis contains all output fields defined here:
@@ -83,27 +83,27 @@ type (
 		Footnotes         string            `json:"footnotes,omitempty"` // https://smartystreets.com/docs/us-street-api#footnotes
 		LACSLinkCode      string            `json:"lacslink_code,omitempty"`
 		LACSLinkIndicator string            `json:"lacslink_indicator,omitempty"`
-		SuiteLinkMatch    bool              `json:"suitelink_match,omitempty"`
-		EWSMatch          bool              `json:"ews_match,omitempty"`      // deprecated
+		SuiteLinkMatch    bool              `json:"suitelink_match,omitzero"`
+		EWSMatch          bool              `json:"ews_match,omitzero"`       // deprecated
 		EnhancedMatch     string            `json:"enhanced_match,omitempty"` //v2 integration
-		Components        ComponentAnalysis `json:"components,omitempty"`
+		Components        ComponentAnalysis `json:"components"`
 	}
 
 	ComponentAnalysis struct {
-		PrimaryNumber            MatchInfo `json:"primary_number,omitempty"`
-		StreetPredirection       MatchInfo `json:"street_predirection,omitempty"`
-		StreetName               MatchInfo `json:"street_name,omitempty"`
-		StreetPostdirection      MatchInfo `json:"street_postdirection,omitempty"`
-		StreetSuffix             MatchInfo `json:"street_suffix,omitempty"`
-		SecondaryNumber          MatchInfo `json:"secondary_number,omitempty"`
-		SecondaryDesignator      MatchInfo `json:"secondary_designator,omitempty"`
-		ExtraSecondaryNumber     MatchInfo `json:"extra_secondary_number,omitempty"`
-		ExtraSecondaryDesignator MatchInfo `json:"extra_secondary_designator,omitempty"`
-		CityName                 MatchInfo `json:"city_name,omitempty"`
-		StateAbbreviation        MatchInfo `json:"state_abbreviation,omitempty"`
-		ZIPCode                  MatchInfo `json:"zipcode,omitempty"`
-		Plus4Code                MatchInfo `json:"plus4_code,omitempty"`
-		Urbanization             MatchInfo `json:"urbanization,omitempty"`
+		PrimaryNumber            MatchInfo `json:"primary_number"`
+		StreetPredirection       MatchInfo `json:"street_predirection"`
+		StreetName               MatchInfo `json:"street_name"`
+		StreetPostdirection      MatchInfo `json:"street_postdirection"`
+		StreetSuffix             MatchInfo `json:"street_suffix"`
+		SecondaryNumber          MatchInfo `json:"secondary_number"`
+		SecondaryDesignator      MatchInfo `json:"secondary_designator"`
+		ExtraSecondaryNumber     MatchInfo `json:"extra_secondary_number"`
+		ExtraSecondaryDesignator MatchInfo `json:"extra_secondary_designator"`
+		CityName                 MatchInfo `json:"city_name"`
+		StateAbbreviation        MatchInfo `json:"state_abbreviation"`
+		ZIPCode                  MatchInfo `json:"zipcode"`
+		Plus4Code                MatchInfo `json:"plus4_code"`
+		Urbanization             MatchInfo `json:"urbanization"`
 	}
 
 	MatchInfo struct {

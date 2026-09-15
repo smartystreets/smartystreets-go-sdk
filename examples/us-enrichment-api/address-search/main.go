@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 		ZIPCode:   "",                                      // optional: Query by address components instead of by SmartyKey
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
@@ -48,7 +49,7 @@ func main() {
 
 	fmt.Println("Results for address search:")
 	for s, response := range results {
-		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
+		jsonResponse, _ := json.Marshal(response, jsontext.WithIndent("     "))
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
 

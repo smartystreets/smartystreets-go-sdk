@@ -2,11 +2,11 @@ package street
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"net/http"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending batches of addresses to the international-street-api.
@@ -36,8 +36,10 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 		return err
 	}
 
-	request := buildRequest(lookup)
-	request = request.WithContext(ctx)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -77,12 +79,15 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 	return nil
 }
 
-func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("GET", verifyURL, nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup *Lookup) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, "GET", verifyURL, nil)
+	if err != nil {
+		return nil, err
+	}
 	query := request.URL.Query()
 	lookup.populate(query)
 	request.URL.RawQuery = query.Encode()
-	return request
+	return request, nil
 }
 
 const verifyURL = "/verify" // Remaining parts will be completed later by the sdk.BaseURLClient.

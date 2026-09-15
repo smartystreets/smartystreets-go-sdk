@@ -1,7 +1,8 @@
 package street
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -222,6 +223,38 @@ func (this *LookupFixture) TestQueryStringEncodingToMatchJSONEncoding_MultipleCu
 	jsonResult := this.marshalJSON(lookup)
 	queryResult := this.encode(lookup)
 	this.compareJSONandQuery(jsonResult, queryResult)
+}
+
+func (this *LookupFixture) TestJSONEncoding_CustomParameterReplacesNamedField() {
+	lookup := &Lookup{Street: "1 Main St"}
+	lookup.AddCustomParameter("street", "replaced")
+	result := this.marshalJSON(lookup)
+	this.So(result["street"], should.Equal, "replaced")
+}
+
+func (this *LookupFixture) TestQueryStringEncodingToMatchJSONEncoding_CustomParameterReplacesNamedField() {
+	lookup := &Lookup{Street: "1 Main St"}
+	lookup.AddCustomParameter("street", "replaced")
+	jsonResult := this.marshalJSON(lookup)
+	queryResult := this.encode(lookup)
+	this.compareJSONandQuery(jsonResult, queryResult)
+}
+
+func (this *LookupFixture) TestJSONEncoding_NamedFieldsPrecedeSortedCustomParameters() {
+	lookup := &Lookup{Street: "1 Main St", MatchStrategy: MatchStrict}
+	lookup.AddCustomParameter("zeta", "last")
+	lookup.AddCustomParameter("alpha", "first")
+	raw, err := json.Marshal(lookup)
+	this.So(err, should.BeNil)
+	this.So(string(raw), should.Equal, `{"street":"1 Main St","match":"strict","alpha":"first","zeta":"last"}`)
+}
+
+func (this *LookupFixture) TestJSONEncoding_HonorsEncoderFormatting() {
+	lookup := &Lookup{MatchStrategy: MatchStrict}
+	lookup.AddCustomParameter("alpha", "first")
+	raw, err := json.Marshal(lookup, jsontext.WithIndent("  "))
+	this.So(err, should.BeNil)
+	this.So(string(raw), should.Equal, "{\n  \"match\": \"strict\",\n  \"alpha\": \"first\"\n}")
 }
 
 func (this *LookupFixture) TestJSONFieldNamesAndValuesMatchQueryStringKeyNamesAndValues() {

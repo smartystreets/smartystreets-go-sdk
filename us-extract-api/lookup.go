@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
 )
 
 // Lookup represents all input fields documented here:
@@ -14,11 +14,11 @@ import (
 type Lookup struct {
 	Text                    string               `json:"text,omitempty"`
 	HTML                    HTMLPayload          `json:"html,omitempty"`
-	Aggressive              bool                 `json:"aggressive,omitempty"`
-	AddressesWithLineBreaks bool                 `json:"addr_line_breaks,omitempty"`
-	AddressesPerLine        int                  `json:"addr_per_line,omitempty"`
+	Aggressive              bool                 `json:"aggressive,omitzero"`
+	AddressesWithLineBreaks bool                 `json:"addr_line_breaks,omitzero"`
+	AddressesPerLine        int                  `json:"addr_per_line,omitzero"`
 	MatchStrategy           street.MatchStrategy `json:"match,omitempty"`
-	Result                  *Result              `json:"result,omitempty"`
+	Result                  *Result              `json:"result,omitzero"`
 }
 
 type HTMLPayload string

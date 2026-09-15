@@ -1,6 +1,6 @@
 package extract
 
-import "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+import "github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
 
 // Result, Metadata, and ExtractedAddress represent all output fields documented here:
 // https://smartystreets.com/docs/cloud/us-extract-api#http-response

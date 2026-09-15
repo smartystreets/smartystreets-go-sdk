@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-autocomplete-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 /*
@@ -63,9 +63,6 @@ func main() {
 		fmt.Printf("\nSecondaries for: [%s]\n", addressWithSecondaries)
 		for s, suggestion := range lookup.Results {
 			fmt.Printf("#%d: %#v\n", s, suggestion)
-			if suggestion.EntryID != "" {
-				entryID = suggestion.EntryID
-			}
 		}
 	}
 

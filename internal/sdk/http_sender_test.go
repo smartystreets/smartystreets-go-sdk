@@ -8,7 +8,7 @@ import (
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 func TestHTTPSenderFixture(t *testing.T) {

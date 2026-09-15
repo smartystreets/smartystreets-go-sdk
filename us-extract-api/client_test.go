@@ -9,7 +9,7 @@ import (
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type testContextKey string
@@ -37,7 +37,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -83,10 +83,21 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Result, should.BeNil)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Text = "42"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -100,7 +111,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest(
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSign() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
 
@@ -114,7 +125,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.sender.response = `{"meta": {"lines": 42}}`
 	f.input.Text = "42"
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(f.T().Context(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")

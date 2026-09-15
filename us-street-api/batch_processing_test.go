@@ -29,7 +29,7 @@ func (f *BatchProcessingFixture) Setup() {
 
 func (f *BatchProcessingFixture) TestManyLookupsSentInBatches() {
 	lookups := make([]*Lookup, 250)
-	for x := 0; x < len(lookups); x++ {
+	for x := range lookups {
 		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
 	}
 	f.client.SendLookups(lookups...)
@@ -48,7 +48,7 @@ func (f *BatchProcessingFixture) TestManyLookupsSentInBatches() {
 
 func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 	lookups := make([]*Lookup, 250)
-	for x := 0; x < len(lookups); x++ {
+	for x := range lookups {
 		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
 	}
 	f.sender.err = errors.New("GOPHERS!")
@@ -67,7 +67,7 @@ func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsFromBeingBatched() {
 
 func (f *BatchProcessingFixture) TestChannelOfLookupsSentInBatches() {
 	input := make(chan *Lookup, 250)
-	for x := 0; x < cap(input); x++ {
+	for x := range cap(input) {
 		input <- &Lookup{InputID: strconv.Itoa(x)}
 	}
 	close(input)
@@ -97,7 +97,7 @@ func unload(stream chan *Lookup) (lookups []*Lookup) {
 
 func (f *BatchProcessingFixture) TestErrorPreventsAllLookupsOnChannelFromBeingBatched() {
 	lookups := make([]*Lookup, 250)
-	for x := 0; x < len(lookups); x++ {
+	for x := range lookups {
 		lookups[x] = &Lookup{InputID: strconv.Itoa(x)}
 	}
 	f.sender.err = errors.New("GOPHERS!")
@@ -138,7 +138,7 @@ func (f *FakeMultiSender) Send(request *http.Request) ([]byte, error) {
 	if f.errOnCall == f.callCount {
 		err = f.err
 	}
-	return []byte(fmt.Sprintf(multiSenderResponseFormat, f.callCount)), err
+	return fmt.Appendf(nil, multiSenderResponseFormat, f.callCount), err
 }
 
 const multiSenderResponseFormat = `[{"input_index": %d}]`

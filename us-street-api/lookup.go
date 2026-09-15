@@ -1,8 +1,12 @@
 package street
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
+	"maps"
 	"net/url"
+	"slices"
 	"strconv"
 )
 
@@ -19,8 +23,8 @@ type Lookup struct {
 	Addressee        string            `json:"addressee,omitempty"`
 	Urbanization     string            `json:"urbanization,omitempty"`
 	InputID          string            `json:"input_id,omitempty"`
-	MaxCandidates    int               `json:"candidates,omitempty"` // Default value: 1, if MatchStrategy is "enhanced" default value: 5
-	MatchStrategy    MatchStrategy     `json:"match,omitempty"`      // Default value: "enhanced"
+	MaxCandidates    int               `json:"candidates,omitzero"` // Default value: 1, if MatchStrategy is "enhanced" default value: 5
+	MatchStrategy    MatchStrategy     `json:"match,omitempty"`     // Default value: "enhanced"
 	OutputFormat     OutputFormat      `json:"format,omitempty"`
 	CountySource     CountySource      `json:"county_source,omitempty"`
 	CustomParameters map[string]string `json:"-"`
@@ -68,26 +72,60 @@ func encode(query url.Values, source string, target string) {
 	}
 }
 
-func (l *Lookup) MarshalJSON() ([]byte, error) {
+// MarshalJSONTo implements [json.MarshalerTo]. The body carries the same defaults
+// as the query string (see defaultValues), and each custom parameter is written as
+// a string member after the named fields. A custom parameter whose name matches a
+// named field replaces it, mirroring url.Values.Set in encodeQueryString.
+func (l *Lookup) MarshalJSONTo(enc *jsontext.Encoder) error {
 	type alias Lookup
 	lc := alias(*l)
 	lc.MatchStrategy, lc.MaxCandidates = l.defaultValues()
-	data, err := json.Marshal(lc)
-	if err != nil || len(l.CustomParameters) == 0 {
-		return data, err
+	if len(l.CustomParameters) == 0 {
+		return json.MarshalEncode(enc, &lc)
 	}
-	var m map[string]json.RawMessage
-	if err := json.Unmarshal(data, &m); err != nil {
-		return nil, err
+
+	fields, err := json.Marshal(&lc, enc.Options())
+	if err != nil {
+		return err
 	}
-	for k, v := range l.CustomParameters {
-		b, err := json.Marshal(v)
+	dec := jsontext.NewDecoder(bytes.NewReader(fields))
+	if _, err := dec.ReadToken(); err != nil { // consume '{'
+		return err
+	}
+	if err := enc.WriteToken(jsontext.BeginObject); err != nil {
+		return err
+	}
+	for dec.PeekKind() != '}' {
+		name, err := dec.ReadToken()
 		if err != nil {
-			return nil, err
+			return err
 		}
-		m[k] = b
+		if _, replaced := l.CustomParameters[name.String()]; replaced {
+			if err := dec.SkipValue(); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := enc.WriteToken(name); err != nil {
+			return err
+		}
+		value, err := dec.ReadValue()
+		if err != nil {
+			return err
+		}
+		if err := enc.WriteValue(value); err != nil {
+			return err
+		}
 	}
-	return json.Marshal(m)
+	for _, name := range slices.Sorted(maps.Keys(l.CustomParameters)) {
+		if err := enc.WriteToken(jsontext.String(name)); err != nil {
+			return err
+		}
+		if err := enc.WriteToken(jsontext.String(l.CustomParameters[name])); err != nil {
+			return err
+		}
+	}
+	return enc.WriteToken(jsontext.EndObject)
 }
 
 func (l *Lookup) defaultValues() (matchStrategy MatchStrategy, maxCandidates int) {

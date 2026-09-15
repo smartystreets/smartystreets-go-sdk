@@ -9,7 +9,7 @@ import (
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type testContextKey string
@@ -38,7 +38,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSentWithContext__ResponseS
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -129,7 +129,7 @@ func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	err := f.client.SendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.Response.Results, should.BeEmpty)
+	f.So(f.input.Response, should.BeZeroValue)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
@@ -143,11 +143,23 @@ func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.So(f.input.Response.Results, should.BeEmpty)
 }
 
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Latitude = 40
+	f.input.Longitude = -111
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
+}
+
 func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest() {
 	f.sender.response = validResponseJSON
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -162,7 +174,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSig
 	f.sender.response = validResponseJSON
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
 
@@ -212,7 +224,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.input.Latitude = 40.123456789
 	f.input.Longitude = -111
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(f.T().Context(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")

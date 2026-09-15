@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/v2/international-postal-code-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {

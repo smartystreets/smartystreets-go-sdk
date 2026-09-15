@@ -30,16 +30,16 @@ func (d *DebugOutputClient) Do(request *http.Request) (*http.Response, error) {
 func dumpRequest(request *http.Request) string {
 	dump, err := httputil.DumpRequestOut(request, true)
 	prefixed := addPrefixToEachLine(string(dump), requestLinePrefix)
-	return composeDump("request", prefixed, err)
+	return composeDump("Request", prefixed, err)
 }
 
 func dumpResponse(response *http.Response, err error) string {
 	if err != nil {
-		return composeDump("err", err.Error(), nil)
+		return composeDump("Err", err.Error(), nil)
 	}
 	dump, err := httputil.DumpResponse(response, true)
 	prefixed := addPrefixToEachLine(string(dump), responseLinePrefix)
-	return composeDump("response", prefixed, err)
+	return composeDump("Response", prefixed, err)
 }
 
 func addPrefixToEachLine(dump string, prefix string) string {
@@ -50,7 +50,7 @@ func composeDump(title string, dump string, err error) string {
 	if err != nil {
 		return fmt.Sprintf("Could not dump HTTP %s: %s\n", title, err.Error())
 	} else {
-		return fmt.Sprintf("HTTP %s:\n%s\n", strings.Title(title), dump)
+		return fmt.Sprintf("HTTP %s:\n%s\n", title, dump)
 	}
 }
 

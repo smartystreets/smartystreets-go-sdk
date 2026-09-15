@@ -9,7 +9,7 @@ import (
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type testContextKey string
@@ -42,7 +42,7 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.input.Freeform = "42"
 	f.input.Country = "CA"
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendLookupWithContext(ctx, f.input)
 
 	f.So(err, should.BeNil)
@@ -53,13 +53,9 @@ func (f *ClientFixture) TestAddressLookupSerializedAndSent__ResponseSuggestionsI
 	f.So(string(f.sender.request.URL.Query().Get("freeform")), should.Equal, "42")
 	f.So(f.sender.request.URL.String(), should.Equal, verifyURL+"?country=CA&freeform=42")
 	f.So(f.input.Results, should.Resemble, []*Candidate{
-		{RootLevel: RootLevel{Address1: "1"}},
-		{RootLevel: RootLevel{Address1: "2"}},
-		{RootLevel: RootLevel{Address1: "3"}}})
-	f.So(f.input.Results, should.Resemble, []*Candidate{
-		{RootLevel: RootLevel{Address1: "1"}},
-		{RootLevel: RootLevel{Address1: "2"}},
-		{RootLevel: RootLevel{Address1: "3"}},
+		{Address1: "1"},
+		{Address1: "2"},
+		{Address1: "3"},
 	})
 }
 
@@ -137,6 +133,18 @@ func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: ""}), should.BeNil)
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Language("Latin")}), should.BeNil)
 	f.So(f.client.SendLookup(&Lookup{Country: "CA", Freeform: "42", Language: Language("NATIVE")}), should.BeNil)
+}
+
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	f.input.Country = "CA"
+	f.input.Freeform = "42"
+
+	var ctx context.Context
+	err := f.client.SendLookupWithContext(ctx, f.input)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
@@ -452,7 +460,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_CredentialSignsRequest(
 	f.sender.response = `[{"address1": "1"}]`
 	f.input.Freeform = "42"
 	f.input.Country = "CA"
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -467,7 +475,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_NilCredentialDoesNotSig
 	f.sender.response = `[{"address1": "1"}]`
 	f.input.Freeform = "42"
 	f.input.Country = "CA"
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendLookupWithContextAndAuth(ctx, f.input, nil)
 
@@ -482,7 +490,7 @@ func (f *ClientFixture) TestSendLookupWithContextAndAuth_SignErrorPropagated() {
 	f.input.Freeform = "42"
 	f.input.Country = "CA"
 
-	err := f.client.SendLookupWithContextAndAuth(context.Background(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendLookupWithContextAndAuth(f.T().Context(), f.input, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")
