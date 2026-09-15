@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/v2/us-reverse-geo-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"testing"
 
-	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+	street "github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
 
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"

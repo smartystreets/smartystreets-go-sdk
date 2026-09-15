@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/v2/international-autocomplete-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {

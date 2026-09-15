@@ -2,9 +2,9 @@ package zipcode
 
 import (
 	"context"
+	"encoding/json/v2"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending batches of addresses to the us-zipcode-api.

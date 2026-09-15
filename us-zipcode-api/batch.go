@@ -3,10 +3,9 @@ package zipcode
 import (
 	"bytes"
 	"context"
+	"encoding/json/v2"
 	"io"
 	"net/http"
-
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 // Batch stores input records and settings related to a group of addresses to be verified in a batch.

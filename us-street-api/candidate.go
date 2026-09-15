@@ -1,6 +1,6 @@
 package street
 
-import sdk "github.com/smartystreets/smartystreets-go-sdk"
+import sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 
 type (
 	// Candidate contains all output fields defined here:
@@ -60,7 +60,7 @@ type (
 		ELOTSort                 string                `json:"elot_sort,omitempty"`
 		Latitude                 float64               `json:"latitude,omitzero"`
 		Longitude                float64               `json:"longitude,omitzero"`
-		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitempty"`
+		CoordinateLicense        sdk.CoordinateLicense `json:"coordinate_license,omitzero"`
 		Precision                string                `json:"precision,omitempty"`
 		TimeZone                 string                `json:"time_zone,omitempty"`
 		UTCOffset                float32               `json:"utc_offset,omitzero"`

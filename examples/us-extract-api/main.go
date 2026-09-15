@@ -1,16 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
-	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-extract-api"
+	street "github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -46,15 +46,9 @@ func main() {
 }
 
 func DumpJSON(v any) string {
-	b, err := json.Marshal(v)
+	b, err := json.Marshal(v, jsontext.WithIndent("  "))
 	if err != nil {
 		return err.Error()
 	}
-
-	var indent bytes.Buffer
-	err = json.Indent(&indent, b, "", "  ")
-	if err != nil {
-		return err.Error()
-	}
-	return indent.String()
+	return string(b)
 }

@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	street "github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -51,7 +52,7 @@ func main() {
 
 			componentAnalysis := &candidate.Analysis.Components // Component Analysis results are found in the Analysis
 			// object.
-			jsonData, err := json.MarshalIndent(componentAnalysis, "\t", "\t")
+			jsonData, err := json.Marshal(componentAnalysis, jsontext.WithIndentPrefix("\t"), jsontext.WithIndent("\t"))
 			if err != nil {
 				log.Fatal("Error marshaling candidate:", err)
 			}

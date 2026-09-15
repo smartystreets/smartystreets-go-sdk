@@ -1,4 +1,4 @@
-module github.com/smartystreets/smartystreets-go-sdk
+module github.com/smartystreets/smartystreets-go-sdk/v2
 
 go 1.27
 

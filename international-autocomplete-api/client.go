@@ -2,10 +2,10 @@ package international_autocomplete_api
 
 import (
 	"context"
+	"encoding/json/v2"
 	"net/http"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type Client struct {

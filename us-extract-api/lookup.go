@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
 )
 
 // Lookup represents all input fields documented here:

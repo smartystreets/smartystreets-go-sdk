@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {

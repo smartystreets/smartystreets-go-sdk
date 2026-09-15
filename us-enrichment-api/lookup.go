@@ -2,10 +2,9 @@ package us_enrichment
 
 import (
 	bytesPackage "bytes"
+	"encoding/json/v2"
 	"net/http"
 	"net/url"
-
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
 )
 
 type Lookup struct {

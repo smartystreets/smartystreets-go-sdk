@@ -2,11 +2,11 @@ package us_reverse_geo
 
 import (
 	"context"
+	"encoding/json/v2"
 	"net/http"
 	"strconv"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type Client struct {

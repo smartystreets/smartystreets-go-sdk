@@ -2,10 +2,10 @@ package autocomplete_pro
 
 import (
 	"context"
+	"encoding/json/v2"
 	"net/http"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending of lookups to the us-autocomplete-pro-api.

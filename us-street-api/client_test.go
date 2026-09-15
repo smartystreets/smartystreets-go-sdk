@@ -11,7 +11,7 @@ import (
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type testContextKey string

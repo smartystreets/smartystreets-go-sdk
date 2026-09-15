@@ -6,11 +6,11 @@
 
 The official client libraries for accessing SmartyStreets APIs from Go.
 
-[![GoDoc](https://godoc.org/github.com/smartystreets/smartystreets-go-sdk?status.png)](http://godoc.org/github.com/smartystreets/smartystreets-go-sdk)
+[![GoDoc](https://pkg.go.dev/github.com/smartystreets/smartystreets-go-sdk/v2?status.png)](http://pkg.go.dev/github.com/smartystreets/smartystreets-go-sdk/v2)
 
 Compatible with Go 1.27 and later.
 
-You may have noticed this page is curiously sparse. Don't panic, there are [examples](/examples) and [documentation](https://godoc.org/github.com/smartystreets/smartystreets-go-sdk).
+You may have noticed this page is curiously sparse. Don't panic, there are [examples](/examples) and [documentation](https://pkg.go.dev/github.com/smartystreets/smartystreets-go-sdk/v2).
 
 ---
 

@@ -4,16 +4,16 @@ import (
 	"net/http"
 	"time"
 
-	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/international-autocomplete-api"
-	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/international-postal-code-api"
-	international_street "github.com/smartystreets/smartystreets-go-sdk/international-street-api"
-	autocomplete "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-api"
-	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/us-autocomplete-pro-api"
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
-	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/us-reverse-geo-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
+	international_autocomplete "github.com/smartystreets/smartystreets-go-sdk/v2/international-autocomplete-api"
+	international_postal_code "github.com/smartystreets/smartystreets-go-sdk/v2/international-postal-code-api"
+	international_street "github.com/smartystreets/smartystreets-go-sdk/v2/international-street-api"
+	autocomplete "github.com/smartystreets/smartystreets-go-sdk/v2/us-autocomplete-api"
+	autocomplete_pro "github.com/smartystreets/smartystreets-go-sdk/v2/us-autocomplete-pro-api"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-extract-api"
+	us_reverse_geo "github.com/smartystreets/smartystreets-go-sdk/v2/us-reverse-geo-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-zipcode-api"
 )
 
 // BuildUSStreetAPIClient builds a client for the US Street API using the provided options.

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type Client struct {

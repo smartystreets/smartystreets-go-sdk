@@ -49,9 +49,9 @@ custom_query_client → license_client → keep_alive_close_client → base_url_
 
 Each middleware client implements the internal `HTTPClient` interface (`Do(*http.Request)`) and wraps another one, adding specific functionality (authentication, retries, base URL injection, custom headers, etc.). The outermost client is wrapped by `HTTPSender`, which implements the root-level `sdk.RequestSender` interface that the API packages consume.
 
-### JSON Encoding (internal/json/)
+### JSON Encoding
 
-All library code marshals and unmarshals through `internal/json`, a thin wrapper over `encoding/json/v2` that pins the SDK's option set: case-insensitive field matching, tolerance of invalid UTF-8 and duplicate object names, and deterministic output. Do not import `encoding/json` directly in library packages. Example programs are consumer code and may use either package.
+Library code marshals and unmarshals with `encoding/json/v2` directly, using its default options. Do not import `encoding/json` (v1) in library packages. Example programs are consumer code and may use either package.
 
 ### Builder Pattern (wireup/)
 

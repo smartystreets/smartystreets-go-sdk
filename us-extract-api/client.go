@@ -2,10 +2,10 @@ package extract
 
 import (
 	"context"
+	"encoding/json/v2"
 	"net/http"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
-	"github.com/smartystreets/smartystreets-go-sdk/internal/json"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending requests to the us-extract-api.

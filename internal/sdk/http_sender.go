@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // HTTPClient matches http.Client and allows us to define custom clients that wrap over http.Client.

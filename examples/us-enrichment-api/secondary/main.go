@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	usenrich "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	usenrich "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "secondary")
 	for i, response := range results {
-		prettyPrinted, err := json.MarshalIndent(response, "", "    ")
+		prettyPrinted, err := json.Marshal(response, jsontext.WithIndent("    "))
 		if err != nil {
 			panic(err)
 		}
