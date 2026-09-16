@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -31,7 +32,7 @@ func main() {
 		Features:  "financial",
 	}
 
-	err, results := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendPropertyPrincipal(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
@@ -44,7 +45,7 @@ func main() {
 
 	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
 	for s, response := range results {
-		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
+		jsonResponse, _ := json.Marshal(response, jsontext.WithIndent("     "))
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
 

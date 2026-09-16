@@ -2,9 +2,9 @@ package street
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending batches of addresses to the us-street-api.
@@ -33,8 +33,10 @@ func (c *Client) SendBatchWithContextAndAuth(ctx context.Context, batch *Batch, 
 	if batch == nil || batch.Length() == 0 {
 		return nil
 	}
-	request := batch.buildRequest()
-	request = request.WithContext(ctx)
+	request, err := batch.buildRequest(ctx)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err

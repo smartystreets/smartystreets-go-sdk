@@ -22,7 +22,6 @@ func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
 
 type FakeMultiHTTPClient struct {
 	requests      []*http.Request
-	headers       []*http.Header
 	bodies        []string
 	responses     []*http.Response
 	errors        []error

@@ -2,7 +2,7 @@ package us_enrichment
 
 import (
 	bytesPackage "bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 	"net/url"
 )
@@ -108,9 +108,11 @@ func (f *principalLookup) getResponse() any {
 }
 
 func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	if err := json.Unmarshal(bytes, &p.Response); err != nil {
+	var response []*PrincipalResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	p.Response = response
 
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found {
@@ -176,9 +178,11 @@ func (g *geoReferenceLookup) getResponse() any {
 }
 
 func (g *geoReferenceLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	if err := json.Unmarshal(bytes, &g.Response); err != nil {
+	var response []*GeoReferenceResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	g.Response = response
 
 	if headers != nil {
 		if etag, found := headers[lookupETagHeader]; found {
@@ -219,9 +223,11 @@ func (s *secondaryLookup) getResponse() any {
 }
 
 func (s *secondaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+	var response []*SecondaryResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	s.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -274,9 +280,11 @@ func (s *secondaryCountLookup) getResponse() any {
 }
 
 func (s *secondaryCountLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &s.Response); err != nil {
+	var response []*SecondaryCountResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	s.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -333,9 +341,11 @@ func (b *businessSummaryLookup) getResponse() any {
 }
 
 func (b *businessSummaryLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+	var response []*BusinessSummaryResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	b.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {
@@ -392,9 +402,11 @@ func (b *businessDetailLookup) getResponse() any {
 }
 
 func (b *businessDetailLookup) unmarshalResponse(bytes []byte, header http.Header) error {
-	if err := json.Unmarshal(bytes, &b.Response); err != nil {
+	var response []*BusinessDetailResponse
+	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
+	b.Response = response
 
 	if header != nil {
 		if etag, found := header[lookupETagHeader]; found {

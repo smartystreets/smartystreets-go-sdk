@@ -2,10 +2,10 @@ package extract
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
-	"github.com/smartystreets/smartystreets-go-sdk"
+	"github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 // Client is responsible for sending requests to the us-extract-api.
@@ -35,8 +35,10 @@ func (c *Client) SendLookupWithContextAndAuth(ctx context.Context, lookup *Looku
 		return nil
 	}
 
-	request := buildRequest(lookup)
-	request = request.WithContext(ctx)
+	request, err := buildRequest(ctx, lookup)
+	if err != nil {
+		return err
+	}
 	if credential != nil {
 		if err := credential.Sign(request); err != nil {
 			return err
@@ -59,10 +61,13 @@ func deserializeResponse(response []byte, lookup *Lookup) error {
 	return nil
 }
 
-func buildRequest(lookup *Lookup) *http.Request {
-	request, _ := http.NewRequest("POST", extractURL, nil) // We control the method and the URL. This is safe.
+func buildRequest(ctx context.Context, lookup *Lookup) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, "POST", extractURL, nil)
+	if err != nil {
+		return nil, err
+	}
 	lookup.populate(request)
-	return request
+	return request, nil
 }
 
 const extractURL = "/" // Remaining parts will be completed later by the sdk.BaseURLClient.

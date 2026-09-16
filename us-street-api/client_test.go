@@ -11,7 +11,7 @@ import (
 	"github.com/smarty/assertions/should"
 	"github.com/smarty/gunit"
 
-	sdk "github.com/smartystreets/smartystreets-go-sdk"
+	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
 )
 
 type testContextKey string
@@ -39,7 +39,7 @@ func (f *ClientFixture) TestSingleAddressBatchWithContext_SentInQueryStringAsGET
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
 
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.SendBatchWithContext(ctx, f.batch)
 
 	f.So(err, should.BeNil)
@@ -79,6 +79,18 @@ func (f *ClientFixture) TestAddressBatchSerializedAndSent__ResponseCandidatesInc
 	f.So(input0.Results, should.Resemble, []*Candidate{{InputID: "42"}})
 	f.So(input1.Results, should.BeEmpty)
 	f.So(input2.Results, should.Resemble, []*Candidate{{InputID: "44", InputIndex: 2}, {InputID: "44", InputIndex: 2, CandidateIndex: 1}})
+}
+
+func (f *ClientFixture) TestNilContextReturnsErrorWithoutSending() {
+	input := &Lookup{InputID: "42"}
+	f.batch.Append(input)
+
+	var ctx context.Context
+	err := f.client.SendBatchWithContext(ctx, f.batch)
+
+	f.So(err, should.NotBeNil)
+	f.So(f.sender.callCount, should.Equal, 0)
+	f.So(f.sender.request, should.BeNil)
 }
 
 func (f *ClientFixture) TestNilBatchNOP() {
@@ -378,7 +390,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_CredentialSignsRequest()
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
-	ctx := context.WithValue(context.Background(), testContextKey("key"), "value")
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 
 	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, sdk.NewSecretKeyCredential("myAuthID", "myAuthToken"))
 
@@ -394,7 +406,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_SignErrorPropagated() {
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
 
-	err := f.client.SendBatchWithContextAndAuth(context.Background(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
+	err := f.client.SendBatchWithContextAndAuth(f.T().Context(), f.batch, &sdk.FakeCredential{Err: errors.New("sign failed")})
 
 	f.So(err, should.NotBeNil)
 	f.So(err.Error(), should.Equal, "sign failed")
@@ -405,7 +417,7 @@ func (f *ClientFixture) TestSendBatchWithContextAndAuth_NilCredentialDoesNotSign
 	f.sender.response = `[{"input_index": 0, "input_id": "42"}]`
 	input := &Lookup{InputID: "42"}
 	f.batch.Append(input)
-	ctx := context.Background()
+	ctx := f.T().Context()
 
 	err := f.client.SendBatchWithContextAndAuth(ctx, f.batch, nil)
 

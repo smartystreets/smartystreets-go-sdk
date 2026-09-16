@@ -86,8 +86,8 @@ type (
 	// Metadata contains all output fields defined here:
 	// https://smartystreets.com/docs/international-street-api#metadata
 	Metadata struct {
-		Latitude              float64 `json:"latitude,omitempty"`
-		Longitude             float64 `json:"longitude,omitempty"`
+		Latitude              float64 `json:"latitude,omitzero"`
+		Longitude             float64 `json:"longitude,omitzero"`
 		GeocodePrecision      string  `json:"geocode_precision,omitempty"`
 		GeocodeClassification string  `json:"geocode_classification,omitempty"`
 		MaxGeocodePrecision   string  `json:"max_geocode_precision,omitempty"`

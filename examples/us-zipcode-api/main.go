@@ -6,15 +6,16 @@ import (
 	"log"
 	"os"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-zipcode-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-zipcode-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildUSZIPCodeAPIClient(
-		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		// Batch requests are sent via HTTP POST. Embedded keys are restricted to GET, so
+		// batches require secret keys: https://www.smarty.com/docs/cloud/authentication
 		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)

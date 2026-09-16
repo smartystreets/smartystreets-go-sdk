@@ -138,7 +138,7 @@ func (f *FakeMultiSender) Send(request *http.Request) ([]byte, error) {
 	if f.errOnCall == f.callCount {
 		err = f.err
 	}
-	return []byte(fmt.Sprintf(multiSenderResponseFormat, f.callCount)), err
+	return fmt.Appendf(nil, multiSenderResponseFormat, f.callCount), err
 }
 
 const multiSenderResponseFormat = `[{"input_index": %d}]`

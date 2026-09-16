@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 		City:         "atlanta",
 	}
 
-	err, summaryResults := client.SendBusinessSummary(&summaryLookup)
+	summaryResults, err := client.SendBusinessSummary(&summaryLookup)
 	if err != nil {
 		log.Fatal("Error sending summary lookup:", err)
 	}
@@ -51,7 +52,7 @@ func main() {
 		ETag:       "", // optional: check if the record has been updated
 	}
 
-	err, detailResults := client.SendBusinessDetail(&detailLookup)
+	detailResults, err := client.SendBusinessDetail(&detailLookup)
 	if err != nil {
 		log.Fatal("Error sending detail lookup:", err)
 	}
@@ -63,7 +64,7 @@ func main() {
 
 	fmt.Println("\nDetail results:")
 	for s, response := range detailResults {
-		jsonResponse, _ := json.MarshalIndent(response, "", "     ")
+		jsonResponse, _ := json.Marshal(response, jsontext.WithIndent("     "))
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
 	}
 

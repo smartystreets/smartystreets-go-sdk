@@ -1,23 +1,24 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/smartystreets/smartystreets-go-sdk/us-extract-api"
-	street "github.com/smartystreets/smartystreets-go-sdk/us-street-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/us-extract-api"
+	street "github.com/smartystreets/smartystreets-go-sdk/v2/us-street-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
 	log.SetFlags(log.Ltime | log.Llongfile)
 
 	client := wireup.BuildUSExtractAPIClient(
-		//wireup.WebsiteKeyCredential(os.Getenv("SMARTY_AUTH_WEB"), os.Getenv("SMARTY_AUTH_REFERER")),
+		// The US Extract API is POST-only and embedded keys are restricted to GET, so this
+		// API requires secret keys: https://www.smarty.com/docs/cloud/authentication
 		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 		// wireup.DebugHTTPOutput(), // uncomment this line to see detailed HTTP request/response information.
 	)
@@ -45,15 +46,9 @@ func main() {
 }
 
 func DumpJSON(v any) string {
-	b, err := json.Marshal(v)
+	b, err := json.Marshal(v, jsontext.WithIndent("  "))
 	if err != nil {
 		return err.Error()
 	}
-
-	var indent bytes.Buffer
-	err = json.Indent(&indent, b, "", "  ")
-	if err != nil {
-		return err.Error()
-	}
-	return indent.String()
+	return string(b)
 }

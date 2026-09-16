@@ -2,7 +2,8 @@ package street
 
 import (
 	"bytes"
-	"encoding/json"
+	"context"
+	"encoding/json/v2"
 	"io"
 	"net/http"
 )
@@ -61,14 +62,17 @@ func (b *Batch) Clear() {
 	b.lookups = nil
 }
 
-func (b *Batch) buildRequest() *http.Request {
-	request, _ := http.NewRequest(http.MethodGet, verifyURL, nil) // We control the method and the URL. This is safe.
+func (b *Batch) buildRequest(ctx context.Context) (*http.Request, error) {
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, verifyURL, nil)
+	if err != nil {
+		return nil, err
+	}
 	if b.Length() == 1 {
 		b.serializeGET(request)
 	} else {
 		b.serializePOST(request)
 	}
-	return request
+	return request, nil
 }
 func (b *Batch) serializeGET(request *http.Request) {
 	request.Method = http.MethodGet

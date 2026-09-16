@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// supported census versions are: 2010, 2020, or leave empty for the latest census data available
-	err, results := client.SendGeoReferenceWithVersion(&lookup, "")
+	results, err := client.SendGeoReferenceWithVersion(&lookup, "")
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)

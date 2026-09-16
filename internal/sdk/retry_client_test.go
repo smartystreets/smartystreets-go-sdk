@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"math/rand/v2"
 	"net/http"
 	"slices"
 	"strings"
@@ -26,7 +25,6 @@ type RetryClientFixture struct {
 	inner    *FakeMultiHTTPClient
 	response *http.Response
 	err      error
-	header   http.Header
 
 	naps []time.Duration
 }
@@ -37,7 +35,7 @@ func (f *RetryClientFixture) TestRequestBodyCannotBeBuffered_ErrorReturnedImmedi
 }
 func (f *RetryClientFixture) sendErrorProneRequest() (*http.Response, error) {
 	f.inner = &FakeMultiHTTPClient{}
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", &ErrorProneReadCloser{readError: errors.New("GOPHERS!")})
 	return client.Do(request)
 }
@@ -83,6 +81,7 @@ func (f *RetryClientFixture) assertBackOffStrategyWasObserved() {
 	f.So(len(f.naps), should.Equal, 4) // 4 backoff sleeps for 5 attempts (first attempt has no backoff)
 	for i, nap := range f.naps {
 		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
+		f.So(nap, should.BeGreaterThanOrEqualTo, time.Duration(0))
 		f.So(nap, should.BeLessThanOrEqualTo, cap)
 	}
 }
@@ -141,7 +140,7 @@ func (f *RetryClientFixture) assertInternalServerError() {
 
 func (f *RetryClientFixture) TestNoRetryRequestedReturnsInnerClientInstead() {
 	inner := &FakeHTTPClient{}
-	client := NewRetryClient(inner, 0, rand.New(rand.NewPCG(0, 0)), f.sleep)
+	client := NewRetryClient(inner, 0, f.sleep)
 	f.So(client, should.Equal, inner)
 }
 
@@ -155,8 +154,11 @@ func (f *RetryClientFixture) TestBackOffNeverToExceedHardCodedMaximum() {
 
 	f.So(f.err, should.BeNil)
 	f.So(f.inner.call, should.Equal, retries)
+	// The maximum must actually be reachable, not just an exclusive upper bound.
+	f.So(slices.Contains(f.naps, maxBackOffDuration*time.Second), should.BeTrue)
 	for i, nap := range f.naps {
 		cap := time.Second * time.Duration(min(i+1, maxBackOffDuration))
+		f.So(nap, should.BeGreaterThanOrEqualTo, time.Duration(0))
 		f.So(nap, should.BeLessThanOrEqualTo, cap)
 	}
 }
@@ -258,7 +260,7 @@ func (f *RetryClientFixture) sendGetWithRetry(retries int) (*http.Response, erro
 		f.T().Fatalf("The number of retries is greater than or equal to the number of status codes provided. Please ensure that the number of retries is less than the number of status codes provided.")
 	}
 
-	client := NewRetryClient(f.inner, retries, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("GET", "/?body=request", nil)
 	return client.Do(request)
 }
@@ -267,7 +269,7 @@ func (f *RetryClientFixture) sendPostWithRetry(retries int) (*http.Response, err
 		f.T().Fatalf("The number of retries is greater than or equal to the number of status codes provided. Please ensure that the number of retries is less than the number of status codes provided.")
 	}
 
-	client := NewRetryClient(f.inner, retries, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(f.inner, retries, f.sleep).(*RetryClient)
 	request, _ := http.NewRequest("POST", "/", strings.NewReader("request"))
 	return client.Do(request)
 }
@@ -279,7 +281,7 @@ func (f *RetryClientFixture) TestContextAlreadyCancelledReturnsImmediately() {
 	ctx, cancel := context.WithCancel(f.T().Context())
 	cancel() // Cancel immediately
 
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, f.sleep).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
 	response, err := client.Do(request)
 
@@ -293,7 +295,7 @@ func (f *RetryClientFixture) TestContextAlreadyCancelledReturnsImmediatelyForPos
 	ctx, cancel := context.WithCancel(f.T().Context())
 	cancel() // Cancel immediately
 
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, f.sleep).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
 	response, err := client.Do(request)
 
@@ -314,7 +316,7 @@ func (f *RetryClientFixture) TestContextCancelledDuringBackoffStopsRetryingGet()
 		}
 	}
 
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), cancellingSleeper).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, cancellingSleeper).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
 	response, err := client.Do(request)
 
@@ -335,7 +337,7 @@ func (f *RetryClientFixture) TestContextCancelledDuringBackoffStopsRetryingPost(
 		}
 	}
 
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), cancellingSleeper).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, cancellingSleeper).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
 	response, err := client.Do(request)
 
@@ -353,7 +355,7 @@ func (f *RetryClientFixture) TestContextCancelledDuringRequestStopsRetryingGet()
 		inner:        NewFailingHTTPClient(500, 500, 500, 500, 500),
 	}
 
-	client := NewRetryClient(cancellingClient, 10, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(cancellingClient, 10, f.sleep).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
 	response, err := client.Do(request)
 
@@ -371,7 +373,7 @@ func (f *RetryClientFixture) TestContextCancelledDuringRequestStopsRetryingPost(
 		inner:        NewFailingHTTPClient(500, 500, 500, 500, 500),
 	}
 
-	client := NewRetryClient(cancellingClient, 10, rand.New(rand.NewPCG(0, 0)), f.sleep).(*RetryClient)
+	client := NewRetryClient(cancellingClient, 10, f.sleep).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "POST", "/", strings.NewReader("body"))
 	response, err := client.Do(request)
 
@@ -393,13 +395,39 @@ func (f *RetryClientFixture) TestContextCancelledDuringRateLimitBackoffStopsRetr
 	}
 
 	// 429 handling: request made, then single sleep in backOff (count=1, cancels), then ctx.Err() exits.
-	client := NewRetryClient(f.inner, 10, rand.New(rand.NewPCG(0, 0)), cancellingSleeper).(*RetryClient)
+	client := NewRetryClient(f.inner, 10, cancellingSleeper).(*RetryClient)
 	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
 	response, err := client.Do(request)
 
 	f.So(response, should.BeNil)
 	f.So(err, should.Equal, context.Canceled)
 	f.So(f.inner.call, should.Equal, 1)
+}
+
+func (f *RetryClientFixture) TestRequestContextIsPassedToSleeper() {
+	type contextKey string
+	ctx := context.WithValue(f.T().Context(), contextKey("key"), "value")
+	f.inner = NewFailingHTTPClient(500, 429, http.StatusOK)
+	f.inner.responses[2].Body = io.NopCloser(strings.NewReader("Success"))
+
+	var sleeperContexts []context.Context
+	recordingSleeper := func(ctx context.Context, _ time.Duration) {
+		sleeperContexts = append(sleeperContexts, ctx)
+	}
+
+	client := NewRetryClient(f.inner, 10, recordingSleeper).(*RetryClient)
+	request, _ := http.NewRequestWithContext(ctx, "GET", "/", nil)
+	_, err := client.Do(request)
+
+	f.So(err, should.BeNil)
+	f.So(f.inner.call, should.Equal, 3)
+	// Both the randomized and the rate-limited backoff paths must hand the
+	// request's own context to the sleeper so cancellation can cut a sleep short.
+	if f.So(len(sleeperContexts), should.Equal, 2) {
+		for _, sleeperContext := range sleeperContexts {
+			f.So(sleeperContext.Value(contextKey("key")), should.Equal, "value")
+		}
+	}
 }
 
 /**************************************************************************/

@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/us-enrichment-api"
-	"github.com/smartystreets/smartystreets-go-sdk/wireup"
+	us_enrichment "github.com/smartystreets/smartystreets-go-sdk/v2/us-enrichment-api"
+	"github.com/smartystreets/smartystreets-go-sdk/v2/wireup"
 )
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	// Universal lookup works with all datasets and optional subsets.
 	// Returns JSON bytes
 	// Note: The DataSubset field can be an empty string for datasets that have no subsets.
-	err, results := client.SendUniversalLookup(&lookup, "property", "principal")
+	results, err := client.SendUniversalLookup(&lookup, "property", "principal")
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
