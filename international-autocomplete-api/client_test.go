@@ -154,6 +154,84 @@ func (f *ClientFixture) TestAddressIDAppendsToURL() {
 	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+"/thisisid?country=FRA&max_group_results=100&max_results=5")
 }
 
+func (f *ClientFixture) TestMixedCaseLanguage() {
+	f.sender.response = `{"candidates":[{"street":"200 Rua Cascata"}]}`
+	f.input.Country = "BRA"
+	f.input.Search = "200 Rua Cascata"
+	f.input.Language = Language("Latin")
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.String(), should.Equal, suggestURL+
+		"?country=BRA"+
+		"&language=latin"+
+		"&max_group_results=100"+
+		"&max_results=5"+
+		"&search=200+Rua+Cascata")
+	f.So(f.input.Result, should.Resemble, &Result{Candidates: []*Candidate{
+		{Street: "200 Rua Cascata"},
+	}})
+}
+
+func (f *ClientFixture) TestMixedCaseLanguageNotMutated() {
+	f.sender.response = `{"candidates":[{"street":"1"}]}`
+	f.input.Country = "BRA"
+	f.input.Search = "200 Rua Cascata"
+	f.input.Language = Language("Latin")
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.input.Language, should.Equal, Language("Latin"))
+}
+
+func (f *ClientFixture) TestInvalidLookup_InvalidLanguageValue() {
+	f.input.Country = "FRA"
+	f.input.Search = "42"
+	f.input.Language = "not-a-language"
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.Equal, errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)"))
+	f.So(f.sender.request, should.BeNil)
+}
+
+func (f *ClientFixture) TestInvalidLookup_InvalidMixedCaseLanguageValue() {
+	f.input.Country = "FRA"
+	f.input.Search = "42"
+	f.input.Language = Language("Klingon")
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.Equal, errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)"))
+	f.So(f.sender.request, should.BeNil)
+}
+
+func (f *ClientFixture) TestValidLookup_ValidLanguageValues() {
+	f.sender.response = `{"candidates":[{"street":"1"}]}`
+
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42", Language: Native}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42", Language: Latin}), should.BeNil)
+	// empty Language is fine
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42"}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42", Language: ""}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42", Language: Language("Latin")}), should.BeNil)
+	f.So(f.client.SendLookup(&Lookup{Country: "FRA", Search: "42", Language: Language("NATIVE")}), should.BeNil)
+}
+
+// The insufficient-input guard runs before language validation, so a lookup that
+// would not be sent anyway stays a NOP even when Language is invalid.
+func (f *ClientFixture) TestInvalidLanguageWithInsufficientInput_NOP() {
+	f.input.Language = Language("Klingon")
+
+	err := f.client.SendLookup(f.input)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.BeNil)
+}
+
 //////////////////////////////////////////////////////////////////
 
 type FakeSender struct {
