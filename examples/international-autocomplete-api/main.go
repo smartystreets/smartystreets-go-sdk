@@ -25,6 +25,7 @@ func main() {
 		Country:  "FRA",
 		Search:   "Louis",
 		Locality: "Paris",
+		Language: international_autocomplete.Native,
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
