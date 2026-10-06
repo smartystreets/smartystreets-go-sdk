@@ -66,12 +66,12 @@ func (f *LookupSerializationFixture) TestGeocodeTrue() {
 }
 
 func (f *LookupSerializationFixture) TestFeatures() {
-	f.lookup.Features = "f1,f2,f3"
+	f.lookup.Features = []Feature{FeatureOccupantUse, FeatureGeocodeClassification, FeatureGeocodePrecisionEnhanced, FeatureSmartyKey}
 
 	f.populate()
 
 	f.So(f.query, should.HaveLength, 1)
-	f.So(f.query.Get("features"), should.Equal, "f1,f2,f3")
+	f.So(f.query.Get("features"), should.Equal, "occupant-use,geocode-classification,geocode-precision-enhanced,smartykey")
 }
 
 func (f *LookupSerializationFixture) TestLanguageBlank() {

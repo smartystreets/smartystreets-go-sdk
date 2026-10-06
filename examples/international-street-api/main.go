@@ -32,6 +32,7 @@ func main() {
 		AdministrativeArea: "SP",
 		Country:            "Brazil",
 		PostalCode:         "02516-050",
+		Features:           []street.Feature{street.FeatureSmartyKey}, // Optional; may require a special plan
 	}
 
 	if err := client.SendLookupWithContext(context.Background(), lookup); err != nil {
@@ -52,6 +53,9 @@ func main() {
 		display(candidate.Address6)
 		display(candidate.Address7)
 		display(candidate.Address8)
+		if candidate.Metadata.SmartyKey != 0 {
+			fmt.Printf("  SmartyKey: %d\n", candidate.Metadata.SmartyKey)
+		}
 		fmt.Println()
 	}
 

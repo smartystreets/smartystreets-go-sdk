@@ -12,7 +12,7 @@ type Lookup struct {
 	Country            string
 	Geocode            bool
 	Language           Language
-	Features           string
+	Features           []Feature
 	Freeform           string
 	Address1           string
 	Address2           string
@@ -41,6 +41,25 @@ func (l Language) normalized() Language {
 	return Language(strings.ToLower(string(l)))
 }
 
+type Feature string
+
+const (
+	FeatureOccupantUse              = Feature("occupant-use")
+	FeatureGeocodeClassification    = Feature("geocode-classification")
+	FeatureGeocodePrecisionEnhanced = Feature("geocode-precision-enhanced")
+	FeatureSmartyKey                = Feature("smartykey")
+)
+
+// featuresValue renders the requested features as the comma-separated list
+// the API expects; an empty slice yields "" so populate omits the parameter.
+func (l *Lookup) featuresValue() string {
+	s := make([]string, len(l.Features))
+	for i, f := range l.Features {
+		s[i] = string(f)
+	}
+	return strings.Join(s, ",")
+}
+
 /**************************************************************************/
 
 func (l *Lookup) populate(query url.Values) {
@@ -48,7 +67,7 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "country", l.Country)
 	populate(query, "geocode", boolString(l.Geocode))
 	populate(query, "language", string(l.Language.normalized()))
-	populate(query, "features", l.Features)
+	populate(query, "features", l.featuresValue())
 	populate(query, "freeform", l.Freeform)
 	populate(query, "address1", l.Address1)
 	populate(query, "address2", l.Address2)
