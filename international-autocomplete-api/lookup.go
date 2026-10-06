@@ -3,6 +3,7 @@ package international_autocomplete_api
 import (
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -20,7 +21,21 @@ type Lookup struct {
 	Geolocation     bool
 	Locality        string
 	PostalCode      string
+	Language        Language
 	Result          *Result
+}
+
+type Language string
+
+const (
+	Native = Language("native")
+	Latin  = Language("latin")
+)
+
+// normalized lets callers supply any letter case (eg. "Latin"); the API accepts
+// either, so this is about sending one canonical form.
+func (l Language) normalized() Language {
+	return Language(strings.ToLower(string(l)))
 }
 
 func (l Lookup) populate(query url.Values) {
@@ -31,6 +46,7 @@ func (l Lookup) populate(query url.Values) {
 	l.populateGeolocation(query)
 	l.populateLocality(query)
 	l.populatePostalCode(query)
+	l.populateLanguage(query)
 }
 func (l Lookup) populateCountry(query url.Values) {
 	if len(l.Country) > 0 {
@@ -69,5 +85,10 @@ func (l Lookup) populateLocality(query url.Values) {
 func (l Lookup) populatePostalCode(query url.Values) {
 	if len(l.PostalCode) > 0 {
 		query.Set("include_only_postal_code", l.PostalCode)
+	}
+}
+func (l Lookup) populateLanguage(query url.Values) {
+	if language := l.Language.normalized(); len(language) > 0 {
+		query.Set("language", string(language))
 	}
 }

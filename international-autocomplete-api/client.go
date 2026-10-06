@@ -3,6 +3,7 @@ package international_autocomplete_api
 import (
 	"context"
 	"encoding/json/v2"
+	"errors"
 	"net/http"
 
 	sdk "github.com/smartystreets/smartystreets-go-sdk/v2"
@@ -26,6 +27,10 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 		return nil
 	}
 
+	if err := ensureValidLanguage(lookup); err != nil {
+		return err
+	}
+
 	request, err := buildRequest(ctx, lookup)
 	if err != nil {
 		return err
@@ -36,6 +41,14 @@ func (c *Client) SendLookupWithContext(ctx context.Context, lookup *Lookup) erro
 	} else {
 		return deserializeResponse(response, lookup)
 	}
+}
+
+func ensureValidLanguage(lookup *Lookup) error {
+	language := lookup.Language.normalized()
+	if language != "" && language != Native && language != Latin {
+		return errors.New("invalid Language value; must be unset, 'native', or 'latin' (case-insensitive)")
+	}
+	return nil
 }
 
 func deserializeResponse(response []byte, lookup *Lookup) error {

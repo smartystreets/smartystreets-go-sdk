@@ -85,3 +85,35 @@ func (f *LookupFixture) TestPostalCode() {
 	f.So(f.query, should.HaveLength, 3)
 	f.So(f.query.Get("include_only_postal_code"), should.Equal, "Hello, World!")
 }
+func (f *LookupFixture) TestLanguageBlank() {
+	f.lookup.Language = Language("")
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 2)
+	f.So(f.query.Get("language"), should.BeBlank)
+}
+func (f *LookupFixture) TestLanguageLatin() {
+	f.lookup.Language = Latin
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 3)
+	f.So(f.query.Get("language"), should.Equal, "latin")
+}
+func (f *LookupFixture) TestLanguageNative() {
+	f.lookup.Language = Native
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 3)
+	f.So(f.query.Get("language"), should.Equal, "native")
+}
+func (f *LookupFixture) TestLanguageMixedCase() {
+	f.lookup.Language = Language("Latin")
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 3)
+	f.So(f.query.Get("language"), should.Equal, "latin")
+}
