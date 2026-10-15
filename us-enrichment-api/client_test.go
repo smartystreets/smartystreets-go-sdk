@@ -196,8 +196,20 @@ func (f *ClientFixture) TestSecondaryCount() {
 	secondaryCountResponse := []*SecondaryCountResponse{
 		{
 			SmartyKey: smartyKey,
-			Count:     3,
-			Etag:      "ABCDEFG",
+			MatchedAddress: MatchedAddress{
+				Street:  "355 E 100 N",
+				City:    "Provo",
+				State:   "UT",
+				ZIPCode: "84606-3268",
+			},
+			Count: 3,
+			RootAddress: RootAddress{
+				SecondaryCount: 3,
+				SmartyKey:      smartyKey,
+				PrimaryNumber:  "355",
+				CityName:       "Provo",
+			},
+			Etag: "ABCDEFG",
 		},
 	}
 	f.So(response, should.Resemble, secondaryCountResponse)
@@ -772,7 +784,7 @@ func (f *ClientFixture) TestBusinessDetailWithIncludeExclude() {
 var validPrincipalResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft","lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-reference","data_set_version":"census-2020","attributes":{"census_block":{"accuracy":"block","geoid":"180759630002012"},"census_county_division":{"accuracy":"exact","code":"1807581764","name":"Wayne"},"census_tract":{"code":"9630.00"},"place":{"accuracy":"exact","code":"1861236","name":"Portland","type":"incorporated"}}}]`
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`
-var validSecondaryCountResponse = `[{"smarty_key":"123","count":3}]`
+var validSecondaryCountResponse = `[{"smarty_key":"123","matched_address":{"street":"355 E 100 N","city":"Provo","state":"UT","zipcode":"84606-3268"},"count":3,"root_address":{"secondary_count":3,"smarty_key":"123","primary_number":"355","city_name":"Provo"}}]`
 var validBusinessSummaryResponse = `[{"smarty_key":"1962995076","data_set_name":"business","businesses":[{"company_name":"Style Studio","business_id":"GEYTCMZSGU2TCMBZHE3DIOI"},{"company_name":"EstheticallyBree","business_id":"GEYTCNBQGAZTQMRYGMYDMMQ"},{"company_name":"Kat Slack Beauty Llc","business_id":"GEYTCNBQGA2DKMJVG43DOOA"}]}]`
 var validBusinessDetailResponse = `[{"smarty_key":"7","data_set_name":"business","business_id":"7","attributes":{"company_name":"data","business_status":"data","year_established":"data"}}]`
 
@@ -853,4 +865,22 @@ func (f *FakeSender) Reset() {
 	f.capturedAuthID = ""
 	f.capturedAuthToken = ""
 	f.hasBasicAuth = false
+}
+
+func (f *ClientFixture) TestResponseFieldsMapToAPINames() {
+	matched := `"matched_address":{"street":"171 W University Pkwy","city":"Orem","state":"UT","zipcode":"84058-7316"}`
+	expectedMatched := MatchedAddress{Street: "171 W University Pkwy", City: "Orem", State: "UT", ZIPCode: "84058-7316"}
+
+	var summary []BusinessSummaryResponse
+	f.So(json.Unmarshal([]byte(`[{`+matched+`}]`), &summary), should.BeNil)
+	f.So(summary[0].MatchedAddress, should.Equal, expectedMatched)
+
+	var secondary []SecondaryResponse
+	f.So(json.Unmarshal([]byte(`[{`+matched+`}]`), &secondary), should.BeNil)
+	f.So(secondary[0].MatchedAddress, should.Equal, expectedMatched)
+
+	var detail []BusinessDetailResponse
+	f.So(json.Unmarshal([]byte(`[{"attributes":{"number_of_pcs_range":"10 to 24","number_of_pcs_total":"11"}}]`), &detail), should.BeNil)
+	f.So(detail[0].Attributes.NumOfPcsRange, should.Equal, "10 to 24")
+	f.So(detail[0].Attributes.NumOfPcsTotal, should.Equal, "11")
 }

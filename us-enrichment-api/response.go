@@ -491,32 +491,35 @@ type Alias struct {
 }
 
 type Secondary struct {
-	SmartyKey           string         `json:"smarty_key"`
-	MatchedAddress      MatchedAddress `json:"matched_address"`
-	SecondaryDesignator string         `json:"secondary_designator"`
-	SecondaryNumber     string         `json:"secondary_number"`
-	Plus4Code           string         `json:"plus4_code"`
+	SmartyKey           string `json:"smarty_key"`
+	SecondaryDesignator string `json:"secondary_designator"`
+	SecondaryNumber     string `json:"secondary_number"`
+	Plus4Code           string `json:"plus4_code"`
 }
 
 type SecondaryResponse struct {
-	SmartyKey   string `json:"smarty_key"`
-	Etag        string
-	RootAddress RootAddress `json:"root_address"`
-	Aliases     []Alias     `json:"aliases"`
-	Secondaries []Secondary `json:"secondaries"`
+	SmartyKey      string `json:"smarty_key"`
+	Etag           string
+	MatchedAddress MatchedAddress `json:"matched_address"`
+	RootAddress    RootAddress    `json:"root_address"`
+	Aliases        []Alias        `json:"aliases"`
+	Secondaries    []Secondary    `json:"secondaries"`
 }
 
 type SecondaryCountResponse struct {
-	SmartyKey string `json:"smarty_key"`
-	Count     int    `json:"count"`
-	Etag      string
+	SmartyKey      string         `json:"smarty_key"`
+	MatchedAddress MatchedAddress `json:"matched_address"`
+	Count          int            `json:"count"`
+	RootAddress    RootAddress    `json:"root_address"`
+	Etag           string
 }
 
 type BusinessSummaryResponse struct {
-	SmartyKey   string                 `json:"smarty_key"`
-	DataSetName string                 `json:"data_set_name"`
-	Businesses  []BusinessSummaryEntry `json:"businesses"`
-	Etag        string
+	SmartyKey      string                 `json:"smarty_key"`
+	DataSetName    string                 `json:"data_set_name"`
+	MatchedAddress MatchedAddress         `json:"matched_address"`
+	Businesses     []BusinessSummaryEntry `json:"businesses"`
+	Etag           string
 }
 
 type BusinessSummaryEntry struct {
@@ -633,8 +636,8 @@ type BusinessDetailAttributes struct {
 	Naics06Description              string `json:"naics_06_description"`
 	NewBusinessIndicator            string `json:"new_business_indicator"`
 	NonProfitIndicator              string `json:"non_profit_indicator"`
-	NumOfPcsRange                   string `json:"num_of_pcs_range"`
-	NumOfPcsTotal                   string `json:"num_of_pcs_total"`
+	NumOfPcsRange                   string `json:"number_of_pcs_range"`
+	NumOfPcsTotal                   string `json:"number_of_pcs_total"`
 	NumberOfYearsInBusiness         string `json:"number_of_years_in_business"`
 	NumberOfYearsInBusinessRange    string `json:"number_of_years_in_business_range"`
 	OfficeEquipmentExpenseRange     string `json:"office_equipment_expense_range"`
