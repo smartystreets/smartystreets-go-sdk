@@ -30,13 +30,13 @@ type ClientFixture struct {
 func (f *ClientFixture) Setup() {
 	f.sender = &FakeSender{}
 	f.client = NewClient(f.sender)
-	f.input = new(principalLookup)
+	f.input = new(propertyLookup)
 }
 
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	smartyKey := "123"
 	f.sender.response = validPrincipalResponse
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: smartyKey}, DataSubset: principalDataSubset}
 
 	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
@@ -47,7 +47,7 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.getDataSet()+"/"+f.input.getDataSubset())
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
-	response := f.input.(*principalLookup).Response
+	response := f.input.(*propertyLookup).Response
 
 	f.So(response, should.Resemble, []*PrincipalResponse{
 		{
@@ -73,7 +73,7 @@ func (f *ClientFixture) TestNilLookupNOP() {
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
-	err := f.client.sendLookup(new(principalLookup))
+	err := f.client.sendLookup(new(propertyLookup))
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
@@ -81,22 +81,22 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
 	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.(*principalLookup).Response, should.BeNil)
+	f.So(f.input.(*propertyLookup).Response, should.BeNil)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
+	f.So(f.input.(*propertyLookup).Response, should.BeEmpty)
 }
 
 func (f *ClientFixture) TestUniversalLookupUnmarshallingWithEtag() {
@@ -216,6 +216,43 @@ func (f *ClientFixture) TestSecondaryCount() {
 }
 
 // Tests for public API methods
+
+func (f *ClientFixture) TestSendProperty() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+
+	response, err := f.client.SendProperty(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property")
+	f.So(response, should.NotBeEmpty)
+	f.So(response[0].SmartyKey, should.Equal, "123")
+}
+
+func (f *ClientFixture) TestSendPropertyWithContextAndAuth() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
+
+	response, err := f.client.SendPropertyWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property")
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.capturedAuthID, should.Equal, "myAuthID")
+	f.So(response, should.NotBeEmpty)
+}
+
+func (f *ClientFixture) TestSendPropertyAddressSearch() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{Freeform: "171 W University Pkwy, Orem, UT 84058"}
+
+	_, err := f.client.SendProperty(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/search/property")
+}
 
 func (f *ClientFixture) TestSendPropertyPrincipal() {
 	f.sender.response = validPrincipalResponse
@@ -804,19 +841,19 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 func (f *ClientFixture) TestLookup304RefreshesResponseEtagWithUntouchedResults() {
 	f.sender.statusCode = 304
 	priorResponse := []*PrincipalResponse{{SmartyKey: "prior"}}
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.input.getLookup().ETag, should.Equal, "old-tag")
 	f.So(f.input.getLookup().ResponseETag, should.Equal, "ABCDEFG")
-	f.So(f.input.(*principalLookup).Response, should.Resemble, priorResponse)
+	f.So(f.input.(*propertyLookup).Response, should.Resemble, priorResponse)
 }
 
 func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
 	f.sender.err = sdk.NewHTTPStatusError(401, nil)
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "123"}}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
@@ -826,14 +863,14 @@ func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
 func (f *ClientFixture) TestSuccessSetsResponseEtagNotInputEtag() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123", ETag: "old-tag"}
-	f.input = &principalLookup{Lookup: lookup}
+	f.input = &propertyLookup{Lookup: lookup}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
 	f.So(err, should.BeNil)
 	f.So(lookup.ETag, should.Equal, "old-tag")
 	f.So(lookup.ResponseETag, should.Equal, "ABCDEFG")
-	f.So(f.input.(*principalLookup).Response[0].Etag, should.Equal, "ABCDEFG")
+	f.So(f.input.(*propertyLookup).Response[0].Etag, should.Equal, "ABCDEFG")
 }
 
 type FakeSender struct {

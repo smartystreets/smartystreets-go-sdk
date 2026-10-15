@@ -19,7 +19,7 @@ func main() {
 		wireup.BasicAuthCredential(os.Getenv("SMARTY_AUTH_ID"), os.Getenv("SMARTY_AUTH_TOKEN")),
 	)
 
-	// Perform a property principal lookup by address instead of by SmartyKey
+	// Perform a property lookup by address instead of by SmartyKey
 
 	// Documentation for input fields can be found at:
 	// https://www.smarty.com/docs/cloud/us-address-enrichment-api#http-request-input-fields
@@ -36,7 +36,7 @@ func main() {
 		ZIPCode:   "",                                      // optional: Query by address components instead of by SmartyKey
 	}
 
-	results, err := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendProperty(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
