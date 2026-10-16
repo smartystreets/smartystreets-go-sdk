@@ -1,11 +1,11 @@
 package us_enrichment
 
-type PrincipalResponse struct {
-	SmartyKey      string              `json:"smarty_key"`
-	DataSetName    string              `json:"data_set_name"`
-	DataSubsetName string              `json:"data_subset_name"`
-	MatchedAddress MatchedAddress      `json:"matched_address"`
-	Attributes     PrincipalAttributes `json:"attributes"`
+type PropertyResponse struct {
+	SmartyKey      string             `json:"smarty_key"`
+	DataSetName    string             `json:"data_set_name"`
+	DataSubsetName string             `json:"data_subset_name"`
+	MatchedAddress MatchedAddress     `json:"matched_address"`
+	Attributes     PropertyAttributes `json:"attributes"`
 	Etag           string
 }
 
@@ -16,7 +16,7 @@ type MatchedAddress struct {
 	ZIPCode string `json:"zipcode"`
 }
 
-type PrincipalAttributes struct {
+type PropertyAttributes struct {
 	FirstFloorSqft                  string             `json:"1st_floor_sqft"`
 	SecondFloorSqft                 string             `json:"2nd_floor_sqft"`
 	Acres                           string             `json:"acres"`

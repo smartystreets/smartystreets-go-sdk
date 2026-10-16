@@ -49,12 +49,12 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 
 	response := f.input.(*propertyLookup).Response
 
-	f.So(response, should.Resemble, []*PrincipalResponse{
+	f.So(response, should.Resemble, []*PropertyResponse{
 		{
 			SmartyKey:      "123",
 			DataSetName:    "property",
 			DataSubsetName: "principal",
-			Attributes: PrincipalAttributes{
+			Attributes: PropertyAttributes{
 				FirstFloorSqft:        "1st_Floor_Sqft",
 				LenderName2:           "Lender_Name_2",
 				LenderSellerCarryBack: "Lender_Seller_Carry_Back",
@@ -840,7 +840,7 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 
 func (f *ClientFixture) TestLookup304RefreshesResponseEtagWithUntouchedResults() {
 	f.sender.statusCode = 304
-	priorResponse := []*PrincipalResponse{{SmartyKey: "prior"}}
+	priorResponse := []*PropertyResponse{{SmartyKey: "prior"}}
 	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)

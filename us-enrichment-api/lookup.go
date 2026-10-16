@@ -87,7 +87,7 @@ func (g *universalLookup) populate(query url.Values) {
 type propertyLookup struct {
 	Lookup     *Lookup
 	DataSubset string
-	Response   []*PrincipalResponse
+	Response   []*PropertyResponse
 }
 
 func (p *propertyLookup) getSmartyKey() string {
@@ -111,7 +111,7 @@ func (f *propertyLookup) getResponse() any {
 }
 
 func (p *propertyLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	var response []*PrincipalResponse
+	var response []*PropertyResponse
 	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
