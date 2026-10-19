@@ -82,33 +82,36 @@ func (g *universalLookup) populate(query url.Values) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-type principalLookup struct {
-	Lookup   *Lookup
-	Response []*PrincipalResponse
+// propertyLookup serves both the current /property path and the legacy
+// /property/principal path; DataSubset selects between them.
+type propertyLookup struct {
+	Lookup     *Lookup
+	DataSubset string
+	Response   []*PropertyResponse
 }
 
-func (p *principalLookup) getSmartyKey() string {
+func (p *propertyLookup) getSmartyKey() string {
 	return p.Lookup.SmartyKey
 }
 
-func (p *principalLookup) getDataSet() string {
+func (p *propertyLookup) getDataSet() string {
 	return propertyDataSet
 }
 
-func (p *principalLookup) getDataSubset() string {
-	return principalDataSubset
+func (p *propertyLookup) getDataSubset() string {
+	return p.DataSubset
 }
 
-func (p *principalLookup) getLookup() *Lookup {
+func (p *propertyLookup) getLookup() *Lookup {
 	return p.Lookup
 }
 
-func (f *principalLookup) getResponse() any {
+func (f *propertyLookup) getResponse() any {
 	return f.Response
 }
 
-func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
-	var response []*PrincipalResponse
+func (p *propertyLookup) unmarshalResponse(bytes []byte, headers http.Header) error {
+	var response []*PropertyResponse
 	if err := json.Unmarshal(bytes, &response); err != nil {
 		return err
 	}
@@ -125,7 +128,7 @@ func (p *principalLookup) unmarshalResponse(bytes []byte, headers http.Header) e
 	return nil
 }
 
-func (e *principalLookup) populate(query url.Values) {
+func (e *propertyLookup) populate(query url.Values) {
 	e.Lookup.populateInclude(query)
 	e.Lookup.populateExclude(query)
 	e.Lookup.populateFreeform(query)

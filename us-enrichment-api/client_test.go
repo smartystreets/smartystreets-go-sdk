@@ -30,13 +30,13 @@ type ClientFixture struct {
 func (f *ClientFixture) Setup() {
 	f.sender = &FakeSender{}
 	f.client = NewClient(f.sender)
-	f.input = new(principalLookup)
+	f.input = new(propertyLookup)
 }
 
 func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggestionsIncorporatedIntoLookup() {
 	smartyKey := "123"
 	f.sender.response = validPrincipalResponse
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: smartyKey}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: smartyKey}, DataSubset: principalDataSubset}
 
 	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
 	err := f.client.sendLookupWithContext(ctx, f.input)
@@ -47,14 +47,14 @@ func (f *ClientFixture) TestLookupSerializedAndSentWithContext__ResponseSuggesti
 	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/"+smartyKey+"/"+f.input.getDataSet()+"/"+f.input.getDataSubset())
 	f.So(f.sender.request.Context(), should.Resemble, ctx)
 
-	response := f.input.(*principalLookup).Response
+	response := f.input.(*propertyLookup).Response
 
-	f.So(response, should.Resemble, []*PrincipalResponse{
+	f.So(response, should.Resemble, []*PropertyResponse{
 		{
 			SmartyKey:      "123",
 			DataSetName:    "property",
 			DataSubsetName: "principal",
-			Attributes: PrincipalAttributes{
+			Attributes: PropertyAttributes{
 				FirstFloorSqft:        "1st_Floor_Sqft",
 				LenderName2:           "Lender_Name_2",
 				LenderSellerCarryBack: "Lender_Seller_Carry_Back",
@@ -73,7 +73,7 @@ func (f *ClientFixture) TestNilLookupNOP() {
 }
 
 func (f *ClientFixture) TestEmptyLookup_NOP() {
-	err := f.client.sendLookup(new(principalLookup))
+	err := f.client.sendLookup(new(propertyLookup))
 	f.So(err, should.BeNil)
 	f.So(f.sender.request, should.BeNil)
 }
@@ -81,22 +81,22 @@ func (f *ClientFixture) TestEmptyLookup_NOP() {
 func (f *ClientFixture) TestSenderErrorPreventsDeserialization() {
 	f.sender.err = errors.New("gophers")
 	f.sender.response = validPrincipalResponse // would be deserialized if not for the err (above)
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.(*principalLookup).Response, should.BeNil)
+	f.So(f.input.(*propertyLookup).Response, should.BeNil)
 }
 
 func (f *ClientFixture) TestDeserializationErrorPreventsDeserialization() {
 	f.sender.response = `I can't haz JSON`
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "12345"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "12345"}}
 
 	err := f.client.sendLookup(f.input)
 
 	f.So(err, should.NotBeNil)
-	f.So(f.input.(*principalLookup).Response, should.BeEmpty)
+	f.So(f.input.(*propertyLookup).Response, should.BeEmpty)
 }
 
 func (f *ClientFixture) TestUniversalLookupUnmarshallingWithEtag() {
@@ -196,14 +196,63 @@ func (f *ClientFixture) TestSecondaryCount() {
 	secondaryCountResponse := []*SecondaryCountResponse{
 		{
 			SmartyKey: smartyKey,
-			Count:     3,
-			Etag:      "ABCDEFG",
+			MatchedAddress: MatchedAddress{
+				Street:  "355 E 100 N",
+				City:    "Provo",
+				State:   "UT",
+				ZIPCode: "84606-3268",
+			},
+			Count: 3,
+			RootAddress: RootAddress{
+				SecondaryCount: 3,
+				SmartyKey:      smartyKey,
+				PrimaryNumber:  "355",
+				CityName:       "Provo",
+			},
+			Etag: "ABCDEFG",
 		},
 	}
 	f.So(response, should.Resemble, secondaryCountResponse)
 }
 
 // Tests for public API methods
+
+func (f *ClientFixture) TestSendProperty() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+
+	response, err := f.client.SendProperty(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request, should.NotBeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property")
+	f.So(response, should.NotBeEmpty)
+	f.So(response[0].SmartyKey, should.Equal, "123")
+}
+
+func (f *ClientFixture) TestSendPropertyWithContextAndAuth() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{SmartyKey: "123"}
+	ctx := context.WithValue(f.T().Context(), testContextKey("key"), "value")
+
+	response, err := f.client.SendPropertyWithContextAndAuth(ctx, lookup, sdk.NewBasicAuthCredential("myAuthID", "myAuthToken"))
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/123/property")
+	f.So(f.sender.request.Context(), should.Equal, ctx)
+	f.So(f.sender.capturedAuthID, should.Equal, "myAuthID")
+	f.So(response, should.NotBeEmpty)
+}
+
+func (f *ClientFixture) TestSendPropertyAddressSearch() {
+	f.sender.response = validPrincipalResponse
+	lookup := &Lookup{Freeform: "171 W University Pkwy, Orem, UT 84058"}
+
+	_, err := f.client.SendProperty(lookup)
+
+	f.So(err, should.BeNil)
+	f.So(f.sender.request.URL.Path, should.Equal, "/lookup/search/property")
+}
 
 func (f *ClientFixture) TestSendPropertyPrincipal() {
 	f.sender.response = validPrincipalResponse
@@ -772,7 +821,7 @@ func (f *ClientFixture) TestBusinessDetailWithIncludeExclude() {
 var validPrincipalResponse = `[{"smarty_key":"123","data_set_name":"property","data_subset_name":"principal","attributes":{"1st_floor_sqft":"1st_Floor_Sqft","lender_name_2":"Lender_Name_2","lender_seller_carry_back":"Lender_Seller_Carry_Back","year_built":"Year_Built","zoning":"Zoning"}}]`
 var validGeoReferenceResponse = `[{"smarty_key":"123","data_set_name":"geo-reference","data_set_version":"census-2020","attributes":{"census_block":{"accuracy":"block","geoid":"180759630002012"},"census_county_division":{"accuracy":"exact","code":"1807581764","name":"Wayne"},"census_tract":{"code":"9630.00"},"place":{"accuracy":"exact","code":"1861236","name":"Portland","type":"incorporated"}}}]`
 var validSecondaryResponse = `[{"smarty_key":"123","root_address":{"secondary_count":10,"smarty_key":"123","primary_number":"3105","street_name":"National Park Service","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"},"aliases":[{"smarty_key":"1882749021","primary_number":"3105","street_name":"National Park","street_suffix":"Rd","city_name":"Juneau","state_abbreviation":"AK","zipcode":"99801","plus4_code":"8437"}],"secondaries":[{"smarty_key":"1785903890","secondary_designator":"Apt","secondary_number":"A5","plus4_code":"8437"},{"smarty_key":"696702050","secondary_designator":"Apt","secondary_number":"B1","plus4_code":"8441"}]}]`
-var validSecondaryCountResponse = `[{"smarty_key":"123","count":3}]`
+var validSecondaryCountResponse = `[{"smarty_key":"123","matched_address":{"street":"355 E 100 N","city":"Provo","state":"UT","zipcode":"84606-3268"},"count":3,"root_address":{"secondary_count":3,"smarty_key":"123","primary_number":"355","city_name":"Provo"}}]`
 var validBusinessSummaryResponse = `[{"smarty_key":"1962995076","data_set_name":"business","businesses":[{"company_name":"Style Studio","business_id":"GEYTCMZSGU2TCMBZHE3DIOI"},{"company_name":"EstheticallyBree","business_id":"GEYTCNBQGAZTQMRYGMYDMMQ"},{"company_name":"Kat Slack Beauty Llc","business_id":"GEYTCNBQGA2DKMJVG43DOOA"}]}]`
 var validBusinessDetailResponse = `[{"smarty_key":"7","data_set_name":"business","business_id":"7","attributes":{"company_name":"data","business_status":"data","year_established":"data"}}]`
 
@@ -791,20 +840,20 @@ func (f *ClientFixture) TestSendPropertyPrincipalWithContextAndAuth_SignErrorPro
 
 func (f *ClientFixture) TestLookup304RefreshesResponseEtagWithUntouchedResults() {
 	f.sender.statusCode = 304
-	priorResponse := []*PrincipalResponse{{SmartyKey: "prior"}}
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
+	priorResponse := []*PropertyResponse{{SmartyKey: "prior"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "123", ETag: "old-tag"}, Response: priorResponse}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
 	f.So(err, should.BeNil)
 	f.So(f.input.getLookup().ETag, should.Equal, "old-tag")
 	f.So(f.input.getLookup().ResponseETag, should.Equal, "ABCDEFG")
-	f.So(f.input.(*principalLookup).Response, should.Resemble, priorResponse)
+	f.So(f.input.(*propertyLookup).Response, should.Resemble, priorResponse)
 }
 
 func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
 	f.sender.err = sdk.NewHTTPStatusError(401, nil)
-	f.input = &principalLookup{Lookup: &Lookup{SmartyKey: "123"}}
+	f.input = &propertyLookup{Lookup: &Lookup{SmartyKey: "123"}}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
@@ -814,14 +863,14 @@ func (f *ClientFixture) TestNon304StatusErrorStillPropagates() {
 func (f *ClientFixture) TestSuccessSetsResponseEtagNotInputEtag() {
 	f.sender.response = validPrincipalResponse
 	lookup := &Lookup{SmartyKey: "123", ETag: "old-tag"}
-	f.input = &principalLookup{Lookup: lookup}
+	f.input = &propertyLookup{Lookup: lookup}
 
 	err := f.client.sendLookupWithContext(f.T().Context(), f.input)
 
 	f.So(err, should.BeNil)
 	f.So(lookup.ETag, should.Equal, "old-tag")
 	f.So(lookup.ResponseETag, should.Equal, "ABCDEFG")
-	f.So(f.input.(*principalLookup).Response[0].Etag, should.Equal, "ABCDEFG")
+	f.So(f.input.(*propertyLookup).Response[0].Etag, should.Equal, "ABCDEFG")
 }
 
 type FakeSender struct {
@@ -853,4 +902,22 @@ func (f *FakeSender) Reset() {
 	f.capturedAuthID = ""
 	f.capturedAuthToken = ""
 	f.hasBasicAuth = false
+}
+
+func (f *ClientFixture) TestResponseFieldsMapToAPINames() {
+	matched := `"matched_address":{"street":"171 W University Pkwy","city":"Orem","state":"UT","zipcode":"84058-7316"}`
+	expectedMatched := MatchedAddress{Street: "171 W University Pkwy", City: "Orem", State: "UT", ZIPCode: "84058-7316"}
+
+	var summary []BusinessSummaryResponse
+	f.So(json.Unmarshal([]byte(`[{`+matched+`}]`), &summary), should.BeNil)
+	f.So(summary[0].MatchedAddress, should.Equal, expectedMatched)
+
+	var secondary []SecondaryResponse
+	f.So(json.Unmarshal([]byte(`[{`+matched+`}]`), &secondary), should.BeNil)
+	f.So(secondary[0].MatchedAddress, should.Equal, expectedMatched)
+
+	var detail []BusinessDetailResponse
+	f.So(json.Unmarshal([]byte(`[{"attributes":{"number_of_pcs_range":"10 to 24","number_of_pcs_total":"11"}}]`), &detail), should.BeNil)
+	f.So(detail[0].Attributes.NumOfPcsRange, should.Equal, "10 to 24")
+	f.So(detail[0].Attributes.NumOfPcsTotal, should.Equal, "11")
 }

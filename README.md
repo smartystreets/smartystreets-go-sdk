@@ -217,7 +217,7 @@ Each directory under [examples/](examples) that contains a `main.go` file is a r
 | `us-autocomplete-pro-api` | US Autocomplete Pro suggestions with city and state filters |
 | `us-extract-api` | Addresses extracted from free-form text |
 | `us-reverse-geo-api` | Addresses near a latitude and longitude |
-| `us-enrichment-api/*` | Property principal, geo-reference, secondary, secondary count, business, business name search, address search, ETag, and universal lookups |
+| `us-enrichment-api/*` | Property, geo-reference, secondary, secondary count, business, business name search, address search, ETag, and universal lookups |
 | `international-street-api` | An international address lookup |
 | `international-postal-code-api` | An international postal code lookup |
 | `international-autocomplete-api` | International autocomplete suggestions |
@@ -227,7 +227,7 @@ To run one example with `make`, use the path under `examples/` with each slash r
 ```bash
 make us-street-api
 make us-street-api-list
-make us-enrichment-api-property-principal
+make us-enrichment-api-property
 ```
 
 To run one example without `make`, change to its directory and run it there. Some examples read files from the current directory.

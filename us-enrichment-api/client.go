@@ -16,22 +16,37 @@ func NewClient(sender sdk.RequestSender) *Client {
 	return &Client{sender: sender}
 }
 
-// Deprecated: SendPropertyPrincipalLookup is deprecated. Use SendPropertyPrincipal
-func (c *Client) SendPropertyPrincipalLookup(smartyKey string) ([]*PrincipalResponse, error) {
+// Deprecated: SendPropertyPrincipalLookup is deprecated. Use SendProperty
+func (c *Client) SendPropertyPrincipalLookup(smartyKey string) ([]*PropertyResponse, error) {
 	return c.SendPropertyPrincipal(&Lookup{SmartyKey: smartyKey})
 }
 
-func (c *Client) SendPropertyPrincipal(lookup *Lookup) ([]*PrincipalResponse, error) {
-	propertyLookup := &principalLookup{Lookup: lookup}
+// SendProperty sends a lookup to the property dataset (/lookup/{smarty_key}/property).
+func (c *Client) SendProperty(lookup *Lookup) ([]*PropertyResponse, error) {
+	propertyLookup := &propertyLookup{Lookup: lookup}
 	err := c.sendLookup(propertyLookup)
 	return propertyLookup.Response, err
 }
 
-// SendPropertyPrincipalWithContextAndAuth sends a lookup with the provided context and per-request credentials.
+// SendPropertyWithContextAndAuth sends a lookup with the provided context and per-request credentials.
 // If credential is non-nil, it will be used to sign this request instead of the client-level credentials.
 // This is useful for multi-tenant scenarios where different requests require different credentials.
-func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*PrincipalResponse, error) {
-	propertyLookup := &principalLookup{Lookup: lookup}
+func (c *Client) SendPropertyWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*PropertyResponse, error) {
+	propertyLookup := &propertyLookup{Lookup: lookup}
+	err := c.sendLookupWithContextAndAuth(ctx, propertyLookup, credential)
+	return propertyLookup.Response, err
+}
+
+// Deprecated: SendPropertyPrincipal uses the legacy /property/principal path. Use SendProperty
+func (c *Client) SendPropertyPrincipal(lookup *Lookup) ([]*PropertyResponse, error) {
+	propertyLookup := &propertyLookup{Lookup: lookup, DataSubset: principalDataSubset}
+	err := c.sendLookup(propertyLookup)
+	return propertyLookup.Response, err
+}
+
+// Deprecated: SendPropertyPrincipalWithContextAndAuth uses the legacy /property/principal path. Use SendPropertyWithContextAndAuth
+func (c *Client) SendPropertyPrincipalWithContextAndAuth(ctx context.Context, lookup *Lookup, credential sdk.Credential) ([]*PropertyResponse, error) {
+	propertyLookup := &propertyLookup{Lookup: lookup, DataSubset: principalDataSubset}
 	err := c.sendLookupWithContextAndAuth(ctx, propertyLookup, credential)
 	return propertyLookup.Response, err
 }

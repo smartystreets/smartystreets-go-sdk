@@ -32,7 +32,7 @@ func main() {
 	// Universal lookup works with all datasets and optional subsets.
 	// Returns JSON bytes
 	// Note: The DataSubset field can be an empty string for datasets that have no subsets.
-	results, err := client.SendUniversalLookup(&lookup, "property", "principal")
+	results, err := client.SendUniversalLookup(&lookup, "property", "")
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
@@ -43,7 +43,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
+	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "property")
 	fmt.Println(string(results))
 
 	fmt.Printf("Etag: %s\n", lookup.ResponseETag)
