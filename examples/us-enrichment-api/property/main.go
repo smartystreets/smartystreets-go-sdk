@@ -32,7 +32,7 @@ func main() {
 		Features:  "financial",
 	}
 
-	results, err := client.SendPropertyPrincipal(&lookup)
+	results, err := client.SendProperty(&lookup)
 
 	if err != nil {
 		log.Fatal("Error sending lookup:", err)
@@ -43,7 +43,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "principal")
+	fmt.Printf("Results for input: (%s, %s)\n", smartyKey, "property")
 	for s, response := range results {
 		jsonResponse, _ := json.Marshal(response, jsontext.WithIndent("     "))
 		fmt.Printf("#%d: %s\n", s, string(jsonResponse))
