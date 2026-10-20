@@ -53,8 +53,8 @@ func main() {
 		display(candidate.Address6)
 		display(candidate.Address7)
 		display(candidate.Address8)
-		if candidate.Metadata.SmartyKey != 0 {
-			fmt.Printf("  SmartyKey: %d\n", candidate.Metadata.SmartyKey)
+		if candidate.Metadata.SmartyKey != "" {
+			fmt.Printf("  SmartyKey: %s\n", candidate.Metadata.SmartyKey)
 		}
 		fmt.Println()
 	}
