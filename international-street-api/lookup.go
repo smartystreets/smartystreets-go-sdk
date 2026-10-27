@@ -2,6 +2,7 @@ package street
 
 import (
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -22,6 +23,7 @@ type Lookup struct {
 	Locality           string
 	AdministrativeArea string
 	PostalCode         string
+	MaxResults         int
 
 	Results []*Candidate
 }
@@ -58,6 +60,13 @@ func (l *Lookup) populate(query url.Values) {
 	populate(query, "locality", l.Locality)
 	populate(query, "administrative_area", l.AdministrativeArea)
 	populate(query, "postal_code", l.PostalCode)
+	l.populateMaxResults(query)
+}
+
+func (l *Lookup) populateMaxResults(query url.Values) {
+	if l.MaxResults > 0 {
+		query.Set("max_results", strconv.Itoa(l.MaxResults))
+	}
 }
 
 func boolString(value bool) string {

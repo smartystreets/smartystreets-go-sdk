@@ -32,27 +32,70 @@ func (f *LookupSerializationFixture) TestNothingToSerialize() {
 	f.So(f.query, should.BeEmpty)
 }
 
-// The Language field is not yet serialized (see Lookup), so this covers the
-// helper directly to keep it honest until the field goes live.
-func (f *LookupSerializationFixture) TestLanguageNormalized() {
-	f.So(Language("Latin").normalized(), should.Equal, Latin)
-	f.So(Language("NATIVE").normalized(), should.Equal, Native)
-	f.So(Latin.normalized(), should.Equal, Latin)
-	f.So(Language("").normalized(), should.Equal, Language(""))
+func (f *LookupSerializationFixture) TestLanguageBlank() {
+	f.lookup.Language = Language("")
+	f.populate()
+	f.So(f.query, should.BeEmpty)
+}
+
+func (f *LookupSerializationFixture) TestLanguageLatin() {
+	f.lookup.Language = Latin
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("language"), should.Equal, "latin")
+}
+
+func (f *LookupSerializationFixture) TestLanguageNative() {
+	f.lookup.Language = Native
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("language"), should.Equal, "native")
+}
+
+func (f *LookupSerializationFixture) TestLanguageMixedCase() {
+	f.lookup.Language = Language("NATIVE")
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("language"), should.Equal, "native")
+}
+
+func (f *LookupSerializationFixture) TestMaxResultsUnset() {
+	f.lookup.MaxResults = 0
+	f.populate()
+	f.So(f.query, should.BeEmpty)
+}
+
+func (f *LookupSerializationFixture) TestMaxResults() {
+	f.lookup.MaxResults = 1000
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("max_results"), should.Equal, "1000")
 }
 
 func (f *LookupSerializationFixture) TestFullLookup() {
 	f.lookup.InputID = "Hello, World!"
 	f.lookup.Country = "CAN"
+	f.lookup.Language = Native
 	f.lookup.Locality = "Toronto"
 	f.lookup.AdministrativeArea = "ON"
 	f.lookup.PostalCode = "ABC DEF"
+	f.lookup.MaxResults = 25
 	f.populate()
 
-	f.So(f.query, should.HaveLength, 5)
+	f.So(f.query, should.HaveLength, 7)
 	f.So(f.query.Get("input_id"), should.Equal, "Hello, World!")
 	f.So(f.query.Get("country"), should.Equal, "CAN")
+	f.So(f.query.Get("language"), should.Equal, "native")
 	f.So(f.query.Get("locality"), should.Equal, "Toronto")
 	f.So(f.query.Get("administrative_area"), should.Equal, "ON")
 	f.So(f.query.Get("postal_code"), should.Equal, "ABC DEF")
+	f.So(f.query.Get("max_results"), should.Equal, "25")
 }

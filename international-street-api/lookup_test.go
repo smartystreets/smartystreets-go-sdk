@@ -107,6 +107,21 @@ func (f *LookupSerializationFixture) TestLanguageMixedCase() {
 	f.So(f.query.Get("language"), should.Equal, "latin")
 }
 
+func (f *LookupSerializationFixture) TestMaxResultsUnset() {
+	f.lookup.MaxResults = 0
+	f.populate()
+	f.So(f.query, should.BeEmpty)
+}
+
+func (f *LookupSerializationFixture) TestMaxResults() {
+	f.lookup.MaxResults = 10
+
+	f.populate()
+
+	f.So(f.query, should.HaveLength, 1)
+	f.So(f.query.Get("max_results"), should.Equal, "10")
+}
+
 func (f *LookupSerializationFixture) TestOrganization() {
 	f.lookup.Organization = "SmartyStreets"
 

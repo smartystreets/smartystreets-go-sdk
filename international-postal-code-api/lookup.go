@@ -2,19 +2,21 @@ package international_postal_code
 
 import (
 	"net/url"
+	"strconv"
 	"strings"
 )
 
 // Lookup contains all input fields defined here:
 // https://smartystreets.com/docs/cloud/international-street-api#http-input-fields
 type Lookup struct {
-	InputID string
-	Country string
-	//Language           Language // future
+	InputID  string
+	Country  string
+	Language Language
 	//Features           string   // future
 	Locality           string
 	AdministrativeArea string
 	PostalCode         string
+	MaxResults         int
 
 	Results []*Candidate
 }
@@ -39,11 +41,18 @@ func (l Language) normalized() Language {
 func (l *Lookup) populate(query url.Values) {
 	populate(query, "input_id", l.InputID)
 	populate(query, "country", l.Country)
-	//populate(query, "language", string(l.Language.normalized())) // future
+	populate(query, "language", string(l.Language.normalized()))
 	//populate(query, "features", l.Features)         // future
 	populate(query, "locality", l.Locality)
 	populate(query, "administrative_area", l.AdministrativeArea)
 	populate(query, "postal_code", l.PostalCode)
+	l.populateMaxResults(query)
+}
+
+func (l *Lookup) populateMaxResults(query url.Values) {
+	if l.MaxResults > 0 {
+		query.Set("max_results", strconv.Itoa(l.MaxResults))
+	}
 }
 
 func populate(query url.Values, key, value string) {
